@@ -6,7 +6,7 @@ library(doSNOW)
 library(coda)
 library(MCMCglmm)
 #setwd("/Users/John/Downloads/LongFunc Code/ChenCode")
-setwd("/Users/John/Documents/Johnstuff/anRpackage/Rfuns")
+setwd("/Users/John/Documents/Johnstuff/LFBayes/Rfuns")
 
 source("MarginalFPCA.R")
 source("ProductFPCA.R")
@@ -140,7 +140,7 @@ system.time(myresults3<-foreach(index=1:iterations,.combine=rbind, .packages = c
   dim(X) <- c(n,1)
 
   q <- 8
-  mcmc <- mcmcWeak(y, missing, X, Bs1, Bt1, q, q, 25000, 1, 5000)
+  mcmc <- mcmcWeak(y, missing, X, Bs1, Bt1, q, q, 300, 1, 50)
   #mcmcEigen <- eigenLF(Bs1, Bt1, mcmc, 3, 10000)
 
 
