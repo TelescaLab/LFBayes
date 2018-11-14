@@ -1,20 +1,20 @@
-\name{anRpackage-package}
-\alias{anRpackage-package}
-\alias{anRpackage}
+\name{LFBayes-package}
+\alias{LFBayes-package}
+\alias{LFBayes}
 \docType{package}
-\title{\packageTitle{anRpackage}}
-\description{\packageDescription{anRpackage}}
+\title{\packageTitle{LFBayes}}
+\description{\packageDescription{LFBayes}}
 \details{
-  The DESCRIPTION file: \packageDESCRIPTION{anRpackage}
-  \packageIndices{anRpackage}
+  The DESCRIPTION file: \packageDESCRIPTION{LFBayes}
+  \packageIndices{LFBayes}
 
   This section should provide a more detailed overview of how to use the
   package, including the most important functions.
 }
 \author{
-  \packageAuthor{anRpackage}
+  \packageAuthor{LFBayes}
   
-  Maintainer: \packageMaintainer{anRpackage}
+  Maintainer: \packageMaintainer{LFBayes}
 }
 \references{
   This optional section can contain literature or other references for

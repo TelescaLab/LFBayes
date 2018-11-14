@@ -1,3 +1,3 @@
-useDynLib(anRpackage, .registration=TRUE)
+useDynLib(LFBayes, .registration=TRUE)
 importFrom(Rcpp, evalCpp)
 exportPattern("^[[:alpha:]]+")

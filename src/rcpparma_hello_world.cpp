@@ -18,8 +18,8 @@
 arma::mat rcpparma_hello_world() {
     arma::mat m1 = arma::eye<arma::mat>(3, 3);
     arma::mat m2 = arma::eye<arma::mat>(3, 3);
-	                     
-    return m1 + 5 * (m1 + m2);
+	  Rcpp::Rcout << "Small ball" << std::endl;
+    return 2*(m1 + 3 * (m1 + m2));
 }
 
 
@@ -50,5 +50,3 @@ Rcpp::List rcpparma_bothproducts(const arma::colvec & x) {
     return Rcpp::List::create(Rcpp::Named("outer")=op,
                               Rcpp::Named("inner")=ip);
 }
-
-
