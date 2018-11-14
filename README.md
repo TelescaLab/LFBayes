@@ -1,2 +1,2 @@
 # LongFunc
-Bayesian Markov Chain Montle Carlo for Longitudinal Functional Data
+Bayesian Markov Chain Montle Carlo methods for Longitudinal Functional Data
