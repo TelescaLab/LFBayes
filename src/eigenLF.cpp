@@ -11,7 +11,7 @@ Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::u
   arma::cube betaC = mod["beta"];
   //arma::mat Delta = mod["Delta"];
   arma::cube HC = mod["HC"];
-  arma::vec varphi = mod["varphi"];
+  //arma::vec varphi = mod["varphi"];
   arma::mat sigma1 = mod["sigma1"];
   arma::mat sigma2 = mod["sigma2"];
   int iter = LambdaC.n_slices;

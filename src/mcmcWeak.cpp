@@ -151,24 +151,24 @@ Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, ar
     }
     LambdaC.slice(i) = Lambda;
     GammaC.slice(i) = Gamma;
-    a1L(i) = a1Ld;
-    a2L(i) = a2Ld;
-    a1G(i) = a1Gd;
-    a2G(i) = a2Gd;
+    //a1L(i) = a1Ld;
+    //a2L(i) = a2Ld;
+    //a1G(i) = a1Gd;
+    //a2G(i) = a2Gd;
     //Delta1.col(i) = D1;
     //Delta2.col(i) = D2;
-    Delta1.col(i) = DM1;
-    Delta2.col(i) = DM2;
-    Phi1C.slice(i) = Phi1;
-    Phi2C.slice(i) = Phi2;
+    //Delta1.col(i) = DM1;
+    //Delta2.col(i) = DM2;
+    //Phi1C.slice(i) = Phi1;
+    //Phi2C.slice(i) = Phi2;
     sigma1M.col(i) = S1;
     sigma2M.col(i) = S2;
-    varphiV(i) = V;
-    etaF(i) = Eta;
-    thetaF(i) = Theta;
+    //varphiV(i) = V;
+    //etaF(i) = Eta;
+    //thetaF(i) = Theta;
     HC.slice(i) = H;
     betaC.slice(i) = Beta;
-    EC.slice(i) = E;
+    //EC.slice(i) = E;
 
     /*
 
@@ -231,14 +231,9 @@ Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, ar
   Rcpp::List mod = Rcpp::List::create(Rcpp::Named("Lambda", LambdaC),
                                       Rcpp::Named("Gamma", GammaC),
                                       Rcpp::Named("sigma1", sigma1M), Rcpp::Named("sigma2", sigma2M),
-                                      Rcpp::Named("varphi", varphiV),
-                                      Rcpp::Named("eta", etaF),
-                                      Rcpp::Named("theta", thetaF),
                                       Rcpp::Named("HC", HC),
-                                      Rcpp::Named("beta", betaC), Rcpp::Named("Delta1", Delta1),
-                                      Rcpp::Named("Delta2", Delta2),Rcpp::Named("a1L", a1L), Rcpp::Named("a2L", a2L),
-                                      Rcpp::Named("a1G", a1G), Rcpp::Named("a2G", a2G),
-                                      Rcpp::Named("bv", bv));
+                                      Rcpp::Named("beta", betaC), Rcpp::Named("Delta1", Delta1));
+
   //return(mod);
   //Rcpp::Named("Delta1", Delta1),
   //Rcpp::Named("Delta2", Delta2),
