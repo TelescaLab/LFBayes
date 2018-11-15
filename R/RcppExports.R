@@ -17,22 +17,6 @@ mcmcWeak <- function(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin
     .Call(`_LFBayes_mcmcWeak`, y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin)
 }
 
-rcpparma_hello_world <- function() {
-    .Call(`_LFBayes_rcpparma_hello_world`)
-}
-
-rcpparma_outerproduct <- function(x) {
-    .Call(`_LFBayes_rcpparma_outerproduct`, x)
-}
-
-rcpparma_innerproduct <- function(x) {
-    .Call(`_LFBayes_rcpparma_innerproduct`, x)
-}
-
-rcpparma_bothproducts <- function(x) {
-    .Call(`_LFBayes_rcpparma_bothproducts`, x)
-}
-
 convertToPrecision <- function(Delta, q1, q2) {
     .Call(`_LFBayes_convertToPrecision`, Delta, q1, q2)
 }

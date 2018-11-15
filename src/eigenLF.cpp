@@ -171,9 +171,9 @@ Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::u
                             Rcpp::Named("eigvecLongmean", eigvecLongmean),
                   //          Rcpp::Named("eigvecLonglower", eigvecLonglower),
                     //        Rcpp::Named("eigvecLongupper", eigvecLongupper),
-                            Rcpp::Named("eigvecLong", eigvecLong),
-                            Rcpp::Named("eigvalFunc", eigvalFunc),
-                            Rcpp::Named("eigvalLong", eigvalLong),
+                            //Rcpp::Named("eigvecLong", eigvecLong),
+                            //Rcpp::Named("eigvalFunc", eigvalFunc),
+                            //Rcpp::Named("eigvalLong", eigvalLong),
                             Rcpp::Named("postcov", postcov));
 }
 
