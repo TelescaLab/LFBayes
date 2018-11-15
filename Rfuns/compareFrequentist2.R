@@ -5,16 +5,17 @@ library(doParallel)
 library(doSNOW)
 library(coda)
 library(MCMCglmm)
+library(LFBayes)
 #setwd("/Users/John/Downloads/LongFunc Code/ChenCode")
 setwd("/Users/John/Documents/Johnstuff/LFBayes/Rfuns")
 
 source("MarginalFPCA.R")
 source("ProductFPCA.R")
 
-errorvar <- .0001
+errorvar <- .1
 t <- seq(from = 0, to = 1, length.out = 20)
 s <- seq(from = 0, to = 1, length.out = 10)
-n <- 30
+n <- 90
 tt <- list()
 tt[[1]] <- 1:(length(t)*length(s))
 tt <- rep(tt, n)
@@ -105,8 +106,8 @@ Lambda <- Loading.Matern(t, p1, q1, Bt)
 #Lambda <- Loading.Brown.Bridge(t, p1, q1)
 Gamma <- Loading.Brown.Motion(s, p2, q2)
 Brown.Motion.Cov <- Bs%*%Gamma%*%t(Gamma)%*%t(Bs)
-Brown.Bridge.Cov <- Bt%*%Lambda%*%t(Lambda)%*%t(Bt)
-Cov.Strong <- kronecker(Brown.Motion.Cov, Brown.Bridge.Cov)
+Matern.Cov <- Bt%*%Lambda%*%t(Lambda)%*%t(Bt)
+Cov.Strong <- kronecker(Brown.Motion.Cov, Matern.Cov)
 H <- diag(rgamma(q1*q2, shape = 1, rate = 1))
 H <- diag(q1*q2)
 Cov.Weak <- kronecker(Bs%*%Gamma, Bt%*%Lambda)%*%H%*%t(kronecker(Bs%*%Gamma, Bt%*%Lambda)) + errorvar*diag(length(s) * length(t))
@@ -114,19 +115,20 @@ pc.j = NULL
 pc.k = NULL
 fpca.op1 = list(dataType = "Sparse", maxK = pc.j, FVEthreshold = .9999, nRegGrid = 20)
 fpca.op2 = list(dataType = "Sparse", maxK = pc.k, FVEthreshold = .9999, nRegGrid = 10)
-
-
 mu1 <- kronecker(sqrt(1/(5*sqrt(s)+1)), sin(5*t))
-iterations <- 100
+
+
+
+iterations <- 500
 pb <- txtProgressBar(max = iterations, style = 3)
 progress <- function(n) setTxtProgressBar(pb, n)
 opts <- list(progress = progress)
-cl <- makeCluster(4)
+cl <- makeCluster(6)
 registerDoSNOW(cl)
-system.time(myresults3<-foreach(index=1:iterations,.combine=rbind, .packages = c("MASS", "LongFunc", "fdapace"), .options.snow = opts)%dopar%{
+system.time(n90_s.1_Sep<-foreach(index=1:iterations,.combine=rbind, .packages = c("MASS", "LFBayes", "fdapace"), .options.snow = opts)%dopar%{
   print(index)
   #x <- mvrnorm(n, mu  = rep(0, length(t)*length(s)), Sigma = Cov.Weak)
-  x <- mvrnorm(n, mu  = 2*as.vector(mu1), Sigma = Cov.Weak)
+  x <- mvrnorm(n, mu  = as.vector(mu1), Sigma = Cov.Weak)
   sx <- sd(x)
   mx <- mean(x)
   x <- (x-mx)/sx
@@ -140,15 +142,7 @@ system.time(myresults3<-foreach(index=1:iterations,.combine=rbind, .packages = c
   dim(X) <- c(n,1)
 
   q <- 8
-  mcmc <- mcmcWeak(y, missing, X, Bs1, Bt1, q, q, 300, 1, 50)
-  #mcmcEigen <- eigenLF(Bs1, Bt1, mcmc, 3, 10000)
-
-
-
-  #D <- getStatistics(kronecker(Bs1, Bt1), mcmc, 1, rep(0, length(t) * length(s)), 10000, 1)
-  #Vmean <- covMean(D$postC)
-  #Vmedian <- covMedian(D$covC)
-  #Vmode <- covMode(D$covC)
+  mcmc <- mcmcWeak(y, missing, X, Bs1, Bt1, q, q, 25000, 1, 5000)
 
 
 
@@ -183,7 +177,7 @@ system.time(myresults3<-foreach(index=1:iterations,.combine=rbind, .packages = c
   results[14] <-min(sum((resProduct$psi[,3] - m2[,3])^2), sum((resProduct$psi[,3] + m2[,3])^2))
   results[15] <-min(sum((mcmc$eigvecFuncmean[,3] - m2[,1])^2), sum((mcmc$eigvecFuncmean[,3] + m2[,1])^2))
   results[16] <-min(sum((mcmc$eigvecFuncmean[,2] - m2[,2])^2), sum((mcmc$eigvecFuncmean[,2] + m2[,2])^2))
-  results[17] <-min(sum((-mcmc$eigvecFuncmean[,1] + m2[,3])^2), sum((mcmc$eigvecFuncmean[,1] + m2[,3])^2))
+  results[17] <-min(sum((mcmc$eigvecFuncmean[,1] - m2[,3])^2), sum((mcmc$eigvecFuncmean[,1] + m2[,3])^2))
 
   results[18] <- sum(resPACE$mu^2)/(length(s) * length(t))
   results[19] <- sum(mcmc$postmean^2)/(length(s) * length(t))
@@ -191,3 +185,4 @@ system.time(myresults3<-foreach(index=1:iterations,.combine=rbind, .packages = c
   results
 })[3]
 stopCluster(cl)
+save(n90_s.1_Sep, "n90_s.1_Sep.RData")
