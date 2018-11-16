@@ -96,11 +96,10 @@ Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::u
     eigvalLong.col(i) = eigvalLong_temp;
     eigvecFunc.slice(i) = eigvecFunc_temp.cols(splineT.n_rows-1-numeig+1,splineT.n_rows-1);
     eigvecLong.slice(i) = eigvecLong_temp.cols(splineS.n_rows - 1-numeig+1,splineS.n_rows - 1);
-    //Rcpp::Rcout << i << std::endl;
   }
   postcov = postcov / (iter - burnin);
-  eigvecFunc = eigvecFunc.tail_slices(eigvecFunc.n_slices - 100);
-  eigvecLong = eigvecLong.tail_slices(eigvecLong.n_slices - 100);
+  //eigvecFunc = eigvecFunc.tail_slices(eigvecFunc.n_slices - 100);
+  //eigvecLong = eigvecLong.tail_slices(eigvecLong.n_slices - 100);
 
   arma::colvec postmean = arma::mean(meanM, 1);
   eigvecFuncmean = arma::mean(eigvecFunc, 2);
@@ -119,6 +118,7 @@ Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::u
   arma::mat eigvecLongsd(splineS.n_rows,numeig);
   arma::vec vtempFunc(iter - burnin);
   arma::vec vtempLong(iter - burnin);
+  
   for(arma::uword i = 0; i < splineT.n_rows; i++){
     for(arma::uword j = 0; j < numeig; j++){
       vtempFunc = eigvecFunc.tube(i, j);
@@ -131,7 +131,7 @@ Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::u
       eigvecLongsd(i, j) = stddev(vtempLong);
     }
   }
-
+  
   arma::mat eigvecFuncm(eigvecFunc.n_slices,numeig);
   arma::mat eigvecLongm(eigvecLong.n_slices,numeig);
   for(arma::uword i = 0; i < eigvecFunc.n_slices; i++){
@@ -148,6 +148,7 @@ Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::u
   arma::mat eigvecFunclower(splineT.n_rows, numeig);
   arma::mat eigvecLongupper(splineS.n_rows, numeig);
   arma::mat eigvecLonglower(splineS.n_rows, numeig);
+
   for(arma::uword j = 0; j < numeig; j++){
     a = quantile_r(eigvecFuncm.col(j), .95);
     eigvecFuncupper.col(j) = eigvecFuncmean.col(j) + a[0] * eigvecFuncsd.col(j);
@@ -158,6 +159,7 @@ Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::u
   }
   arma::vec upper = postmean + a[0] * postsd;
   arma::vec lower = postmean - a[0] * postsd;
+  
   return Rcpp::List::create(//Rcpp::Named("meanM", meanM),
                             Rcpp::Named("postmean", postmean),
     //                        Rcpp::Named("postsd", postsd),
