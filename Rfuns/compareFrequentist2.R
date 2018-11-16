@@ -133,6 +133,7 @@ system.time(n90_s.1_Sep<-foreach(index=1:iterations,.combine=rbind, .packages = 
   mx <- mean(x)
   x <- (x-mx)/sx
   Smooth_scaled_cov <- (Cov.Weak - errorvar * diag(length(s) * length(t))) / sx^2
+  mu <- (mu1 - mx)/sx
   y <- lapply(1:n, function(i) x[i,])
   missing <- list()
   for(i in 1:n){
@@ -143,8 +144,6 @@ system.time(n90_s.1_Sep<-foreach(index=1:iterations,.combine=rbind, .packages = 
 
   q <- 8
   mcmc <- mcmcWeak(y, missing, X, Bs1, Bt1, q, q, 25000, 1, 5000)
-
-
 
   resMarginal <- MarginalFPCA(x, n, length(s), length(t), fpca.op1, fpca.op2, pc.j, rep(pc.k, pc.j))
   resMarginalCov <- marginalcov(resMarginal$eig, resMarginal$scores)
@@ -179,10 +178,150 @@ system.time(n90_s.1_Sep<-foreach(index=1:iterations,.combine=rbind, .packages = 
   results[16] <-min(sum((mcmc$eigvecFuncmean[,2] - m2[,2])^2), sum((mcmc$eigvecFuncmean[,2] + m2[,2])^2))
   results[17] <-min(sum((mcmc$eigvecFuncmean[,1] - m2[,3])^2), sum((mcmc$eigvecFuncmean[,1] + m2[,3])^2))
 
-  results[18] <- sum(resPACE$mu^2)/(length(s) * length(t))
-  results[19] <- sum(mcmc$postmean^2)/(length(s) * length(t))
+  results[18] <- sum((mu - resPACE$mu)^2)/(length(s) * length(t))
+  results[19] <- sum((mu - as.numeric(mcmc$postmean))^2)/(length(s) * length(t))
   gc()
   results
 })[3]
 stopCluster(cl)
-save(n90_s.1_Sep, "n90_s.1_Sep.RData")
+save(n90_s.1_Sep, file = "n90_s.1_Sep.RData")
+
+
+errorvar <- .01
+Cov.Weak <- kronecker(Bs%*%Gamma, Bt%*%Lambda)%*%H%*%t(kronecker(Bs%*%Gamma, Bt%*%Lambda)) + errorvar*diag(length(s) * length(t))
+iterations <- 500
+pb <- txtProgressBar(max = iterations, style = 3)
+progress <- function(n) setTxtProgressBar(pb, n)
+opts <- list(progress = progress)
+cl <- makeCluster(6)
+registerDoSNOW(cl)
+system.time(n90_s.01_Sep<-foreach(index=1:iterations,.combine=rbind, .packages = c("MASS", "LFBayes", "fdapace"), .options.snow = opts)%dopar%{
+  print(index)
+  #x <- mvrnorm(n, mu  = rep(0, length(t)*length(s)), Sigma = Cov.Weak)
+  x <- mvrnorm(n, mu  = as.vector(mu1), Sigma = Cov.Weak)
+  sx <- sd(x)
+  mx <- mean(x)
+  x <- (x-mx)/sx
+  Smooth_scaled_cov <- (Cov.Weak - errorvar * diag(length(s) * length(t))) / sx^2
+  mu <- (mu1 - mu)/sx
+  y <- lapply(1:n, function(i) x[i,])
+  missing <- list()
+  for(i in 1:n){
+    missing[[i]] <- numeric(0)
+  }
+  X <- rep(1,n)
+  dim(X) <- c(n,1)
+  
+  q <- 8
+  mcmc <- mcmcWeak(y, missing, X, Bs1, Bt1, q, q, 25500, 1, 5000)
+  
+  resMarginal <- MarginalFPCA(x, n, length(s), length(t), fpca.op1, fpca.op2, pc.j, rep(pc.k, pc.j))
+  resMarginalCov <- marginalcov(resMarginal$eig, resMarginal$scores)
+  resProduct <- ProductFPCA(x, n, length(s), length(t), fpca.op1, fpca.op2, pc.j, rep(pc.k, pc.j))
+  resProductCov <- productcov(resProduct$eig, resProduct$scores)
+  resPACE <- FPCA(y, tt, list(useBinnedData = "OFF", FVEthreshold = .9999, dataType = "Dense"))
+  yt <- t(x)
+  EmpCov <- 1 / (n-1)  * (yt - rowMeans(yt))%*%t(yt - rowMeans(yt))
+  EmpMean <- colMeans(x)
+  results <- numeric(19)
+  
+  results[1] <- max(abs(eigen(Smooth_scaled_cov - resProductCov)$values)) / (length(s) * length(t))
+  results[2] <- max(abs(eigen(Smooth_scaled_cov - resMarginalCov)$values)) / (length(s) * length(t))
+  results[3] <- max(abs(eigen(Smooth_scaled_cov - resPACE$smoothedCov)$values)) / (length(s) * length(t))
+  results[4] <- max(abs(eigen(Smooth_scaled_cov - (EmpCov - resPACE$sigma2 * diag(length(s) * length(t))))$values)) / (length(s) * length(t))
+  results[5] <- max(abs(eigen(Smooth_scaled_cov - mcmc$postcov)$values)) / (length(s) * length(t))
+  
+  m1 <- eigen(Brown.Motion.Cov)$vectors[,1:3]
+  results[6] <- min(sum((resProduct$phi[,1] - m1[,1])^2), sum((resProduct$phi[,1] + m1[,1])^2))
+  results[7] <-min(sum((resProduct$phi[,2] - m1[,2])^2), sum((resProduct$phi[,2] + m1[,2])^2))
+  results[8] <-min(sum((resProduct$phi[,3] - m1[,3])^2), sum((resProduct$phi[,3] + m1[,3])^2))
+  results[9] <-min(sum((mcmc$eigvecLongmean[,3] - m1[,1])^2), sum((mcmc$eigvecLongmean[,3] + m1[,1])^2))
+  results[10] <-min(sum((mcmc$eigvecLongmean[,2] - m1[,2])^2), sum((mcmc$eigvecLongmean[,2] + m1[,2])^2))
+  results[11] <-min(sum((mcmc$eigvecLongmean[,1] - m1[,3])^2), sum((mcmc$eigvecLongmean[,1] + m1[,3])^2))
+  
+  m2 <- eigen(Matern.Cov)$vectors[,1:3]
+  
+  results[12] <-min(sum((resProduct$psi[,1] - m2[,1])^2), sum((resProduct$psi[,1] + m2[,1])^2))
+  results[13] <-min(sum((resProduct$psi[,2] - m2[,2])^2), sum((resProduct$psi[,2] + m2[,2])^2))
+  results[14] <-min(sum((resProduct$psi[,3] - m2[,3])^2), sum((resProduct$psi[,3] + m2[,3])^2))
+  results[15] <-min(sum((mcmc$eigvecFuncmean[,3] - m2[,1])^2), sum((mcmc$eigvecFuncmean[,3] + m2[,1])^2))
+  results[16] <-min(sum((mcmc$eigvecFuncmean[,2] - m2[,2])^2), sum((mcmc$eigvecFuncmean[,2] + m2[,2])^2))
+  results[17] <-min(sum((mcmc$eigvecFuncmean[,1] - m2[,3])^2), sum((mcmc$eigvecFuncmean[,1] + m2[,3])^2))
+  
+  results[18] <- sum((mu - resPACE$mu)^2)/(length(s) * length(t))
+  results[19] <- sum((mu - as.numeric(mcmc$postmean))^2)/(length(s) * length(t))
+  gc()
+  results
+})[3]
+stopCluster(cl)
+save(n90_s.01_Sep, file = "n90_s.01_Sep.RData")
+
+
+errorvar <- .001
+Cov.Weak <- kronecker(Bs%*%Gamma, Bt%*%Lambda)%*%H%*%t(kronecker(Bs%*%Gamma, Bt%*%Lambda)) + errorvar*diag(length(s) * length(t))
+iterations <- 500
+pb <- txtProgressBar(max = iterations, style = 3)
+progress <- function(n) setTxtProgressBar(pb, n)
+opts <- list(progress = progress)
+cl <- makeCluster(6)
+registerDoSNOW(cl)
+system.time(n90_s.001_Sep<-foreach(index=1:iterations,.combine=rbind, .packages = c("MASS", "LFBayes", "fdapace"), .options.snow = opts)%dopar%{
+  print(index)
+  #x <- mvrnorm(n, mu  = rep(0, length(t)*length(s)), Sigma = Cov.Weak)
+  x <- mvrnorm(n, mu  = as.vector(mu1), Sigma = Cov.Weak)
+  sx <- sd(x)
+  mx <- mean(x)
+  x <- (x-mx)/sx
+  Smooth_scaled_cov <- (Cov.Weak - errorvar * diag(length(s) * length(t))) / sx^2
+  mu <- (mu1 - mx)/sx
+  y <- lapply(1:n, function(i) x[i,])
+  missing <- list()
+  for(i in 1:n){
+    missing[[i]] <- numeric(0)
+  }
+  X <- rep(1,n)
+  dim(X) <- c(n,1)
+  
+  q <- 8
+  mcmc <- mcmcWeak(y, missing, X, Bs1, Bt1, q, q, 25000, 1, 5000)
+  
+  resMarginal <- MarginalFPCA(x, n, length(s), length(t), fpca.op1, fpca.op2, pc.j, rep(pc.k, pc.j))
+  resMarginalCov <- marginalcov(resMarginal$eig, resMarginal$scores)
+  resProduct <- ProductFPCA(x, n, length(s), length(t), fpca.op1, fpca.op2, pc.j, rep(pc.k, pc.j))
+  resProductCov <- productcov(resProduct$eig, resProduct$scores)
+  resPACE <- FPCA(y, tt, list(useBinnedData = "OFF", FVEthreshold = .9999, dataType = "Dense"))
+  yt <- t(x)
+  EmpCov <- 1 / (n-1)  * (yt - rowMeans(yt))%*%t(yt - rowMeans(yt))
+  EmpMean <- colMeans(x)
+  results <- numeric(19)
+  
+  results[1] <- max(abs(eigen(Smooth_scaled_cov - resProductCov)$values)) / (length(s) * length(t))
+  results[2] <- max(abs(eigen(Smooth_scaled_cov - resMarginalCov)$values)) / (length(s) * length(t))
+  results[3] <- max(abs(eigen(Smooth_scaled_cov - resPACE$smoothedCov)$values)) / (length(s) * length(t))
+  results[4] <- max(abs(eigen(Smooth_scaled_cov - (EmpCov - resPACE$sigma2 * diag(length(s) * length(t))))$values)) / (length(s) * length(t))
+  results[5] <- max(abs(eigen(Smooth_scaled_cov - mcmc$postcov)$values)) / (length(s) * length(t))
+  
+  m1 <- eigen(Brown.Motion.Cov)$vectors[,1:3]
+  results[6] <- min(sum((resProduct$phi[,1] - m1[,1])^2), sum((resProduct$phi[,1] + m1[,1])^2))
+  results[7] <-min(sum((resProduct$phi[,2] - m1[,2])^2), sum((resProduct$phi[,2] + m1[,2])^2))
+  results[8] <-min(sum((resProduct$phi[,3] - m1[,3])^2), sum((resProduct$phi[,3] + m1[,3])^2))
+  results[9] <-min(sum((mcmc$eigvecLongmean[,3] - m1[,1])^2), sum((mcmc$eigvecLongmean[,3] + m1[,1])^2))
+  results[10] <-min(sum((mcmc$eigvecLongmean[,2] - m1[,2])^2), sum((mcmc$eigvecLongmean[,2] + m1[,2])^2))
+  results[11] <-min(sum((mcmc$eigvecLongmean[,1] - m1[,3])^2), sum((mcmc$eigvecLongmean[,1] + m1[,3])^2))
+  
+  m2 <- eigen(Matern.Cov)$vectors[,1:3]
+  
+  results[12] <-min(sum((resProduct$psi[,1] - m2[,1])^2), sum((resProduct$psi[,1] + m2[,1])^2))
+  results[13] <-min(sum((resProduct$psi[,2] - m2[,2])^2), sum((resProduct$psi[,2] + m2[,2])^2))
+  results[14] <-min(sum((resProduct$psi[,3] - m2[,3])^2), sum((resProduct$psi[,3] + m2[,3])^2))
+  results[15] <-min(sum((mcmc$eigvecFuncmean[,3] - m2[,1])^2), sum((mcmc$eigvecFuncmean[,3] + m2[,1])^2))
+  results[16] <-min(sum((mcmc$eigvecFuncmean[,2] - m2[,2])^2), sum((mcmc$eigvecFuncmean[,2] + m2[,2])^2))
+  results[17] <-min(sum((mcmc$eigvecFuncmean[,1] - m2[,3])^2), sum((mcmc$eigvecFuncmean[,1] + m2[,3])^2))
+  
+  results[18] <- sum((mu - resPACE$mu)^2)/(length(s) * length(t))
+  results[19] <- sum((mu - as.numeric(mcmc$postmean))^2)/(length(s) * length(t))
+  gc()
+  results
+})[3]
+stopCluster(cl)
+save(n90_s.001_Sep, file = "n90_s.001_Sep.RData")
