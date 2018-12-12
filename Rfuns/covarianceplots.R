@@ -73,15 +73,15 @@ mylist[[5]] <- mcmc$postcov
 mylist[[6]] <- EmpCov
 mylist[[7]] <- resMarginalCov
 mylist[[8]] <- resProductCov
-#mylist[[9]] <- EmpCovBayes
-colnum <- 200
+#mylist[[9]] <- mcmc$postcov_SE
+colnum <- 400
 image(t((Smooth_scaled_cov))[1:colnum,1:colnum][,colnum:1], zlim = c(min(unlist(mylist)), max(unlist(mylist))), col = heat.colors(100))
 image(t(mcmc$postcov)[1:colnum,1:colnum][,colnum:1],zlim = c(min(unlist(mylist)), max(unlist(mylist))), col = heat.colors(100))
 image(t(resPACE$fittedCov)[1:colnum,1:colnum][,colnum:1], zlim = c(min(unlist(mylist)), max(unlist(mylist))),col = heat.colors(100))
 image(t((EmpCov))[1:colnum,1:colnum][,colnum:1], zlim = c(min(unlist(mylist)), max(unlist(mylist))),col = heat.colors(100))
 image(t(resMarginalCov)[1:colnum,1:colnum][,colnum:1], zlim = c(min(unlist(mylist)), max(unlist(mylist))),col = heat.colors(100))
 image(t(resProductCov)[1:colnum,1:colnum][,colnum:1], zlim = c(min(unlist(mylist)), max(unlist(mylist))),col = heat.colors(100))
-#image(t((EmpCovBayes))[1:colnum,1:colnum][,colnum:1], zlim = c(min(unlist(mylist)), max(unlist(mylist))), col = heat.colors(100))
+#image(t((mcmc$postcov_SE))[1:colnum,1:colnum][,colnum:1], zlim = c(min(unlist(mylist)), max(unlist(mylist))), col = heat.colors(100))
 
 
 image(t(cov2cor(Cov.Weak))[1:400,1:400][,1:400], zlim = c(-1,1), col = heat.colors(100))

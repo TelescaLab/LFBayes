@@ -203,6 +203,23 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// updateEta3Sig
+void updateEta3Sig(arma::mat Gamma, arma::mat Lambda, arma::mat Sigma, arma::cube Theta, arma::mat H, arma::mat X, arma::mat Beta, arma::cube& eta);
+RcppExport SEXP _LFBayes_updateEta3Sig(SEXP GammaSEXP, SEXP LambdaSEXP, SEXP SigmaSEXP, SEXP ThetaSEXP, SEXP HSEXP, SEXP XSEXP, SEXP BetaSEXP, SEXP etaSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Gamma(GammaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Lambda(LambdaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type Theta(ThetaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type H(HSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Beta(BetaSEXP);
+    Rcpp::traits::input_parameter< arma::cube& >::type eta(etaSEXP);
+    updateEta3Sig(Gamma, Lambda, Sigma, Theta, H, X, Beta, eta);
+    return R_NilValue;
+END_RCPP
+}
 // updateEtaProd
 void updateEtaProd(arma::mat& Lambda, arma::mat& Gamma, arma::vec sigma1, arma::vec sigma2, arma::vec Delta, arma::mat& splineS, arma::mat& splineT, arma::mat& y, double varphi, arma::mat& beta, arma::mat& X, arma::cube& eta);
 RcppExport SEXP _LFBayes_updateEtaProd(SEXP LambdaSEXP, SEXP GammaSEXP, SEXP sigma1SEXP, SEXP sigma2SEXP, SEXP DeltaSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP ySEXP, SEXP varphiSEXP, SEXP betaSEXP, SEXP XSEXP, SEXP etaSEXP) {
@@ -238,6 +255,22 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::cube& >::type theta(thetaSEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type Gamma(GammaSEXP);
     updateGamma(eta, Lambda, Deltastar, Phistar, sigma1, sigma2, theta, Gamma);
+    return R_NilValue;
+END_RCPP
+}
+// updateGammaSig
+void updateGammaSig(arma::cube& eta, arma::mat& Lambda, arma::vec Deltastar, arma::mat& Phistar, arma::mat Sigma, arma::cube& theta, arma::mat& Gamma);
+RcppExport SEXP _LFBayes_updateGammaSig(SEXP etaSEXP, SEXP LambdaSEXP, SEXP DeltastarSEXP, SEXP PhistarSEXP, SEXP SigmaSEXP, SEXP thetaSEXP, SEXP GammaSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::cube& >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Lambda(LambdaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type Deltastar(DeltastarSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Phistar(PhistarSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< arma::cube& >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Gamma(GammaSEXP);
+    updateGammaSig(eta, Lambda, Deltastar, Phistar, Sigma, theta, Gamma);
     return R_NilValue;
 END_RCPP
 }
@@ -293,6 +326,22 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::cube& >::type theta(thetaSEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type Lambda(LambdaSEXP);
     updateLambda(eta, Gamma, Delta, Phi, sigma1, sigma2, theta, Lambda);
+    return R_NilValue;
+END_RCPP
+}
+// updateLambdaSig
+void updateLambdaSig(arma::cube& eta, arma::mat& Gamma, arma::vec Delta, arma::mat& Phi, arma::mat Sigma, arma::cube& theta, arma::mat& Lambda);
+RcppExport SEXP _LFBayes_updateLambdaSig(SEXP etaSEXP, SEXP GammaSEXP, SEXP DeltaSEXP, SEXP PhiSEXP, SEXP SigmaSEXP, SEXP thetaSEXP, SEXP LambdaSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::cube& >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Gamma(GammaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type Delta(DeltaSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Phi(PhiSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< arma::cube& >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Lambda(LambdaSEXP);
+    updateLambdaSig(eta, Gamma, Delta, Phi, Sigma, theta, Lambda);
     return R_NilValue;
 END_RCPP
 }
@@ -365,6 +414,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// updateSigma
+arma::mat updateSigma(arma::mat Lambda, arma::mat Gamma, arma::cube Theta, arma::cube Eta);
+RcppExport SEXP _LFBayes_updateSigma(SEXP LambdaSEXP, SEXP GammaSEXP, SEXP ThetaSEXP, SEXP EtaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Lambda(LambdaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Gamma(GammaSEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type Theta(ThetaSEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type Eta(EtaSEXP);
+    rcpp_result_gen = Rcpp::wrap(updateSigma(Lambda, Gamma, Theta, Eta));
+    return rcpp_result_gen;
+END_RCPP
+}
 // updateTheta
 arma::cube updateTheta(arma::mat& Lambda, arma::mat& Gamma, arma::vec sigma1, arma::vec sigma2, arma::cube& eta, arma::mat& splineS, arma::mat& splineT, arma::mat& y, double varphi);
 RcppExport SEXP _LFBayes_updateTheta(SEXP LambdaSEXP, SEXP GammaSEXP, SEXP sigma1SEXP, SEXP sigma2SEXP, SEXP etaSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP ySEXP, SEXP varphiSEXP) {
@@ -381,6 +444,24 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat& >::type y(ySEXP);
     Rcpp::traits::input_parameter< double >::type varphi(varphiSEXP);
     rcpp_result_gen = Rcpp::wrap(updateTheta(Lambda, Gamma, sigma1, sigma2, eta, splineS, splineT, y, varphi));
+    return rcpp_result_gen;
+END_RCPP
+}
+// updateThetaSig
+arma::cube updateThetaSig(arma::mat& Lambda, arma::mat& Gamma, arma::mat Sigma, arma::cube& eta, arma::mat& splineS, arma::mat& splineT, arma::mat& y, double varphi);
+RcppExport SEXP _LFBayes_updateThetaSig(SEXP LambdaSEXP, SEXP GammaSEXP, SEXP SigmaSEXP, SEXP etaSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP ySEXP, SEXP varphiSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat& >::type Lambda(LambdaSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Gamma(GammaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< arma::cube& >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type splineS(splineSSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type splineT(splineTSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< double >::type varphi(varphiSEXP);
+    rcpp_result_gen = Rcpp::wrap(updateThetaSig(Lambda, Gamma, Sigma, eta, splineS, splineT, y, varphi));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -552,6 +633,32 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// FuncProcess
+arma::mat FuncProcess(arma::mat Y, arma::mat splineS, arma::mat splineT);
+RcppExport SEXP _LFBayes_FuncProcess(SEXP YSEXP, SEXP splineSSEXP, SEXP splineTSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
+    rcpp_result_gen = Rcpp::wrap(FuncProcess(Y, splineS, splineT));
+    return rcpp_result_gen;
+END_RCPP
+}
+// LongProcess
+arma::mat LongProcess(arma::mat Y, arma::mat splineS, arma::mat splineT);
+RcppExport SEXP _LFBayes_LongProcess(SEXP YSEXP, SEXP splineSSEXP, SEXP splineTSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
+    rcpp_result_gen = Rcpp::wrap(LongProcess(Y, splineS, splineT));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_eigenLF", (DL_FUNC) &_LFBayes_eigenLF, 5},
@@ -567,18 +674,23 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_updateEta", (DL_FUNC) &_LFBayes_updateEta, 12},
     {"_LFBayes_updateEta2", (DL_FUNC) &_LFBayes_updateEta2, 7},
     {"_LFBayes_updateEta3", (DL_FUNC) &_LFBayes_updateEta3, 9},
+    {"_LFBayes_updateEta3Sig", (DL_FUNC) &_LFBayes_updateEta3Sig, 8},
     {"_LFBayes_updateEtaProd", (DL_FUNC) &_LFBayes_updateEtaProd, 12},
     {"_LFBayes_updateGamma", (DL_FUNC) &_LFBayes_updateGamma, 8},
+    {"_LFBayes_updateGammaSig", (DL_FUNC) &_LFBayes_updateGammaSig, 7},
     {"_LFBayes_updateH", (DL_FUNC) &_LFBayes_updateH, 3},
     {"_LFBayes_updateHb", (DL_FUNC) &_LFBayes_updateHb, 1},
     {"_LFBayes_updateHProd", (DL_FUNC) &_LFBayes_updateHProd, 4},
     {"_LFBayes_updateLambda", (DL_FUNC) &_LFBayes_updateLambda, 8},
+    {"_LFBayes_updateLambdaSig", (DL_FUNC) &_LFBayes_updateLambdaSig, 7},
     {"_LFBayes_updateLambda2", (DL_FUNC) &_LFBayes_updateLambda2, 4},
     {"_LFBayes_updateLambda3", (DL_FUNC) &_LFBayes_updateLambda3, 5},
     {"_LFBayes_updatePhi", (DL_FUNC) &_LFBayes_updatePhi, 2},
     {"_LFBayes_updateSigma1", (DL_FUNC) &_LFBayes_updateSigma1, 5},
     {"_LFBayes_updateSigma2", (DL_FUNC) &_LFBayes_updateSigma2, 3},
+    {"_LFBayes_updateSigma", (DL_FUNC) &_LFBayes_updateSigma, 4},
     {"_LFBayes_updateTheta", (DL_FUNC) &_LFBayes_updateTheta, 9},
+    {"_LFBayes_updateThetaSig", (DL_FUNC) &_LFBayes_updateThetaSig, 8},
     {"_LFBayes_updateTheta2", (DL_FUNC) &_LFBayes_updateTheta2, 6},
     {"_LFBayes_updateVarphi", (DL_FUNC) &_LFBayes_updateVarphi, 4},
     {"_LFBayes_updateVarphi2", (DL_FUNC) &_LFBayes_updateVarphi2, 3},
@@ -591,6 +703,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_updateGammaSmoothD", (DL_FUNC) &_LFBayes_updateGammaSmoothD, 6},
     {"_LFBayes_updateTau", (DL_FUNC) &_LFBayes_updateTau, 1},
     {"_LFBayes_updateDeltaProd", (DL_FUNC) &_LFBayes_updateDeltaProd, 2},
+    {"_LFBayes_FuncProcess", (DL_FUNC) &_LFBayes_FuncProcess, 3},
+    {"_LFBayes_LongProcess", (DL_FUNC) &_LFBayes_LongProcess, 3},
     {NULL, NULL, 0}
 };
 

@@ -31,6 +31,8 @@ Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, ar
   arma::vec S1(p1);
   arma::mat sigma2M(p2, iter);
   arma::vec S2(p2);
+  arma::cube SigmaC(p1,p2,iter);
+  arma::mat Sigma(p1,p2);
   arma::vec varphiV(iter);
   arma::vec a1L(iter);
   arma::vec a2L(iter);
@@ -94,6 +96,7 @@ Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, ar
   Phi2.ones();//
   sigma1M.fill(.01);
   sigma2M.fill(.01);
+  Sigma.fill(.01);
   varphiV(0) = 1;
   etaF(0).randn();
   thetaF(0).ones();
@@ -113,37 +116,44 @@ Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, ar
 
   Rcpp::Rcout << "Starting MCMC..." << std::endl;
   for(int i = 0; i < iter; i++){
-    if(i % 10000 == 0){
+    if(i % 1000 == 0){
       Rcpp::Rcout << i << std::endl;
     }
     for(int j = 0; j < thin; j++){
-    /*
-      updateLambda(Eta, Gamma, DM1,  Phi1,
-                    S1, S2, Theta, Lambda);
+    
+
+      //updateGamma(Eta, Lambda, DM2, Phi2, S1,
+        //      S2, Theta, Gamma);
+      updateGammaSig(Eta, Lambda, DM2, Phi2, Sigma,
+                  Theta, Gamma);
+      Phi2 = updatePhistar(Gamma, DM2);
+      DM2 = updateDelta(Gamma, Phi2, DM2, a1Gd, a2Gd);
+    
+    
+      //updateLambda(Eta, Gamma, DM1,  Phi1,
+        //           S1, S2, Theta, Lambda);
+        updateLambdaSig(Eta, Gamma, DM1, Phi1,
+                        Sigma, Theta, Lambda);
       Phi1 = updatePhi(Lambda, DM1);
       DM1 = updateDelta(Lambda, Phi1, DM1, a1Ld, a2Ld);
-
-      updateGamma(Eta, Lambda, DM2, Phi2, S1,
-              S2, Theta, Gamma);
-      Phi2 = updatePhistar(Gamma, DM2);
-      DM2 = updateDelta(Gamma, Phi2, DM2, a1Ld, a2Ld);
-    */
-
-      Lambda = updateLambdaSmoothD(Eta, Gamma, S1, S2, D1, Theta);
-      Gamma = updateGammaSmoothD(Eta, Lambda, S1, S2, D2, Theta);
-      D1 = updateDeltaProdTemp(Lambda, D1, a1Ld, a2Ld);
-      a1Ld = updatea1(D1, a1Ld);
-      a2Ld = updatea2(D1, a2Ld);
-      D2 = updateDeltaProdTemp(Gamma, D2, a1Gd, a2Gd);
-      a1Gd = updatea1(D2, a1Gd);
-      a2Gd = updatea2(D2, a2Gd);
-      S1 = updateSigma1(Eta, Theta, Lambda, Gamma, S2);
-      S2 = updateSigma2(Eta, Theta, Lambda, Gamma, S1);
+      //Lambda = updateLambdaSmoothD(Eta, Gamma, S1, S2, D1, Theta);
+      //Gamma = updateGammaSmoothD(Eta, Lambda, S1, S2, D2, Theta);
+      //D1 = updateDeltaProdTemp(Lambda, D1, a1Ld, a2Ld);
+      a1Ld = updatea1(DM1, a1Ld);
+      a2Ld = updatea2(DM1, a2Ld);
+      //D2 = updateDeltaProdTemp(Gamma, D2, a1Gd, a2Gd);
+      a1Gd = updatea1(DM2, a1Gd);
+      a2Gd = updatea2(DM2, a2Gd);
+      //S1 = updateSigma1(Eta, Theta, Lambda, Gamma, S2);
+      //S2 = updateSigma2(Eta, Theta, Lambda, Gamma, S1);
+      Sigma = updateSigma(Lambda, Gamma, Theta, Eta);
       V = updateVarphi(Theta, splineS, splineT, imputedY);
-      updateEta(Lambda, Gamma, S1, S2, H, splineS, splineT, imputedY, V, Beta, X, Eta);
-      Theta = updateTheta(Lambda, Gamma, S1, S2, Eta, splineS, splineT, imputedY, V);
+      //updateEta(Lambda, Gamma, S1, S2, H, splineS, splineT, imputedY, V, Beta, X, Eta);
+      //updateEta3(Gamma, Lambda, S2, S1, Theta, H, X, Beta, Eta);
+      updateEta3Sig(Gamma, Lambda, Sigma, Theta, H, X, Beta, Eta);
+      //Theta = updateTheta(Lambda, Gamma, S1, S2, Eta, splineS, splineT, imputedY, V);
+      Theta = updateThetaSig(Lambda, Gamma, Sigma, Eta, splineS, splineT, imputedY, V);
       H = updateH(Eta, Beta, X);
-      //H.eye();
       updateBeta(Eta, H, E, X, Beta);
       E = updateE(Beta);
       updateMissing(imputedY, missing, Theta, splineS, splineT, X.n_rows);
@@ -151,24 +161,31 @@ Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, ar
     }
     LambdaC.slice(i) = Lambda;
     GammaC.slice(i) = Gamma;
+    SigmaC.slice(i) = Sigma;
+    HC.slice(i) = H;
+    betaC.slice(i) = Beta;
+    
+    /*
+    Delta1.col(i) = DM1;
+    Delta2.col(i) = DM2;
+    Phi1C.slice(i) = Phi1;
+    Phi2C.slice(i) = Phi2;
+    varphiV(i) = V;
+    etaF(i) = Eta;
+    thetaF(i) = Theta;
+    */
     //a1L(i) = a1Ld;
     //a2L(i) = a2Ld;
     //a1G(i) = a1Gd;
     //a2G(i) = a2Gd;
     //Delta1.col(i) = D1;
     //Delta2.col(i) = D2;
-    //Delta1.col(i) = DM1;
-    //Delta2.col(i) = DM2;
-    //Phi1C.slice(i) = Phi1;
-    //Phi2C.slice(i) = Phi2;
-    sigma1M.col(i) = S1;
-    sigma2M.col(i) = S2;
-    //varphiV(i) = V;
-    //etaF(i) = Eta;
-    //thetaF(i) = Theta;
-    HC.slice(i) = H;
-    betaC.slice(i) = Beta;
+
+    //sigma1M.col(i) = S1;
+    //sigma2M.col(i) = S2;
+
     //EC.slice(i) = E;
+
 
     /*
 
@@ -227,12 +244,14 @@ Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, ar
 
   }
   Rcpp::Rcout << "All done!";
-
   Rcpp::List mod = Rcpp::List::create(Rcpp::Named("Lambda", LambdaC),
                                       Rcpp::Named("Gamma", GammaC),
-                                      Rcpp::Named("sigma1", sigma1M), Rcpp::Named("sigma2", sigma2M),
-                                      Rcpp::Named("HC", HC),
-                                      Rcpp::Named("beta", betaC), Rcpp::Named("Delta1", Delta1));
+                                      //Rcpp::Named("sigma1", sigma1M), Rcpp::Named("sigma2", sigma2M),
+                                      Rcpp::Named("HC", HC), Rcpp::Named("Sigma", SigmaC),
+                                      Rcpp::Named("beta", betaC));/*, Rcpp::Named("theta", thetaF),
+                                      Rcpp::Named("Delta1", Delta1), Rcpp::Named("Delta2", Delta2),
+                                      Rcpp::Named("eta", etaF), Rcpp::Named("Phi1", Phi1C),
+                                      Rcpp::Named("Phi2", Phi2C));*/
 
   //return(mod);
   //Rcpp::Named("Delta1", Delta1),
@@ -242,6 +261,7 @@ Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, ar
   //Rcpp::Named("imputedY", imputedY), Rcpp::Named("initialY", initialY),
   //Rcpp::Named("a1L", a1L), Rcpp::Named("a2L", a2L),
   //Rcpp::Named("a1G", a1G), Rcpp::Named("a2G", a2G));
+  //Rcpp::Rcout << arma::size(imputedY);
   return( eigenLF(splineS, splineT, mod, 3, burnin));
 
   /*

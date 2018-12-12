@@ -204,11 +204,12 @@ for(i in 1:15){
     thetamat[,15 * (j - 1)+ i] <- mcmc$theta[[iter]][i,j,]
   }
 }
-q <- 6
-etamat <- matrix(nrow = n, ncol = q*q)
-for(i in 1:q){
-  for(j in 1:q){
-    etamat[,q * (j - 1) + i]<- mcmc$eta[[iter]][i,j,]
+q1 <- 20
+q2 <- 10
+etamat <- matrix(nrow = n, ncol =q1*q2)
+for(i in 1:q1){
+  for(j in 1:q2){
+    etamat[,q1 * (j - 1) + i]<- mcmc$eta[[iter]][i,j,]
   }
 }
 A <- (kronecker(mcmc$Gamma[,,iter], mcmc$Lambda[,,iter])%*%solve(mcmc$HC[,,iter])%*%t(kronecker(mcmc$Gamma[,,iter],mcmc$Lambda[,,iter])) + diag(kronecker(1/mcmc$sigma2[,iter],1/mcmc$sigma1[,iter])))

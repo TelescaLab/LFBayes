@@ -107,11 +107,11 @@ mcmc <- mcmcWeak(y, missing, X, Bs, Bt, 7, 7, 50000)
 
 getCovWeak <- function(i){
   kronecker(Bs1%*%mcmc$Gamma[,,i], Bt1%*%mcmc$Lambda[,,i])%*%solve(mcmc$HC[,,i]) %*% t(kronecker(Bs1%*%mcmc$Gamma[,,i], Bt1%*%mcmc$Lambda[,,i])) +
-    kronecker(Bs1%*%diag(1/mcmc$sigma2[,i])%*%t(Bs1),Bt1%*%diag(1/mcmc$sigma1[,i])%*%t(Bt1)) + diag(1/mcmc$varphi[i], length(t)*length(s))
+    kronecker(Bs1,Bt1)%*%solve(diag(c(mcmc$Sigma[,,iter])))%*%t(kronecker(Bs1,Bt1))#  kronecker(Bs1%*%diag(1/mcmc$sigma2[,i])%*%t(Bs1),Bt1%*%diag(1/mcmc$sigma1[,i])%*%t(Bt1)) #+ diag(1/mcmc$varphi[i], length(t)*length(s))
 }
 
-fromt <- 5000
-iter <- 25000
+fromt <- 1000
+iter <- 5000
 j <- 0
 #v <- numeric(length(seq(from = 1, to = 10000, by = 100)))
 V <- array(dim = c(length(s) * length(t),length(s) * length(t),length(seq(from = fromt, to = iter, by = 10))))
@@ -123,7 +123,7 @@ for(i in seq(from = fromt, to = iter, by = 10)){
   #print(j)
   S <- V[,,j] + S
 }
-S <- S / (length(seq(from = fromt, to = iter, by = 10)))
+mcmc$postcov <- S / (length(seq(from = fromt, to = iter, by = 10)))
 #myfun <- function(x){
 #  posterior.mode(mcmc(x))
 #}

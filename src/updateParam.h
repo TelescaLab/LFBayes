@@ -67,6 +67,17 @@ double updatea2(arma::vec Delta, double a2);
 double updateHb(arma::mat H);
 Rcpp::List getStatistics(arma::mat spline, Rcpp::List mod, arma::rowvec x, arma::vec trueMean, int burnin, int cov);
 Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int burnin);
+arma::mat FuncProcess(arma::mat Y, arma::mat splineS, arma::mat splineT);
+arma::mat LongProcess(arma::mat Y, arma::mat splineS, arma::mat splineT);
+void updateEta3Sig(arma::mat Gamma, arma::mat Lambda, arma::mat Sigma, arma::cube Theta, arma::mat H, arma::mat X, arma::mat Beta, arma::cube &eta);
+void updateGammaSig(arma::cube &eta, arma::mat &Lambda, arma::vec Deltastar,
+                    arma::mat &Phistar, arma::mat Sigma,
+                    arma::cube &theta, arma::mat &Gamma);
+void updateLambdaSig(arma::cube &eta, arma::mat &Gamma, arma::vec Delta,
+                     arma::mat &Phi, arma::mat Sigma, arma::cube &theta, arma::mat &Lambda);
+arma::cube updateThetaSig(arma::mat &Lambda, arma::mat &Gamma, arma::mat Sigma, arma::cube &eta, arma::mat &splineS,
+                          arma::mat &splineT, arma::mat &y, double varphi);
+arma::mat updateSigma(arma::mat Lambda, arma::mat Gamma, arma::cube Theta, arma::cube Eta);
 extern int p;
 extern int k;
 #endif
