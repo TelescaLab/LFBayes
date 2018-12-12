@@ -53,12 +53,20 @@ updateEta3 <- function(Gamma, Lambda, sigma2, sigma1, Theta, H, X, Beta, eta) {
     invisible(.Call(`_LFBayes_updateEta3`, Gamma, Lambda, sigma2, sigma1, Theta, H, X, Beta, eta))
 }
 
+updateEta3Sig <- function(Gamma, Lambda, Sigma, Theta, H, X, Beta, eta) {
+    invisible(.Call(`_LFBayes_updateEta3Sig`, Gamma, Lambda, Sigma, Theta, H, X, Beta, eta))
+}
+
 updateEtaProd <- function(Lambda, Gamma, sigma1, sigma2, Delta, splineS, splineT, y, varphi, beta, X, eta) {
     invisible(.Call(`_LFBayes_updateEtaProd`, Lambda, Gamma, sigma1, sigma2, Delta, splineS, splineT, y, varphi, beta, X, eta))
 }
 
 updateGamma <- function(eta, Lambda, Deltastar, Phistar, sigma1, sigma2, theta, Gamma) {
     invisible(.Call(`_LFBayes_updateGamma`, eta, Lambda, Deltastar, Phistar, sigma1, sigma2, theta, Gamma))
+}
+
+updateGammaSig <- function(eta, Lambda, Deltastar, Phistar, Sigma, theta, Gamma) {
+    invisible(.Call(`_LFBayes_updateGammaSig`, eta, Lambda, Deltastar, Phistar, Sigma, theta, Gamma))
 }
 
 updateH <- function(eta, beta, X) {
@@ -75,6 +83,10 @@ updateHProd <- function(Eta, beta, X, Delta) {
 
 updateLambda <- function(eta, Gamma, Delta, Phi, sigma1, sigma2, theta, Lambda) {
     invisible(.Call(`_LFBayes_updateLambda`, eta, Gamma, Delta, Phi, sigma1, sigma2, theta, Lambda))
+}
+
+updateLambdaSig <- function(eta, Gamma, Delta, Phi, Sigma, theta, Lambda) {
+    invisible(.Call(`_LFBayes_updateLambdaSig`, eta, Gamma, Delta, Phi, Sigma, theta, Lambda))
 }
 
 updateLambda2 <- function(Theta, eta, Sigma, Tau) {
@@ -97,8 +109,16 @@ updateSigma2 <- function(Theta, Lambda, Eta) {
     .Call(`_LFBayes_updateSigma2`, Theta, Lambda, Eta)
 }
 
+updateSigma <- function(Lambda, Gamma, Theta, Eta) {
+    .Call(`_LFBayes_updateSigma`, Lambda, Gamma, Theta, Eta)
+}
+
 updateTheta <- function(Lambda, Gamma, sigma1, sigma2, eta, splineS, splineT, y, varphi) {
     .Call(`_LFBayes_updateTheta`, Lambda, Gamma, sigma1, sigma2, eta, splineS, splineT, y, varphi)
+}
+
+updateThetaSig <- function(Lambda, Gamma, Sigma, eta, splineS, splineT, y, varphi) {
+    .Call(`_LFBayes_updateThetaSig`, Lambda, Gamma, Sigma, eta, splineS, splineT, y, varphi)
 }
 
 updateTheta2 <- function(Lambda, Sigma, eta, Data, Varphi, Basis) {
@@ -147,5 +167,13 @@ updateTau <- function(Lambda) {
 
 updateDeltaProd <- function(Lambda, Delta) {
     .Call(`_LFBayes_updateDeltaProd`, Lambda, Delta)
+}
+
+FuncProcess <- function(Y, splineS, splineT) {
+    .Call(`_LFBayes_FuncProcess`, Y, splineS, splineT)
+}
+
+LongProcess <- function(Y, splineS, splineT) {
+    .Call(`_LFBayes_LongProcess`, Y, splineS, splineT)
 }
 

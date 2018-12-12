@@ -10,14 +10,17 @@ Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::u
   arma::cube GammaC = mod["Gamma"];
   arma::cube betaC = mod["beta"];
   //arma::mat Delta = mod["Delta"];
+  //arma::field<arma::cube> theta = mod["theta"];
   arma::cube HC = mod["HC"];
   //arma::vec varphi = mod["varphi"];
-  arma::mat sigma1 = mod["sigma1"];
-  arma::mat sigma2 = mod["sigma2"];
+  //arma::mat sigma1 = mod["sigma1"];
+  //arma::mat sigma2 = mod["sigma2"];
+  arma::cube Sigma = mod["Sigma"];
   int iter = LambdaC.n_slices;
   arma::mat spline = arma::kron(splineS, splineT);
   arma::mat cov(spline.n_rows, spline.n_rows);
   arma::mat postcov = arma::zeros<arma::mat>(spline.n_rows, spline.n_rows);
+  //arma::mat theta_postcov = arma::zeros<arma::mat>(spline.n_cols, spline.n_cols);
   arma::mat eigvalFunc(splineT.n_rows, iter - burnin);
   arma::cube eigvecFunc(splineT.n_rows, numeig, iter-burnin);
   arma::vec eigvalFunc_temp;
@@ -32,11 +35,14 @@ Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::u
   arma::mat marginalLong;
   arma::mat meanM(spline.n_rows, iter - burnin);
   arma::vec mmean(iter- burnin);
-
+  //arma::mat thetacov;
+  /*
   cov = spline * (arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)) * arma::inv(arma::diagmat(HC.slice(burnin))) *
     arma::trans(arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin))) + arma::kron(arma::diagmat(1.0 / sigma2.col(burnin)),
                 arma::diagmat(1.0 / sigma1.col(burnin)))) * arma::trans(spline);
-
+  */
+  cov = spline * (arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)) * arma::inv(arma::diagmat(HC.slice(burnin))) *
+    arma::trans(arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)))) * spline.t() + spline * arma::inv(arma::diagmat(arma::vectorise(Sigma.slice(burnin)))) * spline.t();
   /*
   cov = spline * (arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)) * arma::inv(convertToPrecision(Delta.col(burnin), LambdaC.n_cols, GammaC.n_cols)) *
     arma::trans(arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin))) + arma::kron(arma::diagmat(1.0 / sigma2.col(burnin)),
@@ -60,11 +66,18 @@ Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::u
   for(int i = 0; i < iter - burnin; i++){
     meanM.col(i) = spline * arma::kron(GammaC.slice(burnin + i),
               LambdaC.slice(burnin + i)) * arma::trans(betaC.slice(burnin + i));
-
+    /*
     cov = spline * (arma::kron(GammaC.slice(burnin + i), LambdaC.slice(burnin + i)) * arma::inv(arma::diagmat(HC.slice(burnin + i))) *
       arma::trans(arma::kron(GammaC.slice(burnin + i), LambdaC.slice(burnin + i))) + arma::kron(arma::diagmat(1.0 / sigma2.col(burnin + i)),
                   arma::diagmat(1.0 / sigma1.col(burnin + i)))) * arma::trans(spline);
+    */
+    cov = spline * (arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)) * arma::inv(arma::diagmat(HC.slice(burnin))) *
+      arma::trans(arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)))) * spline.t() + spline * arma::inv(arma::diagmat(arma::vectorise(Sigma.slice(burnin)))) * spline.t();
+    
+    //thetacov = arma::cov(arma::trans(arma::reshape( arma::mat(theta(burnin + i).memptr(), theta(burnin + i).n_elem, 1, false), theta(0).n_rows * theta(0).n_cols, 30)));
+    
     postcov = postcov + cov;
+    //theta_postcov = theta_postcov + thetacov;
    /*
     cov = spline * (arma::kron(GammaC.slice(burnin + i), LambdaC.slice(burnin + i)) * arma::inv(convertToPrecision(Delta.col(burnin + i), LambdaC.n_cols, GammaC.n_cols)) *
       arma::trans(arma::kron(GammaC.slice(burnin + i), LambdaC.slice(burnin + i))) + arma::kron(arma::diagmat(1.0 / sigma2.col(burnin + i)),
@@ -98,6 +111,8 @@ Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::u
     eigvecLong.slice(i) = eigvecLong_temp.cols(splineS.n_rows - 1-numeig+1,splineS.n_rows - 1);
   }
   postcov = postcov / (iter - burnin);
+  //theta_postcov = theta_postcov / (iter - burnin);
+  //arma::mat postcov_SE = spline * theta_postcov * arma::trans(spline);
   //eigvecFunc = eigvecFunc.tail_slices(eigvecFunc.n_slices - 100);
   //eigvecLong = eigvecLong.tail_slices(eigvecLong.n_slices - 100);
 
@@ -177,5 +192,6 @@ Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::u
                             //Rcpp::Named("eigvalFunc", eigvalFunc),
                             //Rcpp::Named("eigvalLong", eigvalLong),
                             Rcpp::Named("postcov", postcov));
+                            //Rcpp::Named("postcov_SE", postcov_SE));
 }
 
