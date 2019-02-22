@@ -21,6 +21,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// eigenLFChains
+Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains);
+RcppExport SEXP _LFBayes_eigenLFChains(SEXP splineSSEXP, SEXP splineTSEXP, SEXP modSEXP, SEXP numeigSEXP, SEXP iterSEXP, SEXP burninSEXP, SEXP nchainsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type mod(modSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type numeig(numeigSEXP);
+    Rcpp::traits::input_parameter< int >::type iter(iterSEXP);
+    Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
+    Rcpp::traits::input_parameter< int >::type nchains(nchainsSEXP);
+    rcpp_result_gen = Rcpp::wrap(eigenLFChains(splineS, splineT, mod, numeig, iter, burnin, nchains));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getMarginalFunc
 arma::mat getMarginalFunc(arma::mat& cov, int ns, int nt);
 RcppExport SEXP _LFBayes_getMarginalFunc(SEXP covSEXP, SEXP nsSEXP, SEXP ntSEXP) {
@@ -64,6 +81,59 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type thin(thinSEXP);
     Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
     rcpp_result_gen = Rcpp::wrap(mcmcWeak(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mcmcWeakChains
+Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin, int nchains);
+RcppExport SEXP _LFBayes_mcmcWeakChains(SEXP ySEXP, SEXP missingSEXP, SEXP XSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP q1SEXP, SEXP q2SEXP, SEXP iterSEXP, SEXP thinSEXP, SEXP burninSEXP, SEXP nchainsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::field<arma::vec> >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::field<arma::vec> >::type missing(missingSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
+    Rcpp::traits::input_parameter< int >::type q1(q1SEXP);
+    Rcpp::traits::input_parameter< int >::type q2(q2SEXP);
+    Rcpp::traits::input_parameter< int >::type iter(iterSEXP);
+    Rcpp::traits::input_parameter< int >::type thin(thinSEXP);
+    Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
+    Rcpp::traits::input_parameter< int >::type nchains(nchainsSEXP);
+    rcpp_result_gen = Rcpp::wrap(mcmcWeakChains(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mcmcWeakChainsPCA
+Rcpp::List mcmcWeakChainsPCA(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin, int nchains);
+RcppExport SEXP _LFBayes_mcmcWeakChainsPCA(SEXP ySEXP, SEXP missingSEXP, SEXP XSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP q1SEXP, SEXP q2SEXP, SEXP iterSEXP, SEXP thinSEXP, SEXP burninSEXP, SEXP nchainsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::field<arma::vec> >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::field<arma::vec> >::type missing(missingSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
+    Rcpp::traits::input_parameter< int >::type q1(q1SEXP);
+    Rcpp::traits::input_parameter< int >::type q2(q2SEXP);
+    Rcpp::traits::input_parameter< int >::type iter(iterSEXP);
+    Rcpp::traits::input_parameter< int >::type thin(thinSEXP);
+    Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
+    Rcpp::traits::input_parameter< int >::type nchains(nchainsSEXP);
+    rcpp_result_gen = Rcpp::wrap(mcmcWeakChainsPCA(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains));
+    return rcpp_result_gen;
+END_RCPP
+}
+// timesTwo
+double timesTwo(NumericVector x);
+RcppExport SEXP _LFBayes_timesTwo(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(timesTwo(x));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -168,6 +238,26 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// updateEtaSig
+void updateEtaSig(arma::mat& Lambda, arma::mat& Gamma, arma::mat Sigma, arma::mat H, arma::mat& splineS, arma::mat& splineT, arma::mat& y, double varphi, arma::mat& beta, arma::mat& X, arma::cube& eta);
+RcppExport SEXP _LFBayes_updateEtaSig(SEXP LambdaSEXP, SEXP GammaSEXP, SEXP SigmaSEXP, SEXP HSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP ySEXP, SEXP varphiSEXP, SEXP betaSEXP, SEXP XSEXP, SEXP etaSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat& >::type Lambda(LambdaSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Gamma(GammaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type H(HSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type splineS(splineSSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type splineT(splineTSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< double >::type varphi(varphiSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::cube& >::type eta(etaSEXP);
+    updateEtaSig(Lambda, Gamma, Sigma, H, splineS, splineT, y, varphi, beta, X, eta);
+    return R_NilValue;
+END_RCPP
+}
 // updateEta2
 arma::mat updateEta2(arma::mat Lambda, arma::mat Basis, arma::vec Sigma, arma::mat Data, arma::mat Beta, arma::mat X, double Varphi);
 RcppExport SEXP _LFBayes_updateEta2(SEXP LambdaSEXP, SEXP BasisSEXP, SEXP SigmaSEXP, SEXP DataSEXP, SEXP BetaSEXP, SEXP XSEXP, SEXP VarphiSEXP) {
@@ -217,27 +307,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type Beta(BetaSEXP);
     Rcpp::traits::input_parameter< arma::cube& >::type eta(etaSEXP);
     updateEta3Sig(Gamma, Lambda, Sigma, Theta, H, X, Beta, eta);
-    return R_NilValue;
-END_RCPP
-}
-// updateEtaProd
-void updateEtaProd(arma::mat& Lambda, arma::mat& Gamma, arma::vec sigma1, arma::vec sigma2, arma::vec Delta, arma::mat& splineS, arma::mat& splineT, arma::mat& y, double varphi, arma::mat& beta, arma::mat& X, arma::cube& eta);
-RcppExport SEXP _LFBayes_updateEtaProd(SEXP LambdaSEXP, SEXP GammaSEXP, SEXP sigma1SEXP, SEXP sigma2SEXP, SEXP DeltaSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP ySEXP, SEXP varphiSEXP, SEXP betaSEXP, SEXP XSEXP, SEXP etaSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat& >::type Lambda(LambdaSEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type Gamma(GammaSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type sigma1(sigma1SEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type sigma2(sigma2SEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type Delta(DeltaSEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type splineS(splineSSEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type splineT(splineTSEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type y(ySEXP);
-    Rcpp::traits::input_parameter< double >::type varphi(varphiSEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type beta(betaSEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type X(XSEXP);
-    Rcpp::traits::input_parameter< arma::cube& >::type eta(etaSEXP);
-    updateEtaProd(Lambda, Gamma, sigma1, sigma2, Delta, splineS, splineT, y, varphi, beta, X, eta);
     return R_NilValue;
 END_RCPP
 }
@@ -329,6 +398,22 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// updateLambdaMH
+arma::mat updateLambdaMH(arma::mat Lambda, arma::mat Gamma, arma::cube& theta, arma::cube& eta, arma::mat Sigma, arma::mat H);
+RcppExport SEXP _LFBayes_updateLambdaMH(SEXP LambdaSEXP, SEXP GammaSEXP, SEXP thetaSEXP, SEXP etaSEXP, SEXP SigmaSEXP, SEXP HSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Lambda(LambdaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Gamma(GammaSEXP);
+    Rcpp::traits::input_parameter< arma::cube& >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< arma::cube& >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type H(HSEXP);
+    rcpp_result_gen = Rcpp::wrap(updateLambdaMH(Lambda, Gamma, theta, eta, Sigma, H));
+    return rcpp_result_gen;
+END_RCPP
+}
 // updateLambdaSig
 void updateLambdaSig(arma::cube& eta, arma::mat& Gamma, arma::vec Delta, arma::mat& Phi, arma::mat Sigma, arma::cube& theta, arma::mat& Lambda);
 RcppExport SEXP _LFBayes_updateLambdaSig(SEXP etaSEXP, SEXP GammaSEXP, SEXP DeltaSEXP, SEXP PhiSEXP, SEXP SigmaSEXP, SEXP thetaSEXP, SEXP LambdaSEXP) {
@@ -343,6 +428,23 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat& >::type Lambda(LambdaSEXP);
     updateLambdaSig(eta, Gamma, Delta, Phi, Sigma, theta, Lambda);
     return R_NilValue;
+END_RCPP
+}
+// updateLambdaSigTest
+arma::mat updateLambdaSigTest(arma::cube& eta, arma::mat& Gamma, arma::vec Delta, arma::mat& Phi, arma::mat Sigma, arma::cube& theta, arma::mat& Lambda);
+RcppExport SEXP _LFBayes_updateLambdaSigTest(SEXP etaSEXP, SEXP GammaSEXP, SEXP DeltaSEXP, SEXP PhiSEXP, SEXP SigmaSEXP, SEXP thetaSEXP, SEXP LambdaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::cube& >::type eta(etaSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Gamma(GammaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type Delta(DeltaSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Phi(PhiSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< arma::cube& >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Lambda(LambdaSEXP);
+    rcpp_result_gen = Rcpp::wrap(updateLambdaSigTest(eta, Gamma, Delta, Phi, Sigma, theta, Lambda));
+    return rcpp_result_gen;
 END_RCPP
 }
 // updateLambda2
@@ -508,6 +610,31 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// initializeY
+arma::vec initializeY(arma::vec x, arma::vec missing, int s, int t);
+RcppExport SEXP _LFBayes_initializeY(SEXP xSEXP, SEXP missingSEXP, SEXP sSEXP, SEXP tSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type missing(missingSEXP);
+    Rcpp::traits::input_parameter< int >::type s(sSEXP);
+    Rcpp::traits::input_parameter< int >::type t(tSEXP);
+    rcpp_result_gen = Rcpp::wrap(initializeY(x, missing, s, t));
+    return rcpp_result_gen;
+END_RCPP
+}
+// getPenalty
+arma::mat getPenalty(arma::uword n);
+RcppExport SEXP _LFBayes_getPenalty(SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::uword >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(getPenalty(n));
+    return rcpp_result_gen;
+END_RCPP
+}
 // updatea1
 double updatea1(arma::vec Delta, double a1);
 RcppExport SEXP _LFBayes_updatea1(SEXP DeltaSEXP, SEXP a1SEXP) {
@@ -575,6 +702,36 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type Delta(DeltaSEXP);
     Rcpp::traits::input_parameter< arma::cube >::type Theta(ThetaSEXP);
     rcpp_result_gen = Rcpp::wrap(updateLambdaSmoothD(Eta, Gamma, Sigma1, Sigma2, Delta, Theta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// updateLambdaSmoothDSig
+arma::mat updateLambdaSmoothDSig(arma::cube Eta, arma::mat Gamma, arma::mat Sigma, arma::vec Delta, arma::cube Theta);
+RcppExport SEXP _LFBayes_updateLambdaSmoothDSig(SEXP EtaSEXP, SEXP GammaSEXP, SEXP SigmaSEXP, SEXP DeltaSEXP, SEXP ThetaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::cube >::type Eta(EtaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Gamma(GammaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type Delta(DeltaSEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type Theta(ThetaSEXP);
+    rcpp_result_gen = Rcpp::wrap(updateLambdaSmoothDSig(Eta, Gamma, Sigma, Delta, Theta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// updateGammaSmoothDSig
+arma::mat updateGammaSmoothDSig(arma::cube Eta, arma::mat Lambda, arma::mat Sigma, arma::vec Delta, arma::cube Theta);
+RcppExport SEXP _LFBayes_updateGammaSmoothDSig(SEXP EtaSEXP, SEXP LambdaSEXP, SEXP SigmaSEXP, SEXP DeltaSEXP, SEXP ThetaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::cube >::type Eta(EtaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Lambda(LambdaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type Delta(DeltaSEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type Theta(ThetaSEXP);
+    rcpp_result_gen = Rcpp::wrap(updateGammaSmoothDSig(Eta, Lambda, Sigma, Delta, Theta));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -659,12 +816,215 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// updateDeltaProdPCA
+arma::vec updateDeltaProdPCA(arma::mat Lambda, arma::vec Delta, arma::vec Alpha, double a1, double a2);
+RcppExport SEXP _LFBayes_updateDeltaProdPCA(SEXP LambdaSEXP, SEXP DeltaSEXP, SEXP AlphaSEXP, SEXP a1SEXP, SEXP a2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Lambda(LambdaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type Delta(DeltaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type Alpha(AlphaSEXP);
+    Rcpp::traits::input_parameter< double >::type a1(a1SEXP);
+    Rcpp::traits::input_parameter< double >::type a2(a2SEXP);
+    rcpp_result_gen = Rcpp::wrap(updateDeltaProdPCA(Lambda, Delta, Alpha, a1, a2));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mydnorm
+double mydnorm(arma::vec X, arma::vec mu, arma::mat Sigma, int givelog);
+RcppExport SEXP _LFBayes_mydnorm(SEXP XSEXP, SEXP muSEXP, SEXP SigmaSEXP, SEXP givelogSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< int >::type givelog(givelogSEXP);
+    rcpp_result_gen = Rcpp::wrap(mydnorm(X, mu, Sigma, givelog));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dmvnrm_arma
+double dmvnrm_arma(arma::vec x, arma::vec mean, arma::mat sigma, bool logd);
+RcppExport SEXP _LFBayes_dmvnrm_arma(SEXP xSEXP, SEXP meanSEXP, SEXP sigmaSEXP, SEXP logdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type mean(meanSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type sigma(sigmaSEXP);
+    Rcpp::traits::input_parameter< bool >::type logd(logdSEXP);
+    rcpp_result_gen = Rcpp::wrap(dmvnrm_arma(x, mean, sigma, logd));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rnorm_arma1
+arma::vec rnorm_arma1(arma::vec mean, arma::mat precision);
+RcppExport SEXP _LFBayes_rnorm_arma1(SEXP meanSEXP, SEXP precisionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type mean(meanSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type precision(precisionSEXP);
+    rcpp_result_gen = Rcpp::wrap(rnorm_arma1(mean, precision));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rnorm_arma2
+arma::vec rnorm_arma2(arma::vec mean, arma::mat precision);
+RcppExport SEXP _LFBayes_rnorm_arma2(SEXP meanSEXP, SEXP precisionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type mean(meanSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type precision(precisionSEXP);
+    rcpp_result_gen = Rcpp::wrap(rnorm_arma2(mean, precision));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rnorm_arma3
+arma::vec rnorm_arma3(arma::vec mean, arma::mat precision);
+RcppExport SEXP _LFBayes_rnorm_arma3(SEXP meanSEXP, SEXP precisionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type mean(meanSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type precision(precisionSEXP);
+    rcpp_result_gen = Rcpp::wrap(rnorm_arma3(mean, precision));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rnorm_arma4
+arma::vec rnorm_arma4(arma::vec mean, arma::mat precision);
+RcppExport SEXP _LFBayes_rnorm_arma4(SEXP meanSEXP, SEXP precisionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type mean(meanSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type precision(precisionSEXP);
+    rcpp_result_gen = Rcpp::wrap(rnorm_arma4(mean, precision));
+    return rcpp_result_gen;
+END_RCPP
+}
+// updateAlphaPCA
+arma::vec updateAlphaPCA(arma::mat Lambda, arma::vec Delta, arma::vec Alpha);
+RcppExport SEXP _LFBayes_updateAlphaPCA(SEXP LambdaSEXP, SEXP DeltaSEXP, SEXP AlphaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Lambda(LambdaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type Delta(DeltaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type Alpha(AlphaSEXP);
+    rcpp_result_gen = Rcpp::wrap(updateAlphaPCA(Lambda, Delta, Alpha));
+    return rcpp_result_gen;
+END_RCPP
+}
+// updateLambdaPCA
+arma::mat updateLambdaPCA(arma::cube Eta, arma::mat Gamma, arma::mat Sigma, arma::vec Delta, arma::vec Alpha, arma::cube Theta);
+RcppExport SEXP _LFBayes_updateLambdaPCA(SEXP EtaSEXP, SEXP GammaSEXP, SEXP SigmaSEXP, SEXP DeltaSEXP, SEXP AlphaSEXP, SEXP ThetaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::cube >::type Eta(EtaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Gamma(GammaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type Delta(DeltaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type Alpha(AlphaSEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type Theta(ThetaSEXP);
+    rcpp_result_gen = Rcpp::wrap(updateLambdaPCA(Eta, Gamma, Sigma, Delta, Alpha, Theta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// updateGammaPCA
+arma::mat updateGammaPCA(arma::cube Eta, arma::mat Lambda, arma::mat Sigma, arma::vec Delta, arma::vec Alpha, arma::cube Theta);
+RcppExport SEXP _LFBayes_updateGammaPCA(SEXP EtaSEXP, SEXP LambdaSEXP, SEXP SigmaSEXP, SEXP DeltaSEXP, SEXP AlphaSEXP, SEXP ThetaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::cube >::type Eta(EtaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Lambda(LambdaSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Sigma(SigmaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type Delta(DeltaSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type Alpha(AlphaSEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type Theta(ThetaSEXP);
+    rcpp_result_gen = Rcpp::wrap(updateGammaPCA(Eta, Lambda, Sigma, Delta, Alpha, Theta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// gam_trunc_left
+double gam_trunc_left(double a, double b, double cut);
+RcppExport SEXP _LFBayes_gam_trunc_left(SEXP aSEXP, SEXP bSEXP, SEXP cutSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type a(aSEXP);
+    Rcpp::traits::input_parameter< double >::type b(bSEXP);
+    Rcpp::traits::input_parameter< double >::type cut(cutSEXP);
+    rcpp_result_gen = Rcpp::wrap(gam_trunc_left(a, b, cut));
+    return rcpp_result_gen;
+END_RCPP
+}
+// calculate_WAIC
+Rcpp::List calculate_WAIC(arma::mat Y, arma::mat X, Rcpp::List mod, arma::mat splineS, arma::mat splineT, arma::uword burnin);
+RcppExport SEXP _LFBayes_calculate_WAIC(SEXP YSEXP, SEXP XSEXP, SEXP modSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP burninSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type mod(modSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type burnin(burninSEXP);
+    rcpp_result_gen = Rcpp::wrap(calculate_WAIC(Y, X, mod, splineS, splineT, burnin));
+    return rcpp_result_gen;
+END_RCPP
+}
+// calculate_BIC
+Rcpp::List calculate_BIC(arma::mat Y, arma::mat X, Rcpp::List mod, arma::mat splineS, arma::mat splineT, arma::uword burnin, arma::uword thin);
+RcppExport SEXP _LFBayes_calculate_BIC(SEXP YSEXP, SEXP XSEXP, SEXP modSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP burninSEXP, SEXP thinSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type mod(modSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type burnin(burninSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type thin(thinSEXP);
+    rcpp_result_gen = Rcpp::wrap(calculate_BIC(Y, X, mod, splineS, splineT, burnin, thin));
+    return rcpp_result_gen;
+END_RCPP
+}
+// calculate_DIC
+Rcpp::List calculate_DIC(arma::mat Y, arma::mat X, Rcpp::List mod, arma::mat splineS, arma::mat splineT, arma::uword burnin, arma::uword thin);
+RcppExport SEXP _LFBayes_calculate_DIC(SEXP YSEXP, SEXP XSEXP, SEXP modSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP burninSEXP, SEXP thinSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type mod(modSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type burnin(burninSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type thin(thinSEXP);
+    rcpp_result_gen = Rcpp::wrap(calculate_DIC(Y, X, mod, splineS, splineT, burnin, thin));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_eigenLF", (DL_FUNC) &_LFBayes_eigenLF, 5},
+    {"_LFBayes_eigenLFChains", (DL_FUNC) &_LFBayes_eigenLFChains, 7},
     {"_LFBayes_getMarginalFunc", (DL_FUNC) &_LFBayes_getMarginalFunc, 3},
     {"_LFBayes_getMarginalLong", (DL_FUNC) &_LFBayes_getMarginalLong, 3},
     {"_LFBayes_mcmcWeak", (DL_FUNC) &_LFBayes_mcmcWeak, 10},
+    {"_LFBayes_mcmcWeakChains", (DL_FUNC) &_LFBayes_mcmcWeakChains, 11},
+    {"_LFBayes_mcmcWeakChainsPCA", (DL_FUNC) &_LFBayes_mcmcWeakChainsPCA, 11},
+    {"_LFBayes_timesTwo", (DL_FUNC) &_LFBayes_timesTwo, 1},
     {"_LFBayes_convertToPrecision", (DL_FUNC) &_LFBayes_convertToPrecision, 3},
     {"_LFBayes_updateBeta2", (DL_FUNC) &_LFBayes_updateBeta2, 3},
     {"_LFBayes_updateBetaProd", (DL_FUNC) &_LFBayes_updateBetaProd, 5},
@@ -672,17 +1032,19 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_updateDeltaProdTemp", (DL_FUNC) &_LFBayes_updateDeltaProdTemp, 4},
     {"_LFBayes_updateE", (DL_FUNC) &_LFBayes_updateE, 1},
     {"_LFBayes_updateEta", (DL_FUNC) &_LFBayes_updateEta, 12},
+    {"_LFBayes_updateEtaSig", (DL_FUNC) &_LFBayes_updateEtaSig, 11},
     {"_LFBayes_updateEta2", (DL_FUNC) &_LFBayes_updateEta2, 7},
     {"_LFBayes_updateEta3", (DL_FUNC) &_LFBayes_updateEta3, 9},
     {"_LFBayes_updateEta3Sig", (DL_FUNC) &_LFBayes_updateEta3Sig, 8},
-    {"_LFBayes_updateEtaProd", (DL_FUNC) &_LFBayes_updateEtaProd, 12},
     {"_LFBayes_updateGamma", (DL_FUNC) &_LFBayes_updateGamma, 8},
     {"_LFBayes_updateGammaSig", (DL_FUNC) &_LFBayes_updateGammaSig, 7},
     {"_LFBayes_updateH", (DL_FUNC) &_LFBayes_updateH, 3},
     {"_LFBayes_updateHb", (DL_FUNC) &_LFBayes_updateHb, 1},
     {"_LFBayes_updateHProd", (DL_FUNC) &_LFBayes_updateHProd, 4},
     {"_LFBayes_updateLambda", (DL_FUNC) &_LFBayes_updateLambda, 8},
+    {"_LFBayes_updateLambdaMH", (DL_FUNC) &_LFBayes_updateLambdaMH, 6},
     {"_LFBayes_updateLambdaSig", (DL_FUNC) &_LFBayes_updateLambdaSig, 7},
+    {"_LFBayes_updateLambdaSigTest", (DL_FUNC) &_LFBayes_updateLambdaSigTest, 7},
     {"_LFBayes_updateLambda2", (DL_FUNC) &_LFBayes_updateLambda2, 4},
     {"_LFBayes_updateLambda3", (DL_FUNC) &_LFBayes_updateLambda3, 5},
     {"_LFBayes_updatePhi", (DL_FUNC) &_LFBayes_updatePhi, 2},
@@ -694,17 +1056,35 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_updateTheta2", (DL_FUNC) &_LFBayes_updateTheta2, 6},
     {"_LFBayes_updateVarphi", (DL_FUNC) &_LFBayes_updateVarphi, 4},
     {"_LFBayes_updateVarphi2", (DL_FUNC) &_LFBayes_updateVarphi2, 3},
+    {"_LFBayes_initializeY", (DL_FUNC) &_LFBayes_initializeY, 4},
+    {"_LFBayes_getPenalty", (DL_FUNC) &_LFBayes_getPenalty, 1},
     {"_LFBayes_updatea1", (DL_FUNC) &_LFBayes_updatea1, 2},
     {"_LFBayes_updatea2", (DL_FUNC) &_LFBayes_updatea2, 2},
     {"_LFBayes_updateLambdaSmooth", (DL_FUNC) &_LFBayes_updateLambdaSmooth, 6},
     {"_LFBayes_updateLambda4", (DL_FUNC) &_LFBayes_updateLambda4, 4},
     {"_LFBayes_updateLambdaSmoothD", (DL_FUNC) &_LFBayes_updateLambdaSmoothD, 6},
+    {"_LFBayes_updateLambdaSmoothDSig", (DL_FUNC) &_LFBayes_updateLambdaSmoothDSig, 5},
+    {"_LFBayes_updateGammaSmoothDSig", (DL_FUNC) &_LFBayes_updateGammaSmoothDSig, 5},
     {"_LFBayes_updateGammaSmooth", (DL_FUNC) &_LFBayes_updateGammaSmooth, 6},
     {"_LFBayes_updateGammaSmoothD", (DL_FUNC) &_LFBayes_updateGammaSmoothD, 6},
     {"_LFBayes_updateTau", (DL_FUNC) &_LFBayes_updateTau, 1},
     {"_LFBayes_updateDeltaProd", (DL_FUNC) &_LFBayes_updateDeltaProd, 2},
     {"_LFBayes_FuncProcess", (DL_FUNC) &_LFBayes_FuncProcess, 3},
     {"_LFBayes_LongProcess", (DL_FUNC) &_LFBayes_LongProcess, 3},
+    {"_LFBayes_updateDeltaProdPCA", (DL_FUNC) &_LFBayes_updateDeltaProdPCA, 5},
+    {"_LFBayes_mydnorm", (DL_FUNC) &_LFBayes_mydnorm, 4},
+    {"_LFBayes_dmvnrm_arma", (DL_FUNC) &_LFBayes_dmvnrm_arma, 4},
+    {"_LFBayes_rnorm_arma1", (DL_FUNC) &_LFBayes_rnorm_arma1, 2},
+    {"_LFBayes_rnorm_arma2", (DL_FUNC) &_LFBayes_rnorm_arma2, 2},
+    {"_LFBayes_rnorm_arma3", (DL_FUNC) &_LFBayes_rnorm_arma3, 2},
+    {"_LFBayes_rnorm_arma4", (DL_FUNC) &_LFBayes_rnorm_arma4, 2},
+    {"_LFBayes_updateAlphaPCA", (DL_FUNC) &_LFBayes_updateAlphaPCA, 3},
+    {"_LFBayes_updateLambdaPCA", (DL_FUNC) &_LFBayes_updateLambdaPCA, 6},
+    {"_LFBayes_updateGammaPCA", (DL_FUNC) &_LFBayes_updateGammaPCA, 6},
+    {"_LFBayes_gam_trunc_left", (DL_FUNC) &_LFBayes_gam_trunc_left, 3},
+    {"_LFBayes_calculate_WAIC", (DL_FUNC) &_LFBayes_calculate_WAIC, 6},
+    {"_LFBayes_calculate_BIC", (DL_FUNC) &_LFBayes_calculate_BIC, 7},
+    {"_LFBayes_calculate_DIC", (DL_FUNC) &_LFBayes_calculate_DIC, 7},
     {NULL, NULL, 0}
 };
 

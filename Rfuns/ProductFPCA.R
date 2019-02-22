@@ -55,7 +55,7 @@ ProductFPCA <- function(X.age.year, n, num.years, num.ages, fpca.op1, fpca.op2, 
       mean.Xmat = matrix(rep(mean.X,n), nrow = n, ncol = num.years*num.ages, byrow = TRUE)
       X.age.year.c = X.age.year-mean.Xmat
       X.age.c = matrix(t(X.age.year.c), nrow = n*num.years, ncol = num.ages, byrow = TRUE)
-
+      X.year.c = matrix(X.age.year.c,  nrow = n*num.ages, ncol = num.years)
 # step 2: computing marginal eigenfunctions psi
 
 			# use PACE functions so that it can handle missing values
@@ -73,7 +73,6 @@ ProductFPCA <- function(X.age.year, n, num.years, num.ages, fpca.op1, fpca.op2, 
 					tList[[i]] <- tvec[ind]
 		  	}
 		  }
-
 			res.psi <- FPCA(yList, tList, optns = fpca.op1)
 			psi <- res.psi$phi
 			if (is.null(pc.j)){
@@ -82,9 +81,7 @@ ProductFPCA <- function(X.age.year, n, num.years, num.ages, fpca.op1, fpca.op2, 
 				psi <- psi[, 1:pc.j]
 			}
 
-
  # step 3: computing marginal eigenfunctions phi
-      X.year.c = matrix(X.age.year.c,  nrow = n*num.ages, ncol = num.years)
 			if (sum(is.na(X.year.c)) == 0){
 				tList <- lapply(1:(n*num.ages), function(x) 1:num.years)
 			  yList <- lapply(1:(n*num.ages), function(x) X.year.c[x,])
@@ -99,7 +96,7 @@ ProductFPCA <- function(X.age.year, n, num.years, num.ages, fpca.op1, fpca.op2, 
 					tList[[i]] <- tvec[ind]
 		  	}
 		  }
-
+      print("Hello1")
 			res.phi <- FPCA(yList, tList, optns = fpca.op2)
 			phi <- res.phi$phi
 			if (is.null(pc.k)){
@@ -108,10 +105,8 @@ ProductFPCA <- function(X.age.year, n, num.years, num.ages, fpca.op1, fpca.op2, 
 				phi <- phi[, 1:pc.k]
 			}
 
-
-
+			
       eig.Age.Year <- matrix(0, nrow= num.years*num.ages, ncol= pc.j*pc.k)
-
       i = 0
       for (j in 1:pc.j){
          for (k in 1:pc.k){
@@ -119,8 +114,8 @@ ProductFPCA <- function(X.age.year, n, num.years, num.ages, fpca.op1, fpca.op2, 
             eig.Age.Year[,i] <- as.numeric(outer(psi[,j],phi[, k],"*"))
          }
       }
-
-			lmfull.simu = mFPCA.lm(t(X.age.year.c),eig.Age.Year, ploting=F)
+      
+			lmfull.simu = mFPCA.lm(t(X.age.year.c),eig.Age.Year, printing = F,ploting=F)
 			scores <- lmfull.simu$coefs
       Xest = mean.Xmat + scores%*%t(eig.Age.Year)
 
@@ -131,11 +126,12 @@ ProductFPCA <- function(X.age.year, n, num.years, num.ages, fpca.op1, fpca.op2, 
         mFPCA.Age.Year.pctvar[i] <-
 				     round(mFPCA.lm(t(X.age.year.c),df.eig.Age.Year,model=i,ploting=F)$perct.model,2)
       }
-
+      
       best.model <- order(-mFPCA.Age.Year.pctvar)
 			VarOrdered <- mFPCA.Age.Year.pctvar[best.model]
 			namesV = as.character(t(outer(paste("Psi",1:pc.j,sep=""),paste("Phi",1:pc.k,sep=""),paste,sep=".")))
 		  names(VarOrdered) = namesV[best.model]
+		  
 			return(list(Xest = Xest,mu = mean.X, scores = scores, res.psi = res.psi, res.phi = res.phi,
 				         eig = eig.Age.Year, pc.j = pc.j, psi = psi, pc.k = pc.k, phi = phi, FVE = mFPCA.Age.Year.pctvar, VarOrdered = VarOrdered))
 }

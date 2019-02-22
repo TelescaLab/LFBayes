@@ -8,7 +8,7 @@
 Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int burnin){
   arma::cube LambdaC = mod["Lambda"];
   arma::cube GammaC = mod["Gamma"];
-  arma::cube betaC = mod["beta"];
+  arma::cube betaC = mod["Beta"];
   //arma::mat Delta = mod["Delta"];
   //arma::field<arma::cube> theta = mod["theta"];
   arma::cube HC = mod["HC"];
@@ -36,18 +36,20 @@ Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::u
   arma::mat meanM(spline.n_rows, iter - burnin);
   arma::vec mmean(iter- burnin);
   //arma::mat thetacov;
+  
+  cov = spline * (arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)) * arma::inv(arma::diagmat(HC.slice(burnin))) *
+    arma::trans(arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin))) + arma::inv(arma::diagmat(arma::vectorise(Sigma.slice(burnin))))) * arma::trans(spline);
   /*
   cov = spline * (arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)) * arma::inv(arma::diagmat(HC.slice(burnin))) *
+    arma::trans(arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)))) * spline.t() + spline * arma::inv(arma::diagmat(arma::vectorise(Sigma.slice(burnin)))) * spline.t();
+  */
+  
+  // CHANGE BURNIN INDEXES FIX THIS CRAP
+  /*
+   cov = spline * (arma::kron(GammaC.slice(burnin + i), LambdaC.slice(burnin + i)) * arma::inv(convertToPrecision(Delta.col(burnin), LambdaC.n_cols, GammaC.n_cols)) *
     arma::trans(arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin))) + arma::kron(arma::diagmat(1.0 / sigma2.col(burnin)),
                 arma::diagmat(1.0 / sigma1.col(burnin)))) * arma::trans(spline);
   */
-  cov = spline * (arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)) * arma::inv(arma::diagmat(HC.slice(burnin))) *
-    arma::trans(arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)))) * spline.t() + spline * arma::inv(arma::diagmat(arma::vectorise(Sigma.slice(burnin)))) * spline.t();
-  /*
-  cov = spline * (arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)) * arma::inv(convertToPrecision(Delta.col(burnin), LambdaC.n_cols, GammaC.n_cols)) *
-    arma::trans(arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin))) + arma::kron(arma::diagmat(1.0 / sigma2.col(burnin)),
-                arma::diagmat(1.0 / sigma1.col(burnin)))) * arma::trans(spline);
-   */
   marginalFunc = getMarginalFunc(cov, splineS.n_rows, splineT.n_rows);
   marginalLong = getMarginalLong(cov, splineS.n_rows, splineT.n_rows);
   arma::eig_sym(eigvalFunc_temp, eigvecFunc_temp, marginalFunc);
@@ -71,8 +73,8 @@ Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::u
       arma::trans(arma::kron(GammaC.slice(burnin + i), LambdaC.slice(burnin + i))) + arma::kron(arma::diagmat(1.0 / sigma2.col(burnin + i)),
                   arma::diagmat(1.0 / sigma1.col(burnin + i)))) * arma::trans(spline);
     */
-    cov = spline * (arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)) * arma::inv(arma::diagmat(HC.slice(burnin))) *
-      arma::trans(arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)))) * spline.t() + spline * arma::inv(arma::diagmat(arma::vectorise(Sigma.slice(burnin)))) * spline.t();
+    cov = spline * (arma::kron(GammaC.slice(burnin + i), LambdaC.slice(burnin + i)) * arma::inv(arma::diagmat(HC.slice(burnin + i))) *
+      arma::trans(arma::kron(GammaC.slice(burnin + i), LambdaC.slice(burnin + i)))) * spline.t() + spline * arma::inv(arma::diagmat(arma::vectorise(Sigma.slice(burnin + i)))) * spline.t();
     
     //thetacov = arma::cov(arma::trans(arma::reshape( arma::mat(theta(burnin + i).memptr(), theta(burnin + i).n_elem, 1, false), theta(0).n_rows * theta(0).n_cols, 30)));
     

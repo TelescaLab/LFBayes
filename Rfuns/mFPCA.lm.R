@@ -25,11 +25,11 @@ mFPCA.lm <- function(big.X,eig.funct,model=1:dim(eig.funct)[2],label=1:dim(big.X
     SSR[i] <- sum(summ.lm.i$residuals^2)
     SST[i] <- SSR[i]/(1-R2[i])
     coefs[i,] <- lm.i$coefficients
-    if(printing){
-      print(label[i])
-      print((SST[i]-sum(Xc.i^2))/sum(Xc.i^2))
-      print(summ.lm.i)
-    } 
+    #if(printing){
+     # print(label[i])
+      #print((SST[i]-sum(Xc.i^2))/sum(Xc.i^2))
+      #print(summ.lm.i)
+    #} 
   }
   perct.model <- (1-sum(SSR)/sum(SST))*100
   if (ploting){
