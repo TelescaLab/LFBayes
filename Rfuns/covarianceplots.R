@@ -74,7 +74,7 @@ mylist[[6]] <- EmpCov
 mylist[[7]] <- resMarginalCov
 mylist[[8]] <- resProductCov
 #mylist[[9]] <- mcmc$postcov_SE
-colnum <- 400
+colnum <- 37*56
 image(t((Smooth_scaled_cov))[1:colnum,1:colnum][,colnum:1], zlim = c(min(unlist(mylist)), max(unlist(mylist))), col = heat.colors(100))
 image(t(mcmc$postcov)[1:colnum,1:colnum][,colnum:1],zlim = c(min(unlist(mylist)), max(unlist(mylist))), col = heat.colors(100))
 image(t(resPACE$fittedCov)[1:colnum,1:colnum][,colnum:1], zlim = c(min(unlist(mylist)), max(unlist(mylist))),col = heat.colors(100))

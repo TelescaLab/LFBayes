@@ -5,6 +5,10 @@ eigenLF <- function(splineS, splineT, mod, numeig, burnin) {
     .Call(`_LFBayes_eigenLF`, splineS, splineT, mod, numeig, burnin)
 }
 
+eigenLFChains <- function(splineS, splineT, mod, numeig, iter, burnin, nchains) {
+    .Call(`_LFBayes_eigenLFChains`, splineS, splineT, mod, numeig, iter, burnin, nchains)
+}
+
 getMarginalFunc <- function(cov, ns, nt) {
     .Call(`_LFBayes_getMarginalFunc`, cov, ns, nt)
 }
@@ -15,6 +19,18 @@ getMarginalLong <- function(cov, ns, nt) {
 
 mcmcWeak <- function(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin) {
     .Call(`_LFBayes_mcmcWeak`, y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin)
+}
+
+mcmcWeakChains <- function(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains) {
+    .Call(`_LFBayes_mcmcWeakChains`, y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains)
+}
+
+mcmcWeakChainsPCA <- function(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains) {
+    .Call(`_LFBayes_mcmcWeakChainsPCA`, y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains)
+}
+
+timesTwo <- function(x) {
+    .Call(`_LFBayes_timesTwo`, x)
 }
 
 convertToPrecision <- function(Delta, q1, q2) {
@@ -45,6 +61,10 @@ updateEta <- function(Lambda, Gamma, sigma1, sigma2, H, splineS, splineT, y, var
     invisible(.Call(`_LFBayes_updateEta`, Lambda, Gamma, sigma1, sigma2, H, splineS, splineT, y, varphi, beta, X, eta))
 }
 
+updateEtaSig <- function(Lambda, Gamma, Sigma, H, splineS, splineT, y, varphi, beta, X, eta) {
+    invisible(.Call(`_LFBayes_updateEtaSig`, Lambda, Gamma, Sigma, H, splineS, splineT, y, varphi, beta, X, eta))
+}
+
 updateEta2 <- function(Lambda, Basis, Sigma, Data, Beta, X, Varphi) {
     .Call(`_LFBayes_updateEta2`, Lambda, Basis, Sigma, Data, Beta, X, Varphi)
 }
@@ -55,10 +75,6 @@ updateEta3 <- function(Gamma, Lambda, sigma2, sigma1, Theta, H, X, Beta, eta) {
 
 updateEta3Sig <- function(Gamma, Lambda, Sigma, Theta, H, X, Beta, eta) {
     invisible(.Call(`_LFBayes_updateEta3Sig`, Gamma, Lambda, Sigma, Theta, H, X, Beta, eta))
-}
-
-updateEtaProd <- function(Lambda, Gamma, sigma1, sigma2, Delta, splineS, splineT, y, varphi, beta, X, eta) {
-    invisible(.Call(`_LFBayes_updateEtaProd`, Lambda, Gamma, sigma1, sigma2, Delta, splineS, splineT, y, varphi, beta, X, eta))
 }
 
 updateGamma <- function(eta, Lambda, Deltastar, Phistar, sigma1, sigma2, theta, Gamma) {
@@ -85,8 +101,16 @@ updateLambda <- function(eta, Gamma, Delta, Phi, sigma1, sigma2, theta, Lambda) 
     invisible(.Call(`_LFBayes_updateLambda`, eta, Gamma, Delta, Phi, sigma1, sigma2, theta, Lambda))
 }
 
+updateLambdaMH <- function(Lambda, Gamma, theta, eta, Sigma, H) {
+    .Call(`_LFBayes_updateLambdaMH`, Lambda, Gamma, theta, eta, Sigma, H)
+}
+
 updateLambdaSig <- function(eta, Gamma, Delta, Phi, Sigma, theta, Lambda) {
     invisible(.Call(`_LFBayes_updateLambdaSig`, eta, Gamma, Delta, Phi, Sigma, theta, Lambda))
+}
+
+updateLambdaSigTest <- function(eta, Gamma, Delta, Phi, Sigma, theta, Lambda) {
+    .Call(`_LFBayes_updateLambdaSigTest`, eta, Gamma, Delta, Phi, Sigma, theta, Lambda)
 }
 
 updateLambda2 <- function(Theta, eta, Sigma, Tau) {
@@ -133,6 +157,14 @@ updateVarphi2 <- function(Data, Theta, Basis) {
     .Call(`_LFBayes_updateVarphi2`, Data, Theta, Basis)
 }
 
+initializeY <- function(x, missing, s, t) {
+    .Call(`_LFBayes_initializeY`, x, missing, s, t)
+}
+
+getPenalty <- function(n) {
+    .Call(`_LFBayes_getPenalty`, n)
+}
+
 updatea1 <- function(Delta, a1) {
     .Call(`_LFBayes_updatea1`, Delta, a1)
 }
@@ -151,6 +183,14 @@ updateLambda4 <- function(Theta, eta, Sigma, Delta) {
 
 updateLambdaSmoothD <- function(Eta, Gamma, Sigma1, Sigma2, Delta, Theta) {
     .Call(`_LFBayes_updateLambdaSmoothD`, Eta, Gamma, Sigma1, Sigma2, Delta, Theta)
+}
+
+updateLambdaSmoothDSig <- function(Eta, Gamma, Sigma, Delta, Theta) {
+    .Call(`_LFBayes_updateLambdaSmoothDSig`, Eta, Gamma, Sigma, Delta, Theta)
+}
+
+updateGammaSmoothDSig <- function(Eta, Lambda, Sigma, Delta, Theta) {
+    .Call(`_LFBayes_updateGammaSmoothDSig`, Eta, Lambda, Sigma, Delta, Theta)
 }
 
 updateGammaSmooth <- function(Eta, Lambda, Sigma1, Sigma2, Tau, Theta) {
@@ -175,5 +215,61 @@ FuncProcess <- function(Y, splineS, splineT) {
 
 LongProcess <- function(Y, splineS, splineT) {
     .Call(`_LFBayes_LongProcess`, Y, splineS, splineT)
+}
+
+updateDeltaProdPCA <- function(Lambda, Delta, Alpha, a1, a2) {
+    .Call(`_LFBayes_updateDeltaProdPCA`, Lambda, Delta, Alpha, a1, a2)
+}
+
+mydnorm <- function(X, mu, Sigma, givelog) {
+    .Call(`_LFBayes_mydnorm`, X, mu, Sigma, givelog)
+}
+
+dmvnrm_arma <- function(x, mean, sigma, logd = FALSE) {
+    .Call(`_LFBayes_dmvnrm_arma`, x, mean, sigma, logd)
+}
+
+rnorm_arma1 <- function(mean, precision) {
+    .Call(`_LFBayes_rnorm_arma1`, mean, precision)
+}
+
+rnorm_arma2 <- function(mean, precision) {
+    .Call(`_LFBayes_rnorm_arma2`, mean, precision)
+}
+
+rnorm_arma3 <- function(mean, precision) {
+    .Call(`_LFBayes_rnorm_arma3`, mean, precision)
+}
+
+rnorm_arma4 <- function(mean, precision) {
+    .Call(`_LFBayes_rnorm_arma4`, mean, precision)
+}
+
+updateAlphaPCA <- function(Lambda, Delta, Alpha) {
+    .Call(`_LFBayes_updateAlphaPCA`, Lambda, Delta, Alpha)
+}
+
+updateLambdaPCA <- function(Eta, Gamma, Sigma, Delta, Alpha, Theta) {
+    .Call(`_LFBayes_updateLambdaPCA`, Eta, Gamma, Sigma, Delta, Alpha, Theta)
+}
+
+updateGammaPCA <- function(Eta, Lambda, Sigma, Delta, Alpha, Theta) {
+    .Call(`_LFBayes_updateGammaPCA`, Eta, Lambda, Sigma, Delta, Alpha, Theta)
+}
+
+gam_trunc_left <- function(a, b, cut) {
+    .Call(`_LFBayes_gam_trunc_left`, a, b, cut)
+}
+
+calculate_WAIC <- function(Y, X, mod, splineS, splineT, burnin) {
+    .Call(`_LFBayes_calculate_WAIC`, Y, X, mod, splineS, splineT, burnin)
+}
+
+calculate_BIC <- function(Y, X, mod, splineS, splineT, burnin, thin) {
+    .Call(`_LFBayes_calculate_BIC`, Y, X, mod, splineS, splineT, burnin, thin)
+}
+
+calculate_DIC <- function(Y, X, mod, splineS, splineT, burnin, thin) {
+    .Call(`_LFBayes_calculate_DIC`, Y, X, mod, splineS, splineT, burnin, thin)
 }
 

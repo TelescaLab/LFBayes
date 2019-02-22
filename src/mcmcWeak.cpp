@@ -47,9 +47,9 @@ Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, ar
   //arma::mat Delta(q1 + q2 - 1, iter);
   arma::field<arma::cube> etaF(iter);
   for(int i = 0; i < iter; i++){
-    etaF(i) = arma::cube(LambdaC.n_cols, GammaC.n_cols, X.n_rows);
+    etaF(i) = arma::cube(q1, q2, X.n_rows);
   }
-  arma::cube Eta(Lambda.n_cols, Gamma.n_cols, X.n_rows);
+  arma::cube Eta(q1, q2, X.n_rows);
   arma::field<arma::cube> thetaF(iter);
   for(int i = 0; i < iter; i++){
     thetaF(i) = arma::cube(p1, p2, X.n_rows);
@@ -83,8 +83,8 @@ Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, ar
   Theta.randn();
   Beta.randn();
   E.randu();
-  LambdaC.slice(0).randn();
-  GammaC.slice(0).randn();
+  //LambdaC.slice(0).randn();
+  //GammaC.slice(0).randn();
   Tau1.ones();//
   Tau2.ones();//
   //Delta.ones();
@@ -124,6 +124,7 @@ Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, ar
 
       //updateGamma(Eta, Lambda, DM2, Phi2, S1,
         //      S2, Theta, Gamma);
+    
       updateGammaSig(Eta, Lambda, DM2, Phi2, Sigma,
                   Theta, Gamma);
       Phi2 = updatePhistar(Gamma, DM2);
@@ -132,10 +133,16 @@ Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, ar
     
       //updateLambda(Eta, Gamma, DM1,  Phi1,
         //           S1, S2, Theta, Lambda);
-        updateLambdaSig(Eta, Gamma, DM1, Phi1,
+      
+      updateLambdaSig(Eta, Gamma, DM1, Phi1,
                         Sigma, Theta, Lambda);
-      Phi1 = updatePhi(Lambda, DM1);
+      Phi1 = updatePhi(Lambda, D1);
       DM1 = updateDelta(Lambda, Phi1, DM1, a1Ld, a2Ld);
+      
+      //updateLambdaSig(Eta, Gamma, D1, Phi1, Sigma, Theta, Lambda);
+      //Lambda = updateLambdaSmoothDSig(Eta, Gamma, Sigma, D1, Theta);
+      //Gamma = updateGammaSmoothD(Eta, Lambda, S1, S2, D2, Theta);
+      //Gamma = updateGammaSmoothDSig(Eta, Lambda, Sigma, D2, Theta);
       //Lambda = updateLambdaSmoothD(Eta, Gamma, S1, S2, D1, Theta);
       //Gamma = updateGammaSmoothD(Eta, Lambda, S1, S2, D2, Theta);
       //D1 = updateDeltaProdTemp(Lambda, D1, a1Ld, a2Ld);
@@ -165,15 +172,15 @@ Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, ar
     HC.slice(i) = H;
     betaC.slice(i) = Beta;
     
-    /*
+    
     Delta1.col(i) = DM1;
     Delta2.col(i) = DM2;
-    Phi1C.slice(i) = Phi1;
-    Phi2C.slice(i) = Phi2;
+    //Phi1C.slice(i) = Phi1;
+    //Phi2C.slice(i) = Phi2;
     varphiV(i) = V;
     etaF(i) = Eta;
     thetaF(i) = Theta;
-    */
+    
     //a1L(i) = a1Ld;
     //a2L(i) = a2Ld;
     //a1G(i) = a1Gd;
@@ -248,12 +255,12 @@ Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, ar
                                       Rcpp::Named("Gamma", GammaC),
                                       //Rcpp::Named("sigma1", sigma1M), Rcpp::Named("sigma2", sigma2M),
                                       Rcpp::Named("HC", HC), Rcpp::Named("Sigma", SigmaC),
-                                      Rcpp::Named("beta", betaC));/*, Rcpp::Named("theta", thetaF),
-                                      Rcpp::Named("Delta1", Delta1), Rcpp::Named("Delta2", Delta2),
+                                      Rcpp::Named("beta", betaC), Rcpp::Named("theta", thetaF),
+                                      Rcpp::Named("Delta1", DM1), Rcpp::Named("Delta2", DM2),
                                       Rcpp::Named("eta", etaF), Rcpp::Named("Phi1", Phi1C),
-                                      Rcpp::Named("Phi2", Phi2C));*/
+                                      Rcpp::Named("Phi2", Phi2C), Rcpp::Named("initialY",initialY));
 
-  //return(mod);
+  return(mod);
   //Rcpp::Named("Delta1", Delta1),
   //Rcpp::Named("Delta2", Delta2),
   //Rcpp::Named("Tau1", Tau1),
@@ -262,7 +269,7 @@ Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, ar
   //Rcpp::Named("a1L", a1L), Rcpp::Named("a2L", a2L),
   //Rcpp::Named("a1G", a1G), Rcpp::Named("a2G", a2G));
   //Rcpp::Rcout << arma::size(imputedY);
-  return( eigenLF(splineS, splineT, mod, 3, burnin));
+  //return( eigenLF(splineS, splineT, mod, 3, burnin));
 
   /*
   return Rcpp::List::create(Rcpp::Named("Lambda", LambdaC),
