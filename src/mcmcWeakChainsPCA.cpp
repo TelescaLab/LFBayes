@@ -129,7 +129,7 @@ Rcpp::List mcmcWeakChainsPCA(arma::field<arma::vec> y, arma::field<arma::vec> mi
         H = updateH(Eta, Beta, X);
         updateBeta(Eta, H, E, X, Beta);
         E = updateE(Beta);
-        updateMissing(imputedY, missing, Theta, splineS, splineT, X.n_rows);
+        updateMissing(imputedY, missing, Theta, V, splineS, splineT, X.n_rows);
         
       }
       LambdaF(k).slice(i) = Lambda;

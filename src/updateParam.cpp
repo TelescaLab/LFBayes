@@ -1407,13 +1407,15 @@ arma::vec initializeY(arma::vec x, arma::vec missing, int s, int t){
   return(y);
 }
 
-void updateMissing(arma::mat &y, arma::field<arma::vec> &missing, arma::cube &theta, arma::mat &splineS, arma::mat &splineT, int n){
+void updateMissing(arma::mat &y, arma::field<arma::vec> &missing, arma::cube &theta, double Varphi, arma::mat &splineS, arma::mat &splineT, int n){
   for(int i = 0; i < n; i++){
-    arma::vec predictedY = arma::kron(splineS, splineT) * arma::vectorise(theta.slice(i));
+    
+    //arma::vec predictedY = arma::vectorise(splineT * theta.slice(i) * arma::trans(splineS)) + 1.0/Varphi * arma::randn<arma::vec>(splineS.n_rows * splineT.n_rows);
     arma::vec currentMissing = missing(i);
     for(arma::uword m = 0; m < currentMissing.n_elem; m++){
-      y.col(i).subvec(37 * (currentMissing(m)-1), 37 * (currentMissing(m)-1) + 36) =
-        predictedY.subvec(37 * (currentMissing(m)-1), 37 * (currentMissing(m)-1) + 36);
+      y.col(i).subvec(37 * (currentMissing(m)-1), 37 * (currentMissing(m)-1) + 36) = arma::vectorise(splineT * theta.slice(i) * arma::trans(splineS.row(currentMissing(m)-1))) +
+        1.0/Varphi * arma::randn<arma::vec>(splineT.n_rows);
+        //predictedY.subvec(37 * (currentMissing(m)-1), 37 * (currentMissing(m)-1) + 36);
     }
   }
 }

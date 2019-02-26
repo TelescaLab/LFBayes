@@ -319,3 +319,133 @@ Rcpp::List calculate_DIC(arma::mat Y, arma::mat X, Rcpp::List mod, arma::mat spl
   return(Rcpp::List::create(Rcpp::Named("DIC", DIC), Rcpp::Named("LogLik", loglik), Rcpp::Named("postcov", postcov),
                             Rcpp::Named("meanvec", meanvec)));
 }
+
+//[[Rcpp::export]]
+Rcpp::List calculate_BIC_Missing(arma::field<arma::vec> Y, arma::mat X, arma::field<arma::uvec> observed, Rcpp::List mod, arma::mat splineS, arma::mat splineT, arma::uword burnin, arma::uword thin){
+  arma::field<arma::cube> Lambda = mod["Lambda"];
+  arma::field<arma::cube> Gamma = mod["Gamma"];
+  arma::field<arma::cube> Beta = mod["Beta"];
+  arma::field<arma::cube> H = mod["H"];
+  arma::field<arma::cube> Sigma = mod["Sigma"];
+  arma::field<arma::vec> Varphi = mod["Varphi"];
+  arma::field<arma::cube> Eta = mod["Eta"];
+  arma::mat spline = arma::kron(splineS, splineT);
+  arma::mat cov(spline.n_rows, spline.n_rows);
+  arma::vec meantemp1, meantemp2;
+  arma::vec meanvec = arma::zeros<arma::vec>(spline.n_rows);
+  arma::mat postcov = arma::zeros<arma::mat>(spline.n_rows, spline.n_rows);
+  arma::uword iter = Varphi(0).n_elem;
+  arma::uword nchains = Varphi.n_elem;
+  arma::uword nsubject = arma::size(Eta(0))(2);
+  arma::uword q1 = Lambda(0).n_cols;
+  arma::uword q2 = Gamma(0).n_cols;
+  arma::uword p1 = splineT.n_rows;
+  arma::uword p2 = splineS.n_rows;
+  arma::uword counter = 0;
+  int numelem = 0;
+  double llik = 0;
+  double BIC1 = 0;
+  double BIC2 = 0;
+  for(arma::uword k = 0; k < nchains; k++){
+    for(arma::uword i = burnin; i < iter; i = i + thin){
+      Rcpp::Rcout << i << std::endl;
+      meantemp1 = arma::trans(Beta(k).slice(i)) * X.row(0);
+      meantemp2 = arma::vectorise(splineT * Lambda(k).slice(i) * arma::reshape(meantemp1, q1, q2) *
+        arma::trans(Gamma(k).slice(i)) * arma::trans(splineS));
+      cov = spline * (arma::kron(Gamma(k).slice(i), Lambda(k).slice(i)) * arma::inv(arma::diagmat(H(k).slice(i))) *
+        arma::trans(arma::kron(Gamma(k).slice(i), Lambda(k).slice(i)))) * spline.t() +
+        spline * arma::solve(arma::diagmat(arma::vectorise(Sigma(k).slice(i))), spline.t()) + 
+        arma::diagmat(arma::ones<arma::vec>(splineT.n_rows * splineS.n_rows) * 1.0 / Varphi(k)(i));
+      meanvec = meanvec + meantemp2;
+      postcov = postcov + cov;
+      counter++;
+    }
+  }
+  postcov = postcov / counter;
+  meanvec = meanvec / counter;
+  
+  for(arma::uword s = 0; s < nsubject; s++){
+    arma::vec mymeanpost = meanvec.elem(observed(s));
+    arma::mat mycovpost = postcov.submat(observed(s), observed(s));
+    llik = llik + dmvnrm_arma(Y(s), mymeanpost, mycovpost, 1);
+    numelem = numelem + observed(s).n_elem;
+  }
+  
+  BIC1 = log(nsubject) * ((p1 * q1) + (p2 * q2) + (q1 * q2) + (q1 * q2) + (p1 * p2) + 1) - 2 * llik;
+  BIC2 = log(numelem) * ((p1 * q1) + (p2 * q2) + (q1 * q2) + 1) + 
+    log(nsubject) * ((p1 * p2) + (q1 * q2)) - 2 * llik;
+  return(Rcpp::List::create(Rcpp::Named("BIC1", BIC1), Rcpp::Named("BIC2", BIC2), 
+                            Rcpp::Named("LogLik", llik), 
+                            Rcpp::Named("postcov", postcov),
+                            Rcpp::Named("meanvec", meanvec)));
+}
+
+
+//[[Rcpp::export]]
+Rcpp::List calculate_DIC_Missing(arma::field<arma::vec> Y, arma::mat X, arma::field<arma::uvec> observed, Rcpp::List mod, arma::mat splineS, arma::mat splineT, arma::uword burnin, arma::uword thin){
+  arma::field<arma::cube> Lambda = mod["Lambda"];
+  arma::field<arma::cube> Gamma = mod["Gamma"];
+  arma::field<arma::cube> Beta = mod["Beta"];
+  arma::field<arma::cube> H = mod["H"];
+  arma::field<arma::cube> Sigma = mod["Sigma"];
+  arma::field<arma::vec> Varphi = mod["Varphi"];
+  arma::field<arma::cube> Eta = mod["Eta"];
+  arma::mat spline = arma::kron(splineS, splineT);
+  arma::mat cov(spline.n_rows, spline.n_rows);
+  arma::vec meantemp1, meantemp2;
+  arma::vec meanvec = arma::zeros<arma::vec>(spline.n_rows);
+  arma::mat postcov = arma::zeros<arma::mat>(spline.n_rows, spline.n_rows);
+  arma::uword iter = Varphi(0).n_elem;
+  arma::uword nchains = Varphi.n_elem;
+  arma::uword nsubject = arma::size(Eta(0))(2);
+  arma::uword q1 = Lambda(0).n_cols;
+  arma::uword q2 = Gamma(0).n_cols;
+  arma::uword p1 = splineT.n_rows;
+  arma::uword p2 = splineS.n_rows;
+  arma::uword counter = 0;
+  double loglik = 0;
+  double loglikiter = 0;
+  double DIC = 0;
+  double L = 0;
+  double P = 0;
+  for(arma::uword k = 0; k < nchains; k++){
+    for(arma::uword i = burnin; i < iter; i = i + thin){
+      Rcpp::Rcout << i << std::endl;
+      meantemp1 = arma::trans(Beta(k).slice(i)) * X.row(0);
+      meantemp2 = arma::vectorise(splineT * Lambda(k).slice(i) * arma::reshape(meantemp1, q1, q2) *
+        arma::trans(Gamma(k).slice(i)) * arma::trans(splineS));
+      cov = spline * (arma::kron(Gamma(k).slice(i), Lambda(k).slice(i)) * arma::inv(arma::diagmat(H(k).slice(i))) *
+        arma::trans(arma::kron(Gamma(k).slice(i), Lambda(k).slice(i)))) * spline.t() +
+        spline * arma::solve(arma::diagmat(arma::vectorise(Sigma(k).slice(i))), spline.t()) + 
+        arma::diagmat(arma::ones<arma::vec>(splineT.n_rows * splineS.n_rows) * 1.0 / Varphi(k)(i));
+      meanvec = meanvec + meantemp2;
+      postcov = postcov + cov;
+      counter++;
+      for(arma::uword s = 0; s < nsubject; s++){
+        arma::vec mymean = meantemp2.elem(observed(s));
+        arma::mat mycov = cov.submat(observed(s), observed(s));
+        loglikiter = loglikiter + dmvnrm_arma(Y(s), mymean, mycov, 1);
+      }
+    }
+  }
+  loglikiter = loglikiter / counter;
+  postcov = postcov / counter;
+  meanvec = meanvec / counter;
+  
+  for(arma::uword s = 0; s < nsubject; s++){
+    arma::vec mymeanpost = meanvec.elem(observed(s));
+    arma::mat mycovpost = postcov.submat(observed(s), observed(s));
+    loglik = loglik + dmvnrm_arma(Y(s), mymeanpost, mycovpost, 1);
+  }
+  P = 2 * (loglik - loglikiter);
+  L = loglik;
+  DIC = -2 * (L - P);
+  return(Rcpp::List::create(Rcpp::Named("DIC", DIC), Rcpp::Named("LogLik", loglik), Rcpp::Named("postcov", postcov),
+                            Rcpp::Named("meanvec", meanvec)));
+}
+
+//[[Rcpp::export]]
+void test1(arma::field<arma::uvec> observed, arma::mat S){
+  Rcpp::Rcout << S.submat(observed(0), observed(0)) << std::endl;
+  Rcpp::Rcout << S.submat(observed(1), observed(1));
+}

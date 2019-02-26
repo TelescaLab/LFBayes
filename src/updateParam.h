@@ -54,7 +54,7 @@ arma::mat updateE(arma::mat beta);
 arma::mat getMarginalFunc(arma::mat &cov, int ns, int nt);
 arma::mat getMarginalLong(arma::mat cov, int ns, int nt);
 arma::vec initializeY(arma::vec x, arma::vec missing, int s, int t);
-void updateMissing(arma::mat &y, arma::field<arma::vec> &missing, arma::cube &theta, arma::mat &splineS, arma::mat &splineT, int n);
+void updateMissing(arma::mat &y, arma::field<arma::vec> &missing, arma::cube &theta, double Varphi, arma::mat &splineS, arma::mat &splineT, int n);
 arma::mat getPenalty(arma::uword n);
 arma::mat updateLambdaSmooth(arma::cube Eta, arma::mat Gamma, arma::vec Sigma1, arma::vec Sigma2, arma::vec Tau, arma::cube Theta);
 arma::mat updateLambdaSmoothD(arma::cube Eta, arma::mat Gamma, arma::vec Sigma1, arma::vec Sigma2, arma::vec Delta, arma::cube Theta);
