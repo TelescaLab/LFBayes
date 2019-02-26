@@ -273,3 +273,15 @@ calculate_DIC <- function(Y, X, mod, splineS, splineT, burnin, thin) {
     .Call(`_LFBayes_calculate_DIC`, Y, X, mod, splineS, splineT, burnin, thin)
 }
 
+calculate_BIC_Missing <- function(Y, X, observed, mod, splineS, splineT, burnin, thin) {
+    .Call(`_LFBayes_calculate_BIC_Missing`, Y, X, observed, mod, splineS, splineT, burnin, thin)
+}
+
+calculate_DIC_Missing <- function(Y, X, observed, mod, splineS, splineT, burnin, thin) {
+    .Call(`_LFBayes_calculate_DIC_Missing`, Y, X, observed, mod, splineS, splineT, burnin, thin)
+}
+
+test1 <- function(observed, S) {
+    invisible(.Call(`_LFBayes_test1`, observed, S))
+}
+
