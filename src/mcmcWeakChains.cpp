@@ -124,7 +124,7 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
         V = updateVarphi(Theta, splineS, splineT, imputedY);
         updateEta3Sig(Gamma, Lambda, Sigma, Theta, H, X, Beta, Eta);
         //updateEtaSig(Lambda, Gamma, Sigma, H, splineS, splineT, imputedY, V, Beta, X, Eta);
-        if(i % 5 == 0){
+        if(i % 10 == 0){
           Theta = updateThetaSig(Lambda, Gamma, Sigma, Eta, splineS, splineT, imputedY, V);
         }
         H = updateH(Eta, Beta, X);
@@ -140,13 +140,13 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
       BetaF(k).slice(i) = Beta;
       
       
-      DM1F(k).col(i) = DM1;
-      DM2F(k).col(i) = DM2;
-      Phi1F(k).slice(i) = Phi1;
-      Phi2F(k).slice(i) = Phi2;
+      //DM1F(k).col(i) = DM1;
+      //DM2F(k).col(i) = DM2;
+      //Phi1F(k).slice(i) = Phi1;
+      //Phi2F(k).slice(i) = Phi2;
       varphiF(k)(i) = V;
-      etaF(k, i) = Eta;
-      thetaF(k, i) = Theta;
+      //etaF(k, i) = Eta;
+      //thetaF(k, i) = Theta;
       
     }
   }
@@ -157,11 +157,15 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
   Rcpp::List mod = Rcpp::List::create(Rcpp::Named("Lambda", LambdaF),
                                       Rcpp::Named("Gamma", GammaF),
                                       Rcpp::Named("H", HF), Rcpp::Named("Sigma", SigmaF),
-                                      Rcpp::Named("Beta", BetaF), Rcpp::Named("Theta", thetaF),
+                                      Rcpp::Named("Beta", BetaF), Rcpp::Named("Varphi", varphiF),
+                                      Rcpp::Named("initialY", initialY), Rcpp::Named("imputedY", imputedY));
+                                      /*
+                                      Rcpp::Named("Theta", thetaF),
                                       Rcpp::Named("Delta1", DM1F), Rcpp::Named("Delta2", DM2F),
                                       Rcpp::Named("Eta", etaF), Rcpp::Named("Phi1", Phi1F),
                                       Rcpp::Named("Phi2", Phi2F), Rcpp::Named("initialY", initialY),
                                       Rcpp::Named("Varphi", varphiF), Rcpp::Named("imputedY", imputedY));
+                                      */
   
   return(mod);
   //return(eigenLFChains(splineS, splineT, mod, 3, iter, burnin, nchains));
