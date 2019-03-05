@@ -214,7 +214,6 @@ Rcpp::List calculate_BIC(arma::mat Y, arma::mat X, Rcpp::List mod, arma::mat spl
   arma::field<arma::cube> H = mod["H"];
   arma::field<arma::cube> Sigma = mod["Sigma"];
   arma::field<arma::vec> Varphi = mod["Varphi"];
-  arma::field<arma::cube> Eta = mod["Eta"];
   arma::mat spline = arma::kron(splineS, splineT);
   arma::mat cov(spline.n_rows, spline.n_rows);
   arma::vec meantemp1, meantemp2;
@@ -222,7 +221,7 @@ Rcpp::List calculate_BIC(arma::mat Y, arma::mat X, Rcpp::List mod, arma::mat spl
   arma::mat postcov = arma::zeros<arma::mat>(spline.n_rows, spline.n_rows);
   arma::uword iter = Varphi(0).n_elem;
   arma::uword nchains = Varphi.n_elem;
-  arma::uword nsubject = arma::size(Eta(0))(2);
+  arma::uword nsubject = Y.n_cols;
   arma::uword q1 = Lambda(0).n_cols;
   arma::uword q2 = Gamma(0).n_cols;
   arma::uword p1 = splineT.n_rows;
@@ -269,7 +268,6 @@ Rcpp::List calculate_DIC(arma::mat Y, arma::mat X, Rcpp::List mod, arma::mat spl
   arma::field<arma::cube> H = mod["H"];
   arma::field<arma::cube> Sigma = mod["Sigma"];
   arma::field<arma::vec> Varphi = mod["Varphi"];
-  arma::field<arma::cube> Eta = mod["Eta"];
   arma::mat spline = arma::kron(splineS, splineT);
   arma::mat cov(spline.n_rows, spline.n_rows);
   arma::vec meantemp1, meantemp2;
@@ -277,7 +275,7 @@ Rcpp::List calculate_DIC(arma::mat Y, arma::mat X, Rcpp::List mod, arma::mat spl
   arma::mat postcov = arma::zeros<arma::mat>(spline.n_rows, spline.n_rows);
   arma::uword iter = Varphi(0).n_elem;
   arma::uword nchains = Varphi.n_elem;
-  arma::uword nsubject = arma::size(Eta(0))(2);
+  arma::uword nsubject = Y.n_cols;
   arma::uword q1 = Lambda(0).n_cols;
   arma::uword q2 = Gamma(0).n_cols;
   arma::uword p1 = splineT.n_rows;
@@ -328,7 +326,7 @@ Rcpp::List calculate_BIC_Missing(arma::field<arma::vec> Y, arma::mat X, arma::fi
   arma::field<arma::cube> H = mod["H"];
   arma::field<arma::cube> Sigma = mod["Sigma"];
   arma::field<arma::vec> Varphi = mod["Varphi"];
-  arma::field<arma::cube> Eta = mod["Eta"];
+  //arma::field<arma::cube> Eta = mod["Eta"];
   arma::mat spline = arma::kron(splineS, splineT);
   arma::mat cov(spline.n_rows, spline.n_rows);
   arma::vec meantemp1, meantemp2;
@@ -336,7 +334,7 @@ Rcpp::List calculate_BIC_Missing(arma::field<arma::vec> Y, arma::mat X, arma::fi
   arma::mat postcov = arma::zeros<arma::mat>(spline.n_rows, spline.n_rows);
   arma::uword iter = Varphi(0).n_elem;
   arma::uword nchains = Varphi.n_elem;
-  arma::uword nsubject = arma::size(Eta(0))(2);
+  arma::uword nsubject = Y.n_elem;
   arma::uword q1 = Lambda(0).n_cols;
   arma::uword q2 = Gamma(0).n_cols;
   arma::uword p1 = splineT.n_rows;
@@ -389,7 +387,6 @@ Rcpp::List calculate_DIC_Missing(arma::field<arma::vec> Y, arma::mat X, arma::fi
   arma::field<arma::cube> H = mod["H"];
   arma::field<arma::cube> Sigma = mod["Sigma"];
   arma::field<arma::vec> Varphi = mod["Varphi"];
-  arma::field<arma::cube> Eta = mod["Eta"];
   arma::mat spline = arma::kron(splineS, splineT);
   arma::mat cov(spline.n_rows, spline.n_rows);
   arma::vec meantemp1, meantemp2;
@@ -397,7 +394,7 @@ Rcpp::List calculate_DIC_Missing(arma::field<arma::vec> Y, arma::mat X, arma::fi
   arma::mat postcov = arma::zeros<arma::mat>(spline.n_rows, spline.n_rows);
   arma::uword iter = Varphi(0).n_elem;
   arma::uword nchains = Varphi.n_elem;
-  arma::uword nsubject = arma::size(Eta(0))(2);
+  arma::uword nsubject = Y.n_elem;
   arma::uword q1 = Lambda(0).n_cols;
   arma::uword q2 = Gamma(0).n_cols;
   arma::uword p1 = splineT.n_rows;
