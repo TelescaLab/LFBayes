@@ -96,7 +96,6 @@ ProductFPCA <- function(X.age.year, n, num.years, num.ages, fpca.op1, fpca.op2, 
 					tList[[i]] <- tvec[ind]
 		  	}
 		  }
-      print("Hello1")
 			res.phi <- FPCA(yList, tList, optns = fpca.op2)
 			phi <- res.phi$phi
 			if (is.null(pc.k)){

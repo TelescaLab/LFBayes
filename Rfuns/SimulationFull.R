@@ -216,7 +216,7 @@ progress <- function(n) setTxtProgressBar(pb, n)
 opts <- list(progress = progress)
 cl <- makeCluster(5)
 registerDoSNOW(cl)
-system.time(MCMC5<-foreach(index=1:iterations,.combine=rbind, .packages = c("MASS", "LFBayes", "fdapace"), .options.snow = opts)%dopar%{
+system.time(simulation <-foreach(index=1:iterations,.combine=rbind, .packages = c("MASS", "LFBayes", "fdapace"), .options.snow = opts)%dopar%{
   print(index)
   #x <- mvrnorm(n, mu  = rep(0, TT*SS), Sigma = Cov.Weak)
   x <- mvrnorm(n, mu  = as.vector(mu1), Sigma = Cov)
@@ -291,7 +291,7 @@ system.time(MCMC5<-foreach(index=1:iterations,.combine=rbind, .packages = c("MAS
   results
 })[3]
 stopCluster(cl)
-save(MCMC5, file = "MCMC5.RData")
+save(simulation, file = "simulation.RData")
 
 splinenum <- 10
 Bt1 <- bs(t, df = splinenum, intercept = TRUE)
