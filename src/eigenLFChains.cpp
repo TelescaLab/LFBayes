@@ -66,6 +66,9 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
       marginalLong = getMarginalLong(cov, splineS.n_rows, splineT.n_rows);
       arma::eig_sym(eigvalFunc_temp, eigvecFunc_temp, marginalFunc);
       arma::eig_sym(eigvalLong_temp, eigvecLong_temp, marginalLong);
+      if(i % 100 == 0){
+        Rcpp::Rcout << i << std::endl;
+      }
       if(i > 1){
         for(arma::uword j = 0; j < numeig; j++){
           if(arma::norm(eigvecFunc_temp.col(splineT.n_rows-1-numeig+j+1)*(-1)-eigvecFuncmean.col(j)) <
