@@ -17,14 +17,14 @@ SS <- 20
 TT <- 20
 t <- seq(from = 0, to = 1, length.out = TT)
 s <- seq(from = 0, to = 1, length.out = SS)
-n <- 30
+n <- 150
 tt <- list()
 tt[[1]] <- 1:(TT*SS)
 tt <- rep(tt, n)
 p1 <- 10
 p2 <- 10
-q1 <- 4
-q2 <- 4
+q1 <- 2
+q2 <- 2
 Bt <- bs(t, df = p1, intercept = TRUE)
 Bs <- bs(s, df = p2, intercept = TRUE)
 Bt1 <- bs(t, df = 12, intercept = TRUE)
@@ -196,21 +196,21 @@ pc.k = NULL
 fpca.op1 = list(dataType = "Sparse", maxK = pc.j, FVEthreshold = .9999, nRegGrid = TT)
 fpca.op2 = list(dataType = "Sparse", maxK = pc.k, FVEthreshold = .9999, nRegGrid = SS)
 
-iter <- 50 # Number of iterations
-burnin <- 10 # Burnin iterations
+iter <- 5000 # Number of iterations
+burnin <- 1000 # Burnin iterations
 thin <- 1 # Thinning for each chain
 nchain <- 1 # Number of chains
 neig <- 3 # Number of eigenfunctions for inference
 info_thin <- 10 # Thinning for information criteria (shortens computation time)
 
-splinenum <- 5 # Number of splines used in estimation
+splinenum <- 10 # Number of splines used in estimation
 q1s <- 4 # Number of latent factors for functional dimension
 q2s <- 4 # Number of latent factors for longitudinal dimension
 Bt1 <- bs(t, df = splinenum, intercept = TRUE)
 Bs1 <- bs(s, df = splinenum, intercept = TRUE)
 set.seed(1)
 setwd("/Users/John/Documents/Johnstuff/splines")
-iterations <- 1000
+iterations <- 1
 pb <- txtProgressBar(max = iterations, style = 3)
 progress <- function(n) setTxtProgressBar(pb, n)
 opts <- list(progress = progress)
