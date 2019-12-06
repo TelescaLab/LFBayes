@@ -134,10 +134,10 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
   arma::mat eigvecLonglower(splineS.n_rows, numeig);
   
   for(arma::uword j = 0; j < numeig; j++){
-    a = quantile_r(eigvecFuncm.col(j), .95);
+    a = quantile_r(eigvecFuncm.col(j), .975);
     eigvecFuncupper.col(j) = eigvecFuncmean.col(j) + a[0] * eigvecFuncsd.col(j);
     eigvecFunclower.col(j) = eigvecFuncmean.col(j) - a[0] * eigvecFuncsd.col(j);
-    a = quantile_r(eigvecLongm.col(j), .95);
+    a = quantile_r(eigvecLongm.col(j), .975);
     eigvecLongupper.col(j) = eigvecLongmean.col(j) + a[0] * eigvecLongsd.col(j);
     eigvecLonglower.col(j) = eigvecLongmean.col(j) - a[0] * eigvecLongsd.col(j);
   }
@@ -151,13 +151,14 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
                         Rcpp::Named("lower", lower),
     //                    Rcpp::Named("eigvecFunc", eigvecFunc),
     Rcpp::Named("eigvecFuncmean", eigvecFuncmean),
-    //                Rcpp::Named("eigvecFuncsd", eigvecFuncsd),
+                    Rcpp::Named("eigvecFuncsd", eigvecFuncsd),
                   Rcpp::Named("eigvecFunclower", eigvecFunclower),
                 Rcpp::Named("eigvecFuncupper", eigvecFuncupper),
     Rcpp::Named("eigvecLongmean", eigvecLongmean),
               Rcpp::Named("eigvecLonglower", eigvecLonglower),
             Rcpp::Named("eigvecLongupper", eigvecLongupper),
     //Rcpp::Named("eigvecLong", eigvecLong),
+    Rcpp::Named("eigvecLongsd", eigvecLongsd),
     Rcpp::Named("eigvalFunc", eigvalFunc),
     Rcpp::Named("eigvalLong", eigvalLong),
     Rcpp::Named("postcov", postcov));
