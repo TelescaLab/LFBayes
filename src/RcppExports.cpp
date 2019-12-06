@@ -6,6 +6,103 @@
 
 using namespace Rcpp;
 
+// calculate_WAIC
+Rcpp::List calculate_WAIC(arma::mat Y, arma::mat X, Rcpp::List mod, arma::mat splineS, arma::mat splineT, arma::uword burnin);
+RcppExport SEXP _LFBayes_calculate_WAIC(SEXP YSEXP, SEXP XSEXP, SEXP modSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP burninSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type mod(modSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type burnin(burninSEXP);
+    rcpp_result_gen = Rcpp::wrap(calculate_WAIC(Y, X, mod, splineS, splineT, burnin));
+    return rcpp_result_gen;
+END_RCPP
+}
+// calculate_BIC
+Rcpp::List calculate_BIC(arma::mat Y, arma::mat X, Rcpp::List mod, arma::mat splineS, arma::mat splineT, arma::uword burnin, arma::uword thin);
+RcppExport SEXP _LFBayes_calculate_BIC(SEXP YSEXP, SEXP XSEXP, SEXP modSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP burninSEXP, SEXP thinSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type mod(modSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type burnin(burninSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type thin(thinSEXP);
+    rcpp_result_gen = Rcpp::wrap(calculate_BIC(Y, X, mod, splineS, splineT, burnin, thin));
+    return rcpp_result_gen;
+END_RCPP
+}
+// calculate_DIC
+Rcpp::List calculate_DIC(arma::mat Y, arma::mat X, Rcpp::List mod, arma::mat splineS, arma::mat splineT, arma::uword burnin, arma::uword thin);
+RcppExport SEXP _LFBayes_calculate_DIC(SEXP YSEXP, SEXP XSEXP, SEXP modSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP burninSEXP, SEXP thinSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type mod(modSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type burnin(burninSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type thin(thinSEXP);
+    rcpp_result_gen = Rcpp::wrap(calculate_DIC(Y, X, mod, splineS, splineT, burnin, thin));
+    return rcpp_result_gen;
+END_RCPP
+}
+// calculate_BIC_Missing
+Rcpp::List calculate_BIC_Missing(arma::field<arma::vec> Y, arma::mat X, arma::field<arma::uvec> observed, Rcpp::List mod, arma::mat splineS, arma::mat splineT, arma::uword burnin, arma::uword thin);
+RcppExport SEXP _LFBayes_calculate_BIC_Missing(SEXP YSEXP, SEXP XSEXP, SEXP observedSEXP, SEXP modSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP burninSEXP, SEXP thinSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::field<arma::vec> >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::field<arma::uvec> >::type observed(observedSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type mod(modSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type burnin(burninSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type thin(thinSEXP);
+    rcpp_result_gen = Rcpp::wrap(calculate_BIC_Missing(Y, X, observed, mod, splineS, splineT, burnin, thin));
+    return rcpp_result_gen;
+END_RCPP
+}
+// calculate_DIC_Missing
+Rcpp::List calculate_DIC_Missing(arma::field<arma::vec> Y, arma::mat X, arma::field<arma::uvec> observed, Rcpp::List mod, arma::mat splineS, arma::mat splineT, arma::uword burnin, arma::uword thin);
+RcppExport SEXP _LFBayes_calculate_DIC_Missing(SEXP YSEXP, SEXP XSEXP, SEXP observedSEXP, SEXP modSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP burninSEXP, SEXP thinSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::field<arma::vec> >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::field<arma::uvec> >::type observed(observedSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type mod(modSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type burnin(burninSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type thin(thinSEXP);
+    rcpp_result_gen = Rcpp::wrap(calculate_DIC_Missing(Y, X, observed, mod, splineS, splineT, burnin, thin));
+    return rcpp_result_gen;
+END_RCPP
+}
+// test1
+void test1(arma::field<arma::uvec> observed, arma::mat S);
+RcppExport SEXP _LFBayes_test1(SEXP observedSEXP, SEXP SSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::field<arma::uvec> >::type observed(observedSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type S(SSEXP);
+    test1(observed, S);
+    return R_NilValue;
+END_RCPP
+}
 // eigenLF
 Rcpp::List eigenLF(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int burnin);
 RcppExport SEXP _LFBayes_eigenLF(SEXP splineSSEXP, SEXP splineTSEXP, SEXP modSEXP, SEXP numeigSEXP, SEXP burninSEXP) {
@@ -965,105 +1062,14 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// calculate_WAIC
-Rcpp::List calculate_WAIC(arma::mat Y, arma::mat X, Rcpp::List mod, arma::mat splineS, arma::mat splineT, arma::uword burnin);
-RcppExport SEXP _LFBayes_calculate_WAIC(SEXP YSEXP, SEXP XSEXP, SEXP modSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP burninSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type mod(modSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type burnin(burninSEXP);
-    rcpp_result_gen = Rcpp::wrap(calculate_WAIC(Y, X, mod, splineS, splineT, burnin));
-    return rcpp_result_gen;
-END_RCPP
-}
-// calculate_BIC
-Rcpp::List calculate_BIC(arma::mat Y, arma::mat X, Rcpp::List mod, arma::mat splineS, arma::mat splineT, arma::uword burnin, arma::uword thin);
-RcppExport SEXP _LFBayes_calculate_BIC(SEXP YSEXP, SEXP XSEXP, SEXP modSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP burninSEXP, SEXP thinSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type mod(modSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type burnin(burninSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type thin(thinSEXP);
-    rcpp_result_gen = Rcpp::wrap(calculate_BIC(Y, X, mod, splineS, splineT, burnin, thin));
-    return rcpp_result_gen;
-END_RCPP
-}
-// calculate_DIC
-Rcpp::List calculate_DIC(arma::mat Y, arma::mat X, Rcpp::List mod, arma::mat splineS, arma::mat splineT, arma::uword burnin, arma::uword thin);
-RcppExport SEXP _LFBayes_calculate_DIC(SEXP YSEXP, SEXP XSEXP, SEXP modSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP burninSEXP, SEXP thinSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type mod(modSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type burnin(burninSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type thin(thinSEXP);
-    rcpp_result_gen = Rcpp::wrap(calculate_DIC(Y, X, mod, splineS, splineT, burnin, thin));
-    return rcpp_result_gen;
-END_RCPP
-}
-// calculate_BIC_Missing
-Rcpp::List calculate_BIC_Missing(arma::field<arma::vec> Y, arma::mat X, arma::field<arma::uvec> observed, Rcpp::List mod, arma::mat splineS, arma::mat splineT, arma::uword burnin, arma::uword thin);
-RcppExport SEXP _LFBayes_calculate_BIC_Missing(SEXP YSEXP, SEXP XSEXP, SEXP observedSEXP, SEXP modSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP burninSEXP, SEXP thinSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::field<arma::vec> >::type Y(YSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
-    Rcpp::traits::input_parameter< arma::field<arma::uvec> >::type observed(observedSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type mod(modSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type burnin(burninSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type thin(thinSEXP);
-    rcpp_result_gen = Rcpp::wrap(calculate_BIC_Missing(Y, X, observed, mod, splineS, splineT, burnin, thin));
-    return rcpp_result_gen;
-END_RCPP
-}
-// calculate_DIC_Missing
-Rcpp::List calculate_DIC_Missing(arma::field<arma::vec> Y, arma::mat X, arma::field<arma::uvec> observed, Rcpp::List mod, arma::mat splineS, arma::mat splineT, arma::uword burnin, arma::uword thin);
-RcppExport SEXP _LFBayes_calculate_DIC_Missing(SEXP YSEXP, SEXP XSEXP, SEXP observedSEXP, SEXP modSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP burninSEXP, SEXP thinSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::field<arma::vec> >::type Y(YSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
-    Rcpp::traits::input_parameter< arma::field<arma::uvec> >::type observed(observedSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type mod(modSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type burnin(burninSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type thin(thinSEXP);
-    rcpp_result_gen = Rcpp::wrap(calculate_DIC_Missing(Y, X, observed, mod, splineS, splineT, burnin, thin));
-    return rcpp_result_gen;
-END_RCPP
-}
-// test1
-void test1(arma::field<arma::uvec> observed, arma::mat S);
-RcppExport SEXP _LFBayes_test1(SEXP observedSEXP, SEXP SSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::field<arma::uvec> >::type observed(observedSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type S(SSEXP);
-    test1(observed, S);
-    return R_NilValue;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_LFBayes_calculate_WAIC", (DL_FUNC) &_LFBayes_calculate_WAIC, 6},
+    {"_LFBayes_calculate_BIC", (DL_FUNC) &_LFBayes_calculate_BIC, 7},
+    {"_LFBayes_calculate_DIC", (DL_FUNC) &_LFBayes_calculate_DIC, 7},
+    {"_LFBayes_calculate_BIC_Missing", (DL_FUNC) &_LFBayes_calculate_BIC_Missing, 8},
+    {"_LFBayes_calculate_DIC_Missing", (DL_FUNC) &_LFBayes_calculate_DIC_Missing, 8},
+    {"_LFBayes_test1", (DL_FUNC) &_LFBayes_test1, 2},
     {"_LFBayes_eigenLF", (DL_FUNC) &_LFBayes_eigenLF, 5},
     {"_LFBayes_eigenLFChains", (DL_FUNC) &_LFBayes_eigenLFChains, 7},
     {"_LFBayes_getMarginalFunc", (DL_FUNC) &_LFBayes_getMarginalFunc, 3},
@@ -1129,12 +1135,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_updateLambdaPCA", (DL_FUNC) &_LFBayes_updateLambdaPCA, 6},
     {"_LFBayes_updateGammaPCA", (DL_FUNC) &_LFBayes_updateGammaPCA, 6},
     {"_LFBayes_gam_trunc_left", (DL_FUNC) &_LFBayes_gam_trunc_left, 3},
-    {"_LFBayes_calculate_WAIC", (DL_FUNC) &_LFBayes_calculate_WAIC, 6},
-    {"_LFBayes_calculate_BIC", (DL_FUNC) &_LFBayes_calculate_BIC, 7},
-    {"_LFBayes_calculate_DIC", (DL_FUNC) &_LFBayes_calculate_DIC, 7},
-    {"_LFBayes_calculate_BIC_Missing", (DL_FUNC) &_LFBayes_calculate_BIC_Missing, 8},
-    {"_LFBayes_calculate_DIC_Missing", (DL_FUNC) &_LFBayes_calculate_DIC_Missing, 8},
-    {"_LFBayes_test1", (DL_FUNC) &_LFBayes_test1, 2},
     {NULL, NULL, 0}
 };
 
