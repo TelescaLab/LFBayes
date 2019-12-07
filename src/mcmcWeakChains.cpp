@@ -94,9 +94,7 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
   Rcpp::Rcout << "Starting MCMC..." << std::endl;
   for(int k = 0; k < nchains; k++){
     for(int i = 0; i < iter; i++){
-      if(i % 100 == 0){
         Rcpp::Rcout << i << std::endl;
-      }
       for(int j = 0; j < thin; j++){
         
         updateGammaSig(Eta, Lambda, DM2, Phi2, Sigma,
@@ -107,7 +105,7 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
         
         updateLambdaSig(Eta, Gamma, DM1, Phi1,
                         Sigma, Theta, Lambda);
-
+        
         Phi1 = updatePhi(Lambda, DM1);
         DM1 = updateDelta(Lambda, Phi1, DM1, a1Ld, a2Ld);
          
@@ -146,7 +144,7 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
       //Phi2F(k).slice(i) = Phi2;
       varphiF(k)(i) = V;
       //etaF(k, i) = Eta;
-      //thetaF(k, i) = Theta;
+      thetaF(k, i) = Theta;
       
     }
   }
@@ -158,9 +156,10 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
                                       Rcpp::Named("Gamma", GammaF),
                                       Rcpp::Named("H", HF), Rcpp::Named("Sigma", SigmaF),
                                       Rcpp::Named("Beta", BetaF), Rcpp::Named("Varphi", varphiF),
-                                      Rcpp::Named("initialY", initialY), Rcpp::Named("imputedY", imputedY));
+                                      Rcpp::Named("initialY", initialY), Rcpp::Named("imputedY", imputedY),
+                                      
+                                      Rcpp::Named("Theta", thetaF));
                                       /*
-                                      Rcpp::Named("Theta", thetaF),
                                       Rcpp::Named("Delta1", DM1F), Rcpp::Named("Delta2", DM2F),
                                       Rcpp::Named("Eta", etaF), Rcpp::Named("Phi1", Phi1F),
                                       Rcpp::Named("Phi2", Phi2F), Rcpp::Named("initialY", initialY),

@@ -8,6 +8,7 @@ library(doSNOW)
 library(coda)
 library(MCMCglmm)
 library(LFBayes)
+library(pracma)
 #setwd("/Users/John/Downloads/LongFunc Code/ChenCode")
 setwd("/Users/John/Documents/Johnstuff/LFBayes/Rfuns")
 
@@ -17,7 +18,7 @@ SS <- 20
 TT <- 20
 t <- seq(from = 0, to = 1, length.out = TT)
 s <- seq(from = 0, to = 1, length.out = SS)
-n <- 200
+n <- 60
 tt <- list()
 tt[[1]] <- 1:(TT*SS)
 tt <- rep(tt, n)
@@ -112,8 +113,8 @@ Cov <- kronecker(Bs%*%Gamma, Bt%*%Lambda)%*%H%*%t(kronecker(Bs%*%Gamma, Bt%*%Lam
 #Cov <- kronecker(Bs%*%Gamma, Bt%*%Lambda)%*%H%*%t(kronecker(Bs%*%Gamma, Bt%*%Lambda)) + errorvar * diag(SS * TT)
 
 
-iter <- 10000 # Number of iterations
-burnin <- 5000 # Burnin iterations
+iter <- 5000 # Number of iterations
+burnin <- 2500 # Burnin iterations
 thin <- 1 # Thinning for each chain
 nchain <- 1 # Number of chains
 neig <- 3 # Number of eigenfunctions for inference
@@ -123,6 +124,12 @@ q1s <- 3 # Number of latent factors for functional dimension
 q2s <- 3 # Number of latent factors for longitudinal dimension
 Bt1 <- bs(t, df = splinenum, intercept = TRUE)
 Bs1 <- bs(s, df = splinenum, intercept = TRUE)
+Psi <- matrix(0, nrow = 10, ncol = 10)
+for(i in 1:10){
+  for(j in 1:10){
+    Psi[i,j] <- trapz(s, Bs1[,i] * Bs1[,j])
+  }
+}
 
 x <- mvrnorm(n, mu  = as.vector(mu1), Sigma = Cov)
 sx <- sd(x)
@@ -143,18 +150,22 @@ X <- rep(1,n)
 dim(X) <- c(n,1)
 
 MCMC <- mcmcWeakChains(y, missing, X, Bs1, Bt1, q1s, q2s, iter, thin, burnin, nchain)
-MCMC_eigen <- eigenLFChains(Bs1, Bt1, MCMC, neig, iter, burnin, nchain)
+MCMC_eigen <- eigenLFChains(Bs1, Bt1, MCMC, neig, iter, burnin, nchain, Psi, Psi)
 
+for(i in 1:neig){
+  MCMC_eigen$eigvecFuncmean[,i] <- MCMC_eigen$eigvecFuncmean[,i] / sqrt(sum(MCMC_eigen$eigvecFuncmean[,i]^2))
+  MCMC_eigen$eigvecLongmean[,i] <- MCMC_eigen$eigvecLongmean[,i] / sqrt(sum(MCMC_eigen$eigvecLongmean[,i]^2))
+}
 # Check if eigenfunctions need to be flipped
 signLong <- rep(1,3)
-signLong[1] <- if(sum((MCMC_eigen$eigvecLongmean[,3] + m1[,1])^2) < sum((MCMC_eigen$eigvecLongmean[,3] - m1[,1])^2)) -1 else 1
+signLong[1] <- if(sum((MCMC_eigen$eigvecLongmean[,1] + m1[,3])^2) < sum((MCMC_eigen$eigvecLongmean[,3] - m1[,1])^2)) -1 else 1
 signLong[2] <- if(sum((MCMC_eigen$eigvecLongmean[,2] + m1[,2])^2) < sum((MCMC_eigen$eigvecLongmean[,2] - m1[,2])^2)) -1 else 1
-signLong[3] <- if(sum((MCMC_eigen$eigvecLongmean[,1] + m1[,3])^2) < sum((MCMC_eigen$eigvecLongmean[,1] - m1[,3])^2)) -1 else 1
+signLong[3] <- if(sum((MCMC_eigen$eigvecLongmean[,3] + m1[,1])^2) < sum((MCMC_eigen$eigvecLongmean[,1] - m1[,3])^2)) -1 else 1
 
 signFunc <- rep(1,3)
-signFunc[1] <- if(sum((MCMC_eigen$eigvecFuncmean[,3] + m2[,1])^2) < sum((MCMC_eigen$eigvecFuncmean[,3] - m2[,1])^2)) -1 else 1
+signFunc[1] <- if(sum((MCMC_eigen$eigvecFuncmean[,1] + m2[,3])^2) < sum((MCMC_eigen$eigvecFuncmean[,3] - m2[,1])^2)) -1 else 1
 signFunc[2] <- if(sum((MCMC_eigen$eigvecFuncmean[,2] + m2[,2])^2) < sum((MCMC_eigen$eigvecFuncmean[,2] - m2[,2])^2)) -1 else 1
-signFunc[3] <- if(sum((MCMC_eigen$eigvecFuncmean[,1] + m2[,3])^2) < sum((MCMC_eigen$eigvecFuncmean[,1] - m2[,3])^2)) -1 else 1
+signFunc[3] <- if(sum((MCMC_eigen$eigvecFuncmean[,3] + m2[,1])^2) < sum((MCMC_eigen$eigvecFuncmean[,1] - m2[,3])^2)) -1 else 1
 
 # Evaluate
 results <- numeric(15)
@@ -204,13 +215,27 @@ if(signFunc[3] == -1){
   results[15] <- all(m2[,3] < MCMC_eigen$eigvecFuncupper[,1] & m2[,3] > MCMC_eigen$eigvecFunclower[,1])
 }
 
-Psi <- matrix(0, nrow = 10, ncol = 10)
-for(i in 1:10){
-  for(j in 1:10){
-    Psi[i,j] <- (s[2]-s[1]) * Bs1[,i]%*%Bs1[,j]
-  }
-}
-solve(sqrtm(Psi))%*%eigen(cov(t(A)%*%sqrtm(Psi)))$vectors[,1]
+
+v <- Bs1%*%sqrtm(Psi)$Binv%*%eigen(cov(A%*%sqrtm(Psi)$B))$vectors[,1]
+A <- basis(my_nmf)
+B <- coef(my_nmf)
+mycov <- kronecker(Bs1%*%MCMC$Gamma[[1]][,,5000],Bt1%*%MCMC$Lambda[[1]][,,5000])%*%solve(MCMC$H[[1]][,,5000])%*%t(kronecker(Bs1%*%MCMC$Gamma[[1]][,,5000], Bt1%*%MCMC$Lambda[[1]][,,5000]))
+my_marg_long <- getMarginalLong(mycov, 20, 20)
+my_marg_func <- getMarginalFunc(mycov, 20, 20)
+v1 <- eigen(my_marg_long)$vector[,1]
+H_t <- t(matrix(1/diag(MCMC$H[[1]][,,5000]), nrow = q1s, ncol = q2s))
+v2 <- Bs1 %*% sqrtm(Psi)$Binv %*% eigen(sqrtm(Psi)$B %*% MCMC$Gamma[[1]][,,5000] %*% (diag(H_t[,1]) + diag(H_t[,2]) + diag(H_t[,3])) %*% t(MCMC$Gamma[[1]][,,5000])%*%sqrtm(Psi)$B)$vectors[,3]
+v2 <- Bt1 %*% sqrtm(Psi)$Binv %*% eigen(sqrtm(Psi)$B %*% MCMC$Lambda[[1]][,,5000] %*% (diag(H_t[1,]) + diag(H_t[2,]) + diag(H_t[3,])) %*% t(MCMC$Lambda[[1]][,,5000])%*%sqrtm(Psi)$B)$vectors[,2]
+
+
+mycov2 <- kronecker(Bs1%*%MCMC$Gamma[[1]][,,4000]%*%diag(A[,1])%*%t(MCMC$Gamma[[1]][,,4000])%*%t(Bs1), Bt1%*%MCMC$Lambda[[1]][,,4000]%*%diag(B[1,])%*%t(MCMC$Lambda[[1]][,,4000])%*%t(Bt1))
+my_nmf <- NMF::nmf(matrix(1/diag(MCMC$H[[1]][,,4000]), nrow = 2, ncol = 3), rank = 3)
+basis(my_nmf)
+coef(my_nmf)
+
+v1 <- solve(sqrtm(Psi)$Binv)%*%eigen(cov(A%*%sqrtm(Psi)$B))$vectors[,1]
+v2 <- eigen(Bs1%*%cov(A)%*%t(Bs1))$vectors[,1]
+v3 <- Bs1%*%eigen(cov(A%*%sqrtm(Psi)))$vectors[,1]
 set.seed(1)
 setwd("/Users/John/Documents/Johnstuff/splines")
 iterations <- 1

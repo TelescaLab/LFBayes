@@ -119,8 +119,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // eigenLFChains
-Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains);
-RcppExport SEXP _LFBayes_eigenLFChains(SEXP splineSSEXP, SEXP splineTSEXP, SEXP modSEXP, SEXP numeigSEXP, SEXP iterSEXP, SEXP burninSEXP, SEXP nchainsSEXP) {
+Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains, arma::mat Psis, arma::mat Psit);
+RcppExport SEXP _LFBayes_eigenLFChains(SEXP splineSSEXP, SEXP splineTSEXP, SEXP modSEXP, SEXP numeigSEXP, SEXP iterSEXP, SEXP burninSEXP, SEXP nchainsSEXP, SEXP PsisSEXP, SEXP PsitSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -131,7 +131,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type iter(iterSEXP);
     Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
     Rcpp::traits::input_parameter< int >::type nchains(nchainsSEXP);
-    rcpp_result_gen = Rcpp::wrap(eigenLFChains(splineS, splineT, mod, numeig, iter, burnin, nchains));
+    Rcpp::traits::input_parameter< arma::mat >::type Psis(PsisSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Psit(PsitSEXP);
+    rcpp_result_gen = Rcpp::wrap(eigenLFChains(splineS, splineT, mod, numeig, iter, burnin, nchains, Psis, Psit));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1071,7 +1073,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_calculate_DIC_Missing", (DL_FUNC) &_LFBayes_calculate_DIC_Missing, 8},
     {"_LFBayes_test1", (DL_FUNC) &_LFBayes_test1, 2},
     {"_LFBayes_eigenLF", (DL_FUNC) &_LFBayes_eigenLF, 5},
-    {"_LFBayes_eigenLFChains", (DL_FUNC) &_LFBayes_eigenLFChains, 7},
+    {"_LFBayes_eigenLFChains", (DL_FUNC) &_LFBayes_eigenLFChains, 9},
     {"_LFBayes_getMarginalFunc", (DL_FUNC) &_LFBayes_getMarginalFunc, 3},
     {"_LFBayes_getMarginalLong", (DL_FUNC) &_LFBayes_getMarginalLong, 3},
     {"_LFBayes_mcmcWeak", (DL_FUNC) &_LFBayes_mcmcWeak, 10},
