@@ -29,8 +29,8 @@ eigenLF <- function(splineS, splineT, mod, numeig, burnin) {
     .Call(`_LFBayes_eigenLF`, splineS, splineT, mod, numeig, burnin)
 }
 
-eigenLFChains <- function(splineS, splineT, mod, numeig, iter, burnin, nchains) {
-    .Call(`_LFBayes_eigenLFChains`, splineS, splineT, mod, numeig, iter, burnin, nchains)
+eigenLFChains <- function(splineS, splineT, mod, numeig, iter, burnin, nchains, Psis, Psit) {
+    .Call(`_LFBayes_eigenLFChains`, splineS, splineT, mod, numeig, iter, burnin, nchains, Psis, Psit)
 }
 
 getMarginalFunc <- function(cov, ns, nt) {
