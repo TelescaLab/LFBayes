@@ -124,7 +124,7 @@ Rcpp::List mcmcWeakChainsPCA(arma::field<arma::vec> y, arma::field<arma::vec> mi
         //updateEta3Sig(Gamma, Lambda, Sigma, Theta, H, X, Beta, Eta);
         updateEtaSig(Lambda, Gamma, Sigma, H, splineS, splineT, imputedY, V, Beta, X, Eta);
         if(i % 25 == 0){
-          Theta = updateThetaSig(Lambda, Gamma, Sigma, Eta, splineS, splineT, imputedY, V);
+          //Theta = updateThetaSig(Lambda, Gamma, Sigma, Eta, splineS, splineT, imputedY, V);
         }
         H = updateH(Eta, Beta, X);
         updateBeta(Eta, H, E, X, Beta);

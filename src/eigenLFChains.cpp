@@ -90,13 +90,15 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
       for(arma::uword h_q2s = 0; h_q2s < q2s; h_q2s++){
         H_long = H_long + arma::diagmat(H_trans.col(h_q2s));
       }
-      Func_cov = Psitsqrt * LambdaF(k).slice(burnin + i) * arma::diagmat(H_func) * arma::trans(LambdaF(k).slice(burnin + i)) * Psitsqrt;
-      Long_cov = Psissqrt * GammaF(k).slice(burnin + i) * arma::diagmat(H_long) * arma::trans(GammaF(k).slice(burnin + i)) * Psissqrt;
+      Func_cov = Psitsqrt * (arma::diagmat(arma::sum(1 / SigmaF(k).slice(burnin + i), 1)) + LambdaF(k).slice(burnin + i) * arma::diagmat(H_func) * arma::trans(LambdaF(k).slice(burnin + i))) * Psitsqrt;
+      Long_cov = Psissqrt * (arma::diagmat(arma::sum(1 / SigmaF(k).slice(burnin + i), 0)) + GammaF(k).slice(burnin + i) * arma::diagmat(H_long) * arma::trans(GammaF(k).slice(burnin + i))) * Psissqrt;
       arma::eig_sym(eigvalFunc_temp, Func_weight, Func_cov);
       arma::eig_sym(eigvalLong_temp, Long_weight, Long_cov);
       eigvecFunc_temp = splineT * Psitsqrtinv * Func_weight.cols(splineT.n_cols - numeig, splineT.n_cols - 1);
       eigvecLong_temp = splineS * Psissqrtinv * Long_weight.cols(splineS.n_cols - numeig, splineS.n_cols - 1);
-      if(i % 100 == 0){
+      eigvecFunc_temp = arma::normalise(eigvecFunc_temp, 2, 0);
+      eigvecLong_temp = arma::normalise(eigvecLong_temp, 2, 0);
+      if(i % 5000 == 0){
         Rcpp::Rcout << i << std::endl;
       }
       if(i > 1){
