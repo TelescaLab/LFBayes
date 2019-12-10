@@ -94,7 +94,9 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
   Rcpp::Rcout << "Starting MCMC..." << std::endl;
   for(int k = 0; k < nchains; k++){
     for(int i = 0; i < iter; i++){
+      if(i % 5000 == 0){
         Rcpp::Rcout << i << std::endl;
+      }
       for(int j = 0; j < thin; j++){
         
         updateGammaSig(Eta, Lambda, DM2, Phi2, Sigma,
@@ -158,9 +160,10 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
                                       Rcpp::Named("Beta", BetaF), Rcpp::Named("Varphi", varphiF),
                                       Rcpp::Named("initialY", initialY), Rcpp::Named("imputedY", imputedY),
                                       
-                                      Rcpp::Named("Theta", thetaF));
+                                      //Rcpp::Named("Theta", thetaF));
+                                      
+                                      Rcpp::Named("Delta1", DM1F), Rcpp::Named("Delta2", DM2F));
                                       /*
-                                      Rcpp::Named("Delta1", DM1F), Rcpp::Named("Delta2", DM2F),
                                       Rcpp::Named("Eta", etaF), Rcpp::Named("Phi1", Phi1F),
                                       Rcpp::Named("Phi2", Phi2F), Rcpp::Named("initialY", initialY),
                                       Rcpp::Named("Varphi", varphiF), Rcpp::Named("imputedY", imputedY));
