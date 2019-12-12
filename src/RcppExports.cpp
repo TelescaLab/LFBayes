@@ -119,8 +119,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // eigenLFChains
-Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains, arma::mat Psis, arma::mat Psit);
-RcppExport SEXP _LFBayes_eigenLFChains(SEXP splineSSEXP, SEXP splineTSEXP, SEXP modSEXP, SEXP numeigSEXP, SEXP iterSEXP, SEXP burninSEXP, SEXP nchainsSEXP, SEXP PsisSEXP, SEXP PsitSEXP) {
+Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains, arma::vec s, arma::vec t);
+RcppExport SEXP _LFBayes_eigenLFChains(SEXP splineSSEXP, SEXP splineTSEXP, SEXP modSEXP, SEXP numeigSEXP, SEXP iterSEXP, SEXP burninSEXP, SEXP nchainsSEXP, SEXP sSEXP, SEXP tSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -131,9 +131,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type iter(iterSEXP);
     Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
     Rcpp::traits::input_parameter< int >::type nchains(nchainsSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type Psis(PsisSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type Psit(PsitSEXP);
-    rcpp_result_gen = Rcpp::wrap(eigenLFChains(splineS, splineT, mod, numeig, iter, burnin, nchains, Psis, Psit));
+    Rcpp::traits::input_parameter< arma::vec >::type s(sSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type t(tSEXP);
+    rcpp_result_gen = Rcpp::wrap(eigenLFChains(splineS, splineT, mod, numeig, iter, burnin, nchains, s, t));
     return rcpp_result_gen;
 END_RCPP
 }
