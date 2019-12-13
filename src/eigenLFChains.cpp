@@ -2,9 +2,14 @@
 #include "updateParam.h"
 #include <typeinfo>
 // [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::plugins(openmp)]]
-// [[Rcpp::export]]
 
+arma::mat integrated(arma::mat spline, arma::vec times);
+arma::vec integrated_latent(arma::mat latent, arma::vec times);
+Rcpp::List extract_eigenfn(arma::mat latent, arma::mat S, arma::mat H, arma::mat spline,
+                           arma::mat spline_int_sqrt, arma::mat spline_int_sqrt_inv,
+                           arma::mat spline_int, arma::vec latent_trapz, arma::uword numeig);
+
+// [[Rcpp::export]]
 Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains, arma::vec s, arma::vec t){
   arma::field<arma::cube> LambdaF = mod["Lambda"];
   arma::field<arma::cube> GammaF = mod["Gamma"];
@@ -29,12 +34,9 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
   arma::mat marginalLong;
   arma::mat meanM(spline.n_rows, nchains * (iter - burnin));
   arma::vec mmean(nchains * (iter- burnin));
-
   arma::uword q1s = LambdaF(0).n_cols;
   arma::uword q2s = GammaF(0).n_cols;
-  arma::mat H_trans(q2s, q1s);
-  arma::mat H_func = arma::zeros<arma::mat>(q1s, q1s);
-  arma::mat H_long = arma::zeros<arma::mat>(q2s, q2s);
+  arma::mat H, S;
   arma::mat Func_cov;
   arma::mat Long_cov;
   arma::mat Func_weight;
@@ -49,24 +51,13 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
   arma::mat Phi(splineT.n_rows, LambdaF(0).n_cols);
   arma::mat splineS_int(splineS.n_cols, splineS.n_cols);
   arma::mat splineT_int(splineT.n_cols, splineT.n_cols);
-  
-  
-  for(arma::uword i = 0; i < splineS.n_cols; i++){
-    for(arma::uword j = 0; j < splineS.n_cols; j++){
-      splineS_int(i, j) = *REAL(trapz(s, splineS.col(i) % splineS.col(j)));
-    }
-  }
-  
-  
-  for(arma::uword i = 0; i < splineT.n_cols; i++){
-    for(arma::uword j = 0; j < splineT.n_cols; j++){
-      splineT_int(i, j) = *REAL(trapz(t, splineT.col(i) % splineT.col(j)));
-    }
-  }
+  splineS_int = integrated(splineS, s);
+  splineT_int = integrated(splineT, t);
   arma::mat splineS_int_sqrt = arma::sqrtmat_sympd(splineS_int);
   arma::mat splineS_int_sqrt_inv = arma::inv_sympd(splineS_int_sqrt);
   arma::mat splineT_int_sqrt = arma::sqrtmat_sympd(splineT_int);
   arma::mat splineT_int_sqrt_inv = arma::inv_sympd(splineT_int_sqrt);
+  Rcpp::List List_func, List_long;
   //arma::mat thetacov;
   /*
   cov = spline * (arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)) * arma::inv(arma::diagmat(HC.slice(burnin))) *
@@ -74,7 +65,7 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
               arma::diagmat(1.0 / sigma1.col(burnin)))) * arma::trans(spline);
   */
   //cov = spline * (arma::kron(GammaF.slice(burnin), LambdaC.slice(burnin)) * arma::inv(arma::diagmat(HC.slice(burnin))) *
-    //arma::trans(arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)))) * spline.t() + spline * arma::inv(arma::diagmat(arma::vectorise(Sigma.slice(burnin)))) * spline.t();
+  //arma::trans(arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)))) * spline.t() + spline * arma::inv(arma::diagmat(arma::vectorise(Sigma.slice(burnin)))) * spline.t();
   /*
   cov = spline * (arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin)) * arma::inv(convertToPrecision(Delta.col(burnin), LambdaC.n_cols, GammaC.n_cols)) *
   arma::trans(arma::kron(GammaC.slice(burnin), LambdaC.slice(burnin))) + arma::kron(arma::diagmat(1.0 / sigma2.col(burnin)),
@@ -91,89 +82,103 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
   eigvecFunc.slice(0) = eigvecFunc_temp.cols(splineT.n_rows-1-numeig+1, splineT.n_rows-1);
   
   eigvecLong.slice(0) = eigvecLong_temp.cols(splineS.n_rows - 1 - numeig+1, splineS.n_rows - 1);
-   */
+  */
   //eigvec = eigvec_temp.cols(splineT.n_rows-1-numeig+1, splineT.n_rows-1);
   //eigvecsq = arma::square(eigvec);
   meanM.col(0) = spline * arma::kron(GammaF(0).slice(burnin),
             LambdaF(0).slice(burnin)) * arma::trans(BetaF(0).slice(burnin));
   for(int k = 0; k < nchains; k++){
     for(int i = 0; i < iter - burnin; i++){
-      meanM.col(i + k * (iter - burnin)) = spline * arma::kron(GammaF(k).slice(burnin + i), LambdaF(k).slice(burnin + i)) * arma::trans(BetaF(k).slice(burnin + i));
+      if(i % 5000 == 0){
+        Rcpp::Rcout << i << std::endl;
+      }
+      Psi = splineS * GammaF(k).slice(burnin + i);
+      Phi = splineT * LambdaF(k).slice(burnin + i);
+      Psi_trapz = integrated_latent(Psi, s);
+      Phi_trapz = integrated_latent(Phi, s);
+      meanM.col(i + k * (iter - burnin)) = arma::vectorise(Phi * arma::reshape(BetaF(k).slice(burnin+i), Phi.n_cols, Psi.n_cols) * Psi.t());
       //cov = spline * (arma::kron(GammaF(k).slice(burnin + i), LambdaF(k).slice(burnin + i)) * arma::inv(arma::diagmat(HF(k).slice(burnin + i))) *
-        //arma::trans(arma::kron(GammaF(k).slice(burnin + i), LambdaF(k).slice(burnin + i)))) * spline.t() + spline * arma::inv(arma::diagmat(arma::vectorise(SigmaF(k).slice(burnin + i)))) * spline.t();
-      for(arma::uword jj = 0; jj < Psi.n_cols; jj++){
-        Psi.col(jj) = splineS * GammaF(k).slice(burnin + i).col(jj);
-        Psi_trapz(jj) = *REAL(trapz(s, Psi.col(jj) % Psi.col(jj)));
-      }
-      for(arma::uword jj = 0; jj < Phi.n_cols; jj++){
-        Phi.col(jj) = splineT * LambdaF(k).slice(burnin + i).col(jj);
-        Phi_trapz(jj) = *REAL(trapz(t, Phi.col(jj) % Phi.col(jj)));
-      }
+      //arma::trans(arma::kron(GammaF(k).slice(burnin + i), LambdaF(k).slice(burnin + i)))) * spline.t() + spline * arma::inv(arma::diagmat(arma::vectorise(SigmaF(k).slice(burnin + i)))) * spline.t();
       postcov = postcov + cov;
       //marginalFunc = getMarginalFunc(cov, splineS.n_rows, splineT.n_rows);
       //marginalLong = getMarginalLong(cov, splineS.n_rows, splineT.n_rows);
       //arma::eig_sym(eigvalFunc_temp, eigvecFunc_temp, marginalFunc);
       //arma::eig_sym(eigvalLong_temp, eigvecLong_temp, marginalLong);
-      H_trans = arma::reshape(1 / arma::diagvec(HF(k).slice(burnin + i)), q1s, q2s);
-      H_func = arma::diagmat(H_trans * Psi_trapz);
-      H_long = arma::diagmat(H_trans.t() * Phi_trapz);
+      H = arma::reshape(1 / arma::diagvec(HF(k).slice(burnin + i)), q1s, q2s);
+      S = 1 / SigmaF(k).slice(burnin + i);
+      /* 
+      H_func = arma::diagmat(H * Psi_trapz);
+      H_long = arma::diagmat(H.t() * Phi_trapz);
       Func_cov = splineT_int_sqrt * (arma::diagmat(1 / SigmaF(k).slice(burnin + i) * splineS_int.diag()) + LambdaF(k).slice(burnin + i) * arma::diagmat(H_func) * arma::trans(LambdaF(k).slice(burnin + i))) * splineT_int_sqrt;
       Long_cov = splineS_int_sqrt * (arma::diagmat(1 / SigmaF(k).slice(burnin + i).t() * splineT_int.diag()) + GammaF(k).slice(burnin + i) * arma::diagmat(H_long) * arma::trans(GammaF(k).slice(burnin + i))) * splineS_int_sqrt;
       arma::eig_sym(eigvalFunc_temp, Func_weight, Func_cov);
       arma::eig_sym(eigvalLong_temp, Long_weight, Long_cov);
+      
       eigvecFunc_temp = splineT * splineT_int_sqrt_inv * Func_weight.cols(splineT.n_cols - numeig, splineT.n_cols - 1);
       eigvecLong_temp = splineS * splineS_int_sqrt_inv * Long_weight.cols(splineS.n_cols - numeig, splineS.n_cols - 1);
+      */
+      List_func = extract_eigenfn(LambdaF(k).slice(burnin + i), S, H, splineT, splineT_int_sqrt, splineT_int_sqrt_inv, splineS_int, Psi_trapz, numeig);
+      List_long = extract_eigenfn(GammaF(k).slice(burnin + i), S.t(), H.t(), splineS, splineS_int_sqrt, splineS_int_sqrt_inv, splineT_int, Phi_trapz, numeig);
+      eigvecFunc_temp = Rcpp::as<arma::mat>(List_func["eigenfn"]);
+      eigvalFunc_temp = Rcpp::as<arma::vec>(List_func["eigenval"]);
+      eigvecLong_temp = Rcpp::as<arma::mat>(List_long["eigenfn"]);
+      eigvalLong_temp = Rcpp::as<arma::vec>(List_long["eigenval"]);
       eigvecFunc_temp = arma::normalise(eigvecFunc_temp, 2, 0);
       eigvecLong_temp = arma::normalise(eigvecLong_temp, 2, 0);
-      if(i % 5000 == 0){
-        Rcpp::Rcout << i << std::endl;
-      }
+      
       if(i > 1){
         for(arma::uword j = 0; j < numeig; j++){
           /*
           if(arma::norm(eigvecFunc_temp.col(splineT.n_rows-1-numeig+j+1)*(-1)-eigvecFuncmean.col(j)) <
             arma::norm(eigvecFunc_temp.col(splineT.n_rows-1-numeig+j+1)-eigvecFuncmean.col(j))){
-            eigvecFunc_temp.col(splineT.n_rows-1-numeig+j+1) = eigvecFunc_temp.col(splineT.n_rows-1-numeig+j+1) * (-1);
+          eigvecFunc_temp.col(splineT.n_rows-1-numeig+j+1) = eigvecFunc_temp.col(splineT.n_rows-1-numeig+j+1) * (-1);
           }
           */
+          
           if(arma::norm(eigvecFunc_temp.col(j)*(-1)-eigvecFuncmean.col(j)) <
             arma::norm(eigvecFunc_temp.col(j)-eigvecFuncmean.col(j))){
             eigvecFunc_temp.col(j) = eigvecFunc_temp.col(j) * (-1);
           }
+          
           /*
           if(arma::norm(eigvecLong_temp.col(splineS.n_rows - 1-numeig+j+1)*(-1)-eigvecLongmean.col(j)) <
             arma::norm(eigvecLong_temp.col(splineS.n_rows - 1-numeig+j+1)-eigvecLongmean.col(j))){
-            eigvecLong_temp.col(splineS.n_rows - 1-numeig+j+1) = eigvecLong_temp.col(splineS.n_rows - 1-numeig+j+1) * (-1);
-          }
+          eigvecLong_temp.col(splineS.n_rows - 1-numeig+j+1) = eigvecLong_temp.col(splineS.n_rows - 1-numeig+j+1) * (-1);
+            }
           */
           if(arma::norm(eigvecLong_temp.col(j)*(-1)-eigvecLongmean.col(j)) <
             arma::norm(eigvecLong_temp.col(j)-eigvecLongmean.col(j))){
             eigvecLong_temp.col(j) = eigvecLong_temp.col(j) * (-1);
           }
         }
-        eigvecFuncmean = eigvecFunc_temp + eigvecFuncmean;
-        eigvecLongmean = eigvecLong_temp + eigvecLongmean;
+        eigvecFuncmean = (eigvecFunc_temp - eigvecFuncmean) / i + eigvecFuncmean;
+        eigvecLongmean = (eigvecLong_temp - eigvecLongmean) / i + eigvecLongmean;
         //eigvecFuncmean = eigvecFunc_temp.cols(splineT.n_rows-1-numeig+1, splineT.n_rows-1) + eigvecFuncmean;
         //eigvecLongmean = eigvecLong_temp.cols(splineS.n_rows - 1-numeig+1, splineS.n_rows - 1) + eigvecLongmean;
       }
       eigvalFunc_temp = eigvalFunc_temp / arma::accu(eigvalFunc_temp);
+      
       eigvalLong_temp = eigvalLong_temp / arma::accu(eigvalLong_temp);
+      
       eigvalFunc.col(i + k * (iter - burnin)).head(splineT.n_cols) = eigvalFunc_temp;
+      
       eigvalLong.col(i + k * (iter - burnin)).head(splineS.n_cols) = eigvalLong_temp;
+      
       eigvecFunc.slice(i + k * (iter - burnin)) = eigvecFunc_temp;
+      
       eigvecLong.slice(i + k * (iter - burnin)) = eigvecLong_temp;
       //eigvecFunc.slice(i + k * (iter - burnin)) = eigvecFunc_temp.cols(splineT.n_rows-1-numeig+1,splineT.n_rows-1);
       //eigvecLong.slice(i + k * (iter - burnin)) = eigvecLong_temp.cols(splineS.n_rows - 1-numeig+1,splineS.n_rows - 1);
-
-      H_func.zeros();
-      H_long.zeros();
+      
+      //H_func.zeros();
+      //H_long.zeros();
+}
     }
-  }
   postcov = postcov / (nchains * (iter - burnin));
   
   arma::colvec postmean = arma::mean(meanM, 1);
-  eigvecFuncmean = arma::mean(eigvecFunc, 2);
-  eigvecLongmean = arma::mean(eigvecLong, 2);
+  //eigvecFuncmean = arma::mean(eigvecFunc, 2);
+  //eigvecLongmean = arma::mean(eigvecLong, 2);
   arma::colvec postsd = arma::trans(arma::stddev(arma::trans(meanM), 1));
   
   arma::mat eigvecFuncsd(splineT.n_rows,numeig);
@@ -220,26 +225,67 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
     eigvecLongupper.col(j) = eigvecLongmean.col(j) + a[0] * eigvecLongsd.col(j);
     eigvecLonglower.col(j) = eigvecLongmean.col(j) - a[0] * eigvecLongsd.col(j);
   }
-
+  
   
   return Rcpp::List::create(//Rcpp::Named("meanM", meanM),
     Rcpp::Named("postmean", postmean),
-                            Rcpp::Named("postsd", postsd),
-                          Rcpp::Named("upper", upper),
-                        Rcpp::Named("lower", lower),
-                        Rcpp::Named("eigvecFunc", eigvecFunc),
+    Rcpp::Named("postsd", postsd),
+    Rcpp::Named("upper", upper),
+    Rcpp::Named("lower", lower),
+    Rcpp::Named("eigvecFunc", eigvecFunc),
     Rcpp::Named("eigvecFuncmean", eigvecFuncmean),
-                    Rcpp::Named("eigvecFuncsd", eigvecFuncsd),
-                  Rcpp::Named("eigvecFunclower", eigvecFunclower),
-                Rcpp::Named("eigvecFuncupper", eigvecFuncupper),
+    Rcpp::Named("eigvecFuncsd", eigvecFuncsd),
+    Rcpp::Named("eigvecFunclower", eigvecFunclower),
+    Rcpp::Named("eigvecFuncupper", eigvecFuncupper),
     Rcpp::Named("eigvecLongmean", eigvecLongmean),
-              Rcpp::Named("eigvecLonglower", eigvecLonglower),
-            Rcpp::Named("eigvecLongupper", eigvecLongupper),
+    Rcpp::Named("eigvecLonglower", eigvecLonglower),
+    Rcpp::Named("eigvecLongupper", eigvecLongupper),
     Rcpp::Named("eigvecLong", eigvecLong),
     Rcpp::Named("eigvecLongsd", eigvecLongsd),
     Rcpp::Named("eigvalFunc", eigvalFunc),
     Rcpp::Named("eigvalLong", eigvalLong),
     Rcpp::Named("postcov", postcov));
   //Rcpp::Named("postcov_SE", postcov_SE));
+}
+
+// [[Rcpp::export]]
+arma::vec integrated_latent(arma::mat latent, arma::vec times){
+  arma::uword latent_dim = latent.n_cols;
+  arma::vec latent_int(latent_dim);
+  for(arma::uword i = 0; i < latent_dim; i++){
+    latent_int(i) = arma::as_scalar(trapz(times, latent.col(i) % latent.col(i)));
+  }
+  return(latent_int);
+}
+
+// [[Rcpp::export]]
+arma::mat integrated(arma::mat spline, arma::vec times){
+  arma::uword spline_dim = spline.n_cols;
+  arma::mat spline_int(spline_dim, spline_dim);
+  for(arma::uword i = 0; i < spline_dim; i++){
+    for(arma::uword j = 0; j < spline_dim; j++){
+      spline_int(i, j) = arma::as_scalar(trapz(times, spline.col(i) % spline.col(j)));
+    }
+  }
+  return(spline_int);
+}
+
+// [[Rcpp::export]]
+Rcpp::List extract_eigenfn(arma::mat latent, arma::mat S, arma::mat H, arma::mat spline,
+                           arma::mat spline_int_sqrt, arma::mat spline_int_sqrt_inv,
+                           arma::mat spline_int, arma::vec latent_trapz, arma::uword numeig){
+  arma::uword spline_dim = spline.n_cols;
+  arma::uword time_size = spline.n_rows;
+  arma::mat HD = arma::diagmat(H * latent_trapz);
+  arma::mat cov_latent = spline_int_sqrt * (arma::diagmat(S * spline_int.diag()) + latent * HD * latent.t()) * spline_int_sqrt;
+  arma::mat eigenfn;
+  arma::vec eigval;
+  arma::eig_sym(eigval, eigenfn, cov_latent);
+  arma::mat eigen_spline(time_size, numeig);
+  for(arma::uword i = 0; i < numeig; i++){
+    eigen_spline.col(i) = spline * spline_int_sqrt_inv * eigenfn.col(spline_dim - 1 - i);
+  }
+  
+  return(Rcpp::List::create(Rcpp::Named("eigenfn", eigen_spline), Rcpp::Named("eigenval", eigval)));
 }
 

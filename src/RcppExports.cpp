@@ -137,6 +137,49 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// integrated_latent
+arma::vec integrated_latent(arma::mat latent, arma::vec times);
+RcppExport SEXP _LFBayes_integrated_latent(SEXP latentSEXP, SEXP timesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type latent(latentSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type times(timesSEXP);
+    rcpp_result_gen = Rcpp::wrap(integrated_latent(latent, times));
+    return rcpp_result_gen;
+END_RCPP
+}
+// integrated
+arma::mat integrated(arma::mat spline, arma::vec times);
+RcppExport SEXP _LFBayes_integrated(SEXP splineSEXP, SEXP timesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type spline(splineSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type times(timesSEXP);
+    rcpp_result_gen = Rcpp::wrap(integrated(spline, times));
+    return rcpp_result_gen;
+END_RCPP
+}
+// extract_eigenfn
+Rcpp::List extract_eigenfn(arma::mat latent, arma::mat S, arma::mat H, arma::mat spline, arma::mat spline_int_sqrt, arma::mat spline_int_sqrt_inv, arma::mat spline_int, arma::vec latent_trapz, arma::uword numeig);
+RcppExport SEXP _LFBayes_extract_eigenfn(SEXP latentSEXP, SEXP SSEXP, SEXP HSEXP, SEXP splineSEXP, SEXP spline_int_sqrtSEXP, SEXP spline_int_sqrt_invSEXP, SEXP spline_intSEXP, SEXP latent_trapzSEXP, SEXP numeigSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type latent(latentSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type S(SSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type H(HSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type spline(splineSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type spline_int_sqrt(spline_int_sqrtSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type spline_int_sqrt_inv(spline_int_sqrt_invSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type spline_int(spline_intSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type latent_trapz(latent_trapzSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type numeig(numeigSEXP);
+    rcpp_result_gen = Rcpp::wrap(extract_eigenfn(latent, S, H, spline, spline_int_sqrt, spline_int_sqrt_inv, spline_int, latent_trapz, numeig));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getMarginalFunc
 arma::mat getMarginalFunc(arma::mat& cov, int ns, int nt);
 RcppExport SEXP _LFBayes_getMarginalFunc(SEXP covSEXP, SEXP nsSEXP, SEXP ntSEXP) {
@@ -1074,6 +1117,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_test1", (DL_FUNC) &_LFBayes_test1, 2},
     {"_LFBayes_eigenLF", (DL_FUNC) &_LFBayes_eigenLF, 5},
     {"_LFBayes_eigenLFChains", (DL_FUNC) &_LFBayes_eigenLFChains, 9},
+    {"_LFBayes_integrated_latent", (DL_FUNC) &_LFBayes_integrated_latent, 2},
+    {"_LFBayes_integrated", (DL_FUNC) &_LFBayes_integrated, 2},
+    {"_LFBayes_extract_eigenfn", (DL_FUNC) &_LFBayes_extract_eigenfn, 9},
     {"_LFBayes_getMarginalFunc", (DL_FUNC) &_LFBayes_getMarginalFunc, 3},
     {"_LFBayes_getMarginalLong", (DL_FUNC) &_LFBayes_getMarginalLong, 3},
     {"_LFBayes_mcmcWeak", (DL_FUNC) &_LFBayes_mcmcWeak, 10},

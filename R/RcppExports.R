@@ -33,6 +33,18 @@ eigenLFChains <- function(splineS, splineT, mod, numeig, iter, burnin, nchains, 
     .Call(`_LFBayes_eigenLFChains`, splineS, splineT, mod, numeig, iter, burnin, nchains, s, t)
 }
 
+integrated_latent <- function(latent, times) {
+    .Call(`_LFBayes_integrated_latent`, latent, times)
+}
+
+integrated <- function(spline, times) {
+    .Call(`_LFBayes_integrated`, spline, times)
+}
+
+extract_eigenfn <- function(latent, S, H, spline, spline_int_sqrt, spline_int_sqrt_inv, spline_int, latent_trapz, numeig) {
+    .Call(`_LFBayes_extract_eigenfn`, latent, S, H, spline, spline_int_sqrt, spline_int_sqrt_inv, spline_int, latent_trapz, numeig)
+}
+
 getMarginalFunc <- function(cov, ns, nt) {
     .Call(`_LFBayes_getMarginalFunc`, cov, ns, nt)
 }
