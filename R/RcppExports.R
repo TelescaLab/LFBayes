@@ -29,8 +29,8 @@ eigenLF <- function(splineS, splineT, mod, numeig, burnin) {
     .Call(`_LFBayes_eigenLF`, splineS, splineT, mod, numeig, burnin)
 }
 
-eigenLFChains <- function(splineS, splineT, mod, numeig, iter, burnin, nchains, s, t) {
-    .Call(`_LFBayes_eigenLFChains`, splineS, splineT, mod, numeig, iter, burnin, nchains, s, t)
+eigenLFChains <- function(splineS, splineT, mod, numeig, iter, burnin, nchains, s, t, alpha) {
+    .Call(`_LFBayes_eigenLFChains`, splineS, splineT, mod, numeig, iter, burnin, nchains, s, t, alpha)
 }
 
 integrated_latent <- function(latent, times) {

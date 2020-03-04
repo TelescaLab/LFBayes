@@ -119,8 +119,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // eigenLFChains
-Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains, arma::vec s, arma::vec t);
-RcppExport SEXP _LFBayes_eigenLFChains(SEXP splineSSEXP, SEXP splineTSEXP, SEXP modSEXP, SEXP numeigSEXP, SEXP iterSEXP, SEXP burninSEXP, SEXP nchainsSEXP, SEXP sSEXP, SEXP tSEXP) {
+Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains, arma::vec s, arma::vec t, double alpha);
+RcppExport SEXP _LFBayes_eigenLFChains(SEXP splineSSEXP, SEXP splineTSEXP, SEXP modSEXP, SEXP numeigSEXP, SEXP iterSEXP, SEXP burninSEXP, SEXP nchainsSEXP, SEXP sSEXP, SEXP tSEXP, SEXP alphaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -133,7 +133,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type nchains(nchainsSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type s(sSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type t(tSEXP);
-    rcpp_result_gen = Rcpp::wrap(eigenLFChains(splineS, splineT, mod, numeig, iter, burnin, nchains, s, t));
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    rcpp_result_gen = Rcpp::wrap(eigenLFChains(splineS, splineT, mod, numeig, iter, burnin, nchains, s, t, alpha));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1116,7 +1117,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_calculate_DIC_Missing", (DL_FUNC) &_LFBayes_calculate_DIC_Missing, 8},
     {"_LFBayes_test1", (DL_FUNC) &_LFBayes_test1, 2},
     {"_LFBayes_eigenLF", (DL_FUNC) &_LFBayes_eigenLF, 5},
-    {"_LFBayes_eigenLFChains", (DL_FUNC) &_LFBayes_eigenLFChains, 9},
+    {"_LFBayes_eigenLFChains", (DL_FUNC) &_LFBayes_eigenLFChains, 10},
     {"_LFBayes_integrated_latent", (DL_FUNC) &_LFBayes_integrated_latent, 2},
     {"_LFBayes_integrated", (DL_FUNC) &_LFBayes_integrated, 2},
     {"_LFBayes_extract_eigenfn", (DL_FUNC) &_LFBayes_extract_eigenfn, 9},

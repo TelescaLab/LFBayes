@@ -10,7 +10,7 @@ Rcpp::List extract_eigenfn(arma::mat latent, arma::mat S, arma::mat H, arma::mat
                            arma::mat spline_int, arma::vec latent_trapz, arma::uword numeig);
 
 // [[Rcpp::export]]
-Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains, arma::vec s, arma::vec t){
+Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains, arma::vec s, arma::vec t, double alpha){
   arma::field<arma::cube> LambdaF = mod["Lambda"];
   arma::field<arma::cube> GammaF = mod["Gamma"];
   arma::field<arma::cube> BetaF = mod["Beta"];
@@ -209,7 +209,7 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
   }
   Rcpp::Environment base("package:stats");
   Rcpp::Function quantile_r = base["quantile"];
-  Rcpp::NumericVector a =  quantile_r(mmean, .975);
+  Rcpp::NumericVector a =  quantile_r(mmean, 1 - alpha);
   arma::mat eigvecFuncupper(splineT.n_rows, numeig);
   arma::mat eigvecFunclower(splineT.n_rows, numeig);
   arma::mat eigvecLongupper(splineS.n_rows, numeig);
@@ -218,10 +218,10 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
   arma::vec lower = postmean - a[0] * postsd;
   
   for(arma::uword j = 0; j < numeig; j++){
-    a = quantile_r(eigvecFuncm.col(j), .975);
+    a = quantile_r(eigvecFuncm.col(j), 1 - alpha);
     eigvecFuncupper.col(j) = eigvecFuncmean.col(j) + a[0] * eigvecFuncsd.col(j);
     eigvecFunclower.col(j) = eigvecFuncmean.col(j) - a[0] * eigvecFuncsd.col(j);
-    a = quantile_r(eigvecLongm.col(j), .975);
+    a = quantile_r(eigvecLongm.col(j), 1 - alpha);
     eigvecLongupper.col(j) = eigvecLongmean.col(j) + a[0] * eigvecLongsd.col(j);
     eigvecLonglower.col(j) = eigvecLongmean.col(j) - a[0] * eigvecLongsd.col(j);
   }
