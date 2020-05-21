@@ -7,6 +7,8 @@
 // [[Rcpp::export]]
 Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin, int nchains){
   // Allocate memory for parameters
+  Rcpp::Rcout << "1" << std::endl;
+  
   int p1 = splineT.n_cols;
   int p2 = splineS.n_cols;
   arma::field<arma::cube> LambdaF(nchains);
@@ -91,12 +93,12 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
   DM1.ones();
   DM2.ones();
   
-  Rcpp::Rcout << "Starting MCMC..." << std::endl;
+  //Rcpp::Rcout << "Starting MCMC..." << std::endl;
   for(int k = 0; k < nchains; k++){
     for(int i = 0; i < iter; i++){
-      if(i % 5000 == 0){
-        Rcpp::Rcout << i << std::endl;
-      }
+    //  if(i % 5000 == 0){
+     //   Rcpp::Rcout << i << std::endl;
+   //   }
       for(int j = 0; j < thin; j++){
         
         updateGammaSig(Eta, Lambda, DM2, Phi2, Sigma,
@@ -152,7 +154,7 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
   }
   
   
-  Rcpp::Rcout << "All done!";
+  //Rcpp::Rcout << "All done!";
   
   Rcpp::List mod = Rcpp::List::create(Rcpp::Named("Lambda", LambdaF),
                                       Rcpp::Named("Gamma", GammaF),
@@ -160,7 +162,7 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
                                       Rcpp::Named("Beta", BetaF), Rcpp::Named("Varphi", varphiF),
                                       Rcpp::Named("initialY", initialY), Rcpp::Named("imputedY", imputedY),
                                       
-                                      //Rcpp::Named("Theta", thetaF));
+                                      Rcpp::Named("Theta", thetaF),
                                       
                                       Rcpp::Named("Delta1", DM1F), Rcpp::Named("Delta2", DM2F));
                                       /*

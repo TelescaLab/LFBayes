@@ -207,6 +207,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// loglik
+arma::mat loglik(arma::vec y, arma::mat X, arma::mat Bs, arma::mat Bt, arma::field<arma::vec> missing, arma::field<arma::cube> Theta, arma::field<arma::vec> Varphi, arma::uword iter, arma::uword burnin);
+RcppExport SEXP _LFBayes_loglik(SEXP ySEXP, SEXP XSEXP, SEXP BsSEXP, SEXP BtSEXP, SEXP missingSEXP, SEXP ThetaSEXP, SEXP VarphiSEXP, SEXP iterSEXP, SEXP burninSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Bs(BsSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type Bt(BtSEXP);
+    Rcpp::traits::input_parameter< arma::field<arma::vec> >::type missing(missingSEXP);
+    Rcpp::traits::input_parameter< arma::field<arma::cube> >::type Theta(ThetaSEXP);
+    Rcpp::traits::input_parameter< arma::field<arma::vec> >::type Varphi(VarphiSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type iter(iterSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type burnin(burninSEXP);
+    rcpp_result_gen = Rcpp::wrap(loglik(y, X, Bs, Bt, missing, Theta, Varphi, iter, burnin));
+    return rcpp_result_gen;
+END_RCPP
+}
 // mcmcWeak
 Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin);
 RcppExport SEXP _LFBayes_mcmcWeak(SEXP ySEXP, SEXP missingSEXP, SEXP XSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP q1SEXP, SEXP q2SEXP, SEXP iterSEXP, SEXP thinSEXP, SEXP burninSEXP) {
@@ -1123,6 +1142,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_extract_eigenfn", (DL_FUNC) &_LFBayes_extract_eigenfn, 9},
     {"_LFBayes_getMarginalFunc", (DL_FUNC) &_LFBayes_getMarginalFunc, 3},
     {"_LFBayes_getMarginalLong", (DL_FUNC) &_LFBayes_getMarginalLong, 3},
+    {"_LFBayes_loglik", (DL_FUNC) &_LFBayes_loglik, 9},
     {"_LFBayes_mcmcWeak", (DL_FUNC) &_LFBayes_mcmcWeak, 10},
     {"_LFBayes_mcmcWeakChains", (DL_FUNC) &_LFBayes_mcmcWeakChains, 11},
     {"_LFBayes_mcmcWeakChainsPCA", (DL_FUNC) &_LFBayes_mcmcWeakChainsPCA, 11},

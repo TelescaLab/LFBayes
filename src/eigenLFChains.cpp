@@ -11,6 +11,7 @@ Rcpp::List extract_eigenfn(arma::mat latent, arma::mat S, arma::mat H, arma::mat
 
 // [[Rcpp::export]]
 Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains, arma::vec s, arma::vec t, double alpha){
+  
   arma::field<arma::cube> LambdaF = mod["Lambda"];
   arma::field<arma::cube> GammaF = mod["Gamma"];
   arma::field<arma::cube> BetaF = mod["Beta"];
@@ -41,18 +42,27 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
   arma::mat Long_cov;
   arma::mat Func_weight;
   arma::mat Long_weight;
-  Rcpp::Environment pracma("package:pracma");
-  Rcpp::Function trapz = pracma["trapz"];
+  //Rcpp::Environment pracma("package:pracma");
+  //Rcpp::Function trapz = pracma["trapz"];
+  Rcpp::Rcout << "2" << std::endl;
+  
   arma::vec splineT_trapz(splineT.n_cols);
+
   arma::vec splineS_trapz(splineS.n_cols);
+
   arma::vec Psi_trapz(GammaF(0).n_cols);
+
   arma::vec Phi_trapz(LambdaF(0).n_cols);
+
   arma::mat Psi(splineS.n_rows, GammaF(0).n_cols);
   arma::mat Phi(splineT.n_rows, LambdaF(0).n_cols);
+
   arma::mat splineS_int(splineS.n_cols, splineS.n_cols);
   arma::mat splineT_int(splineT.n_cols, splineT.n_cols);
+
   splineS_int = integrated(splineS, s);
   splineT_int = integrated(splineT, t);
+
   arma::mat splineS_int_sqrt = arma::sqrtmat_sympd(splineS_int);
   arma::mat splineS_int_sqrt_inv = arma::inv_sympd(splineS_int_sqrt);
   arma::mat splineT_int_sqrt = arma::sqrtmat_sympd(splineT_int);
@@ -89,13 +99,16 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
             LambdaF(0).slice(burnin)) * arma::trans(BetaF(0).slice(burnin));
   for(int k = 0; k < nchains; k++){
     for(int i = 0; i < iter - burnin; i++){
-      if(i % 5000 == 0){
-        Rcpp::Rcout << i << std::endl;
+      if(i % 100 == 0){
+     //   Rcpp::Rcout << i << std::endl;
       }
+
       Psi = splineS * GammaF(k).slice(burnin + i);
       Phi = splineT * LambdaF(k).slice(burnin + i);
+
       Psi_trapz = integrated_latent(Psi, s);
-      Phi_trapz = integrated_latent(Phi, s);
+      Phi_trapz = integrated_latent(Phi, t);
+
       meanM.col(i + k * (iter - burnin)) = arma::vectorise(Phi * arma::reshape(BetaF(k).slice(burnin+i), Phi.n_cols, Psi.n_cols) * Psi.t());
       //cov = spline * (arma::kron(GammaF(k).slice(burnin + i), LambdaF(k).slice(burnin + i)) * arma::inv(arma::diagmat(HF(k).slice(burnin + i))) *
       //arma::trans(arma::kron(GammaF(k).slice(burnin + i), LambdaF(k).slice(burnin + i)))) * spline.t() + spline * arma::inv(arma::diagmat(arma::vectorise(SigmaF(k).slice(burnin + i)))) * spline.t();
@@ -207,23 +220,26 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
       eigvecLongm(i, j) = arma::max(arma::abs(eigvecLong.slice(i).col(j)-eigvecLongmean.col(j)) / eigvecLongsd.col(j));
     }
   }
-  Rcpp::Environment base("package:stats");
-  Rcpp::Function quantile_r = base["quantile"];
-  Rcpp::NumericVector a =  quantile_r(mmean, 1 - alpha);
+  //Rcpp::Environment base("package:stats");
+  //Rcpp::Function quantile_r = base["quantile"];
+  arma::vec quantiles(1);
+  quantiles(0) = 1 - alpha;
+  //Rcpp::NumericVector a = arma::quantile(mmean, quantiles);
+  double a = arma::as_scalar(arma::quantile(mmean, quantiles));
   arma::mat eigvecFuncupper(splineT.n_rows, numeig);
   arma::mat eigvecFunclower(splineT.n_rows, numeig);
   arma::mat eigvecLongupper(splineS.n_rows, numeig);
   arma::mat eigvecLonglower(splineS.n_rows, numeig);
-  arma::vec upper = postmean + a[0] * postsd;
-  arma::vec lower = postmean - a[0] * postsd;
+  arma::vec upper = postmean + a * postsd;
+  arma::vec lower = postmean - a * postsd;
   
   for(arma::uword j = 0; j < numeig; j++){
-    a = quantile_r(eigvecFuncm.col(j), 1 - alpha);
-    eigvecFuncupper.col(j) = eigvecFuncmean.col(j) + a[0] * eigvecFuncsd.col(j);
-    eigvecFunclower.col(j) = eigvecFuncmean.col(j) - a[0] * eigvecFuncsd.col(j);
-    a = quantile_r(eigvecLongm.col(j), 1 - alpha);
-    eigvecLongupper.col(j) = eigvecLongmean.col(j) + a[0] * eigvecLongsd.col(j);
-    eigvecLonglower.col(j) = eigvecLongmean.col(j) - a[0] * eigvecLongsd.col(j);
+    a = arma::as_scalar(arma::quantile(eigvecFuncm.col(j), quantiles));
+    eigvecFuncupper.col(j) = eigvecFuncmean.col(j) + a * eigvecFuncsd.col(j);
+    eigvecFunclower.col(j) = eigvecFuncmean.col(j) - a * eigvecFuncsd.col(j);
+    a = arma::as_scalar(arma::quantile(eigvecLongm.col(j), quantiles));
+    eigvecLongupper.col(j) = eigvecLongmean.col(j) + a * eigvecLongsd.col(j);
+    eigvecLonglower.col(j) = eigvecLongmean.col(j) - a * eigvecLongsd.col(j);
   }
   
   
@@ -253,7 +269,7 @@ arma::vec integrated_latent(arma::mat latent, arma::vec times){
   arma::uword latent_dim = latent.n_cols;
   arma::vec latent_int(latent_dim);
   for(arma::uword i = 0; i < latent_dim; i++){
-    latent_int(i) = arma::as_scalar(trapz(times, latent.col(i) % latent.col(i)));
+    latent_int(i) = arma::as_scalar(arma::trapz(times, latent.col(i) % latent.col(i)));
   }
   return(latent_int);
 }
@@ -264,7 +280,7 @@ arma::mat integrated(arma::mat spline, arma::vec times){
   arma::mat spline_int(spline_dim, spline_dim);
   for(arma::uword i = 0; i < spline_dim; i++){
     for(arma::uword j = 0; j < spline_dim; j++){
-      spline_int(i, j) = arma::as_scalar(trapz(times, spline.col(i) % spline.col(j)));
+      spline_int(i, j) = arma::as_scalar(arma::trapz(times, spline.col(i) % spline.col(j)));
     }
   }
   return(spline_int);

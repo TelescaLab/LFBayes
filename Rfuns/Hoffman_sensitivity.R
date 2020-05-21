@@ -1,4 +1,5 @@
-args = commandArgs(trailingOnly = TRUE)
+args <- 3000
+#args = commandArgs(trailingOnly = TRUE)
 args <- as.numeric(args[1])
 library(splines)
 library(MASS)
@@ -47,7 +48,7 @@ if(args[1] > 3500 & args[1] <= 4000){
 }
 
 cat("Seed is", args[1] %% 500, "splinenum is", splinenum, "q is", q1s)
-
+alpha <- 0.1
 errorvar <- .025
 SS <- 20
 TT <- 20
@@ -139,12 +140,12 @@ H <- GenerateH(q1, q2)
 mu1 <- GenerateMu1(s,t)
 Lambda <- Loading.Matern(t, p1, q1, Bt)
 Gamma <- Loading.Brown.Bridge(s, p2, q2)
-Cov <- kronecker(Bs%*%Gamma, Bt%*%Lambda)%*%H%*%t(kronecker(Bs%*%Gamma, Bt%*%Lambda)) + errorvar * diag(SS * TT)
+Cov <- kronecker(Bs%*%Gamma.new, Bt%*%Lambda)%*%H%*%t(kronecker(Bs%*%Gamma.new, Bt%*%Lambda)) + errorvar * diag(SS * TT)
 Bt1 <- bs(t, df = splinenum, intercept = TRUE)
 Bs1 <- bs(s, df = splinenum, intercept = TRUE)
 
-iter <- 20000 # Number of iterations
-burnin <- 5000 # Burnin iterations
+iter <- 5000 # Number of iterations
+burnin <- 500 # Burnin iterations
 thin <- 1 # Thinning for each chain
 nchain <- 1 # Number of chains
 neig <- 3 # Number of eigenfunctions for inference
@@ -167,7 +168,52 @@ for(ii in 1:n){
 X <- rep(1,n)
 dim(X) <- c(n,1)
 MCMC <- mcmcWeakChains(y, missing, X, Bs1, Bt1, q1s, q2s, iter, thin, burnin, nchain)
-MCMC_eigen <- eigenLFChains(Bs1, Bt1, MCMC, neig, iter, burnin, nchain,s,t)
+Bs1_extra <- bs(seq(from = 0, to = 1, length.out = 60), df = splinenum, intercept = TRUE)
+Bt1_extra <- bs(seq(from = 0, to = 1, length.out = 60), df = splinenum, intercept = TRUE)
+s_extra <- seq(from = 0, to = 1, length.out = 60)
+t_extra <- seq(from = 0, to = 1, length.out = 60)
+MCMC_eigen <- eigenLFChains(Bs1, Bt1, MCMC, 3, iter, burnin, nchain,s,t, alpha)
+
+my_tibble <- tibble(long = c(m1[,1], m1[,2], m1[,3]),
+                    time = rep(seq(from = 0, to = 1, length.out = TT), 3),
+                    func = factor(rep(c("Eigenfunction 1", "Eigenfunction 2", "Eigenfunction 3"), each = SS)),
+                    upper = c(MCMC_eigen$eigvecLongupper[,1],
+                              MCMC_eigen$eigvecLongupper[,2],
+                              MCMC_eigen$eigvecLongupper[,3]),
+                    lower = c(MCMC_eigen$eigvecLonglower[,1],
+                              MCMC_eigen$eigvecLonglower[,2],
+                              MCMC_eigen$eigvecLonglower[,3]))
+
+# my_tibble <- tibble(long = c(m1[,1], m1[,2], m1[,3]),
+#                     time = rep(seq(from = 0, to = 1, length.out = TT), 3),
+#                     func = rep(1:3, each = SS),
+#                     upper = c(MCMC_eigen$eigvecLongupper[,1],
+#                               MCMC_eigen$eigvecLongupper[,2],
+#                               MCMC_eigen$eigvecLongupper[,3]),
+#                     lower = c(MCMC_eigen$eigvecLonglower[,1],
+#                               MCMC_eigen$eigvecLonglower[,2],
+#                               MCMC_eigen$eigvecLonglower[,3]))
+quantile(MCMC_eigen$eigvalLong[12,100:4500], c(.5, .95))
+quantile(MCMC_eigen$eigvalLong[11,100:4500], c(.5, .95))
+levels(my_tibble$func) <- c("Eigenfunction 1, 70% - 75%", "Eigenfunction 2, 21% - 26%", "Eigenfunction 3")
+#my_label = list('1' = "Eigenfunction 1", '2' = "Eigenfunction 2", '3' = "Eigenfunction 3")
+my_tibble %>%
+  filter(func == "Eigenfunction 1, 70% - 75%" | func == "Eigenfunction 2, 21% - 26%") %>%
+  ggplot(aes(x = time)) + geom_line(aes(y = long)) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.3, fill = "blue") +
+  facet_wrap(func ~ .) +
+  xlab("Time") +
+  ylab("Eigenfunction value") +
+  theme_bw()
+#my_tibble %>% filter(func == "Eigenfunction 1") %>% ggplot(aes(x = time)) + geom_line(aes(y = long))
+lines(t,MCMC_eigen$eigvecFunclower[,2], type = "l")
+plot(t,MCMC_eigen$eigvecFuncupper[,2], type = "l")
+points(t,m2[,2])
+
+lines(s,MCMC_eigen$eigvecLonglower[,1], type = "l")
+plot(s,MCMC_eigen$eigvecLongupper[,1], type = "l")
+points(s,-m1[,1])
+
 signLong <- rep(1,3)
 signLong[1] <- if(sum((MCMC_eigen$eigvecLongmean[,1] + m1[,1])^2) < sum((MCMC_eigen$eigvecLongmean[,1] - m1[,1])^2)) -1 else 1
 signLong[2] <- if(sum((MCMC_eigen$eigvecLongmean[,2] + m1[,2])^2) < sum((MCMC_eigen$eigvecLongmean[,2] - m1[,2])^2)) -1 else 1

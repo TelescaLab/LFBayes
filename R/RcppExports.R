@@ -53,6 +53,10 @@ getMarginalLong <- function(cov, ns, nt) {
     .Call(`_LFBayes_getMarginalLong`, cov, ns, nt)
 }
 
+loglik <- function(y, X, Bs, Bt, missing, Theta, Varphi, iter, burnin) {
+    .Call(`_LFBayes_loglik`, y, X, Bs, Bt, missing, Theta, Varphi, iter, burnin)
+}
+
 mcmcWeak <- function(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin) {
     .Call(`_LFBayes_mcmcWeak`, y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin)
 }
