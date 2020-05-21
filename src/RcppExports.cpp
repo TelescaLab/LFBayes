@@ -247,8 +247,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // mcmcWeakChains
-Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin, int nchains);
-RcppExport SEXP _LFBayes_mcmcWeakChains(SEXP ySEXP, SEXP missingSEXP, SEXP XSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP q1SEXP, SEXP q2SEXP, SEXP iterSEXP, SEXP thinSEXP, SEXP burninSEXP, SEXP nchainsSEXP) {
+Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin, int nchains, int test);
+RcppExport SEXP _LFBayes_mcmcWeakChains(SEXP ySEXP, SEXP missingSEXP, SEXP XSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP q1SEXP, SEXP q2SEXP, SEXP iterSEXP, SEXP thinSEXP, SEXP burninSEXP, SEXP nchainsSEXP, SEXP testSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -263,7 +263,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type thin(thinSEXP);
     Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
     Rcpp::traits::input_parameter< int >::type nchains(nchainsSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmcWeakChains(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains));
+    Rcpp::traits::input_parameter< int >::type test(testSEXP);
+    rcpp_result_gen = Rcpp::wrap(mcmcWeakChains(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains, test));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1144,7 +1145,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_getMarginalLong", (DL_FUNC) &_LFBayes_getMarginalLong, 3},
     {"_LFBayes_loglik", (DL_FUNC) &_LFBayes_loglik, 9},
     {"_LFBayes_mcmcWeak", (DL_FUNC) &_LFBayes_mcmcWeak, 10},
-    {"_LFBayes_mcmcWeakChains", (DL_FUNC) &_LFBayes_mcmcWeakChains, 11},
+    {"_LFBayes_mcmcWeakChains", (DL_FUNC) &_LFBayes_mcmcWeakChains, 12},
     {"_LFBayes_mcmcWeakChainsPCA", (DL_FUNC) &_LFBayes_mcmcWeakChainsPCA, 11},
     {"_LFBayes_timesTwo", (DL_FUNC) &_LFBayes_timesTwo, 1},
     {"_LFBayes_convertToPrecision", (DL_FUNC) &_LFBayes_convertToPrecision, 3},

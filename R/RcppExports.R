@@ -61,8 +61,8 @@ mcmcWeak <- function(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin
     .Call(`_LFBayes_mcmcWeak`, y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin)
 }
 
-mcmcWeakChains <- function(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains) {
-    .Call(`_LFBayes_mcmcWeakChains`, y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains)
+mcmcWeakChains <- function(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains, test) {
+    .Call(`_LFBayes_mcmcWeakChains`, y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains, test)
 }
 
 mcmcWeakChainsPCA <- function(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains) {
