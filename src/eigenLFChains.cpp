@@ -1,14 +1,8 @@
 #include <RcppArmadillo.h>
 #include "updateParam.h"
 #include <typeinfo>
+#include "utility.h"
 // [[Rcpp::depends(RcppArmadillo)]]
-
-arma::mat integrated(arma::mat spline, arma::vec times);
-arma::vec integrated_latent(arma::mat latent, arma::vec times);
-Rcpp::List extract_eigenfn(arma::mat latent, arma::mat S, arma::mat H, arma::mat spline,
-                           arma::mat spline_int_sqrt, arma::mat spline_int_sqrt_inv,
-                           arma::mat spline_int, arma::vec latent_trapz, arma::uword numeig);
-
 // [[Rcpp::export]]
 Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains, arma::vec s, arma::vec t, double alpha){
   
@@ -59,10 +53,15 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
 
   arma::mat splineS_int(splineS.n_cols, splineS.n_cols);
   arma::mat splineT_int(splineT.n_cols, splineT.n_cols);
+<<<<<<< HEAD
 
   splineS_int = integrated(splineS, s);
   splineT_int = integrated(splineT, t);
 
+=======
+  splineS_int = integrated55(splineS, s);
+  splineT_int = integrated55(splineT, t);
+>>>>>>> classes
   arma::mat splineS_int_sqrt = arma::sqrtmat_sympd(splineS_int);
   arma::mat splineS_int_sqrt_inv = arma::inv_sympd(splineS_int_sqrt);
   arma::mat splineT_int_sqrt = arma::sqrtmat_sympd(splineT_int);
@@ -97,18 +96,29 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
   //eigvecsq = arma::square(eigvec);
   meanM.col(0) = spline * arma::kron(GammaF(0).slice(burnin),
             LambdaF(0).slice(burnin)) * arma::trans(BetaF(0).slice(burnin));
+  Rcpp::Rcout << "Starting post-processing..." << std::endl;
   for(int k = 0; k < nchains; k++){
     for(int i = 0; i < iter - burnin; i++){
+<<<<<<< HEAD
       if(i % 100 == 0){
      //   Rcpp::Rcout << i << std::endl;
+=======
+      if(int(i) % int(floor(double(iter - burnin) / 10.0)) == 0){
+        Rcpp::Rcout << 100 * i / (iter - burnin) << '%' << std::endl;
+>>>>>>> classes
       }
 
       Psi = splineS * GammaF(k).slice(burnin + i);
       Phi = splineT * LambdaF(k).slice(burnin + i);
+<<<<<<< HEAD
 
       Psi_trapz = integrated_latent(Psi, s);
       Phi_trapz = integrated_latent(Phi, t);
 
+=======
+      Psi_trapz = integrated_latent55(Psi, s);
+      Phi_trapz = integrated_latent55(Phi, s);
+>>>>>>> classes
       meanM.col(i + k * (iter - burnin)) = arma::vectorise(Phi * arma::reshape(BetaF(k).slice(burnin+i), Phi.n_cols, Psi.n_cols) * Psi.t());
       //cov = spline * (arma::kron(GammaF(k).slice(burnin + i), LambdaF(k).slice(burnin + i)) * arma::inv(arma::diagmat(HF(k).slice(burnin + i))) *
       //arma::trans(arma::kron(GammaF(k).slice(burnin + i), LambdaF(k).slice(burnin + i)))) * spline.t() + spline * arma::inv(arma::diagmat(arma::vectorise(SigmaF(k).slice(burnin + i)))) * spline.t();
@@ -130,8 +140,8 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
       eigvecFunc_temp = splineT * splineT_int_sqrt_inv * Func_weight.cols(splineT.n_cols - numeig, splineT.n_cols - 1);
       eigvecLong_temp = splineS * splineS_int_sqrt_inv * Long_weight.cols(splineS.n_cols - numeig, splineS.n_cols - 1);
       */
-      List_func = extract_eigenfn(LambdaF(k).slice(burnin + i), S, H, splineT, splineT_int_sqrt, splineT_int_sqrt_inv, splineS_int, Psi_trapz, numeig);
-      List_long = extract_eigenfn(GammaF(k).slice(burnin + i), S.t(), H.t(), splineS, splineS_int_sqrt, splineS_int_sqrt_inv, splineT_int, Phi_trapz, numeig);
+      List_func = extract_eigenfn55(LambdaF(k).slice(burnin + i), S, H, splineT, splineT_int_sqrt, splineT_int_sqrt_inv, splineS_int, Psi_trapz, numeig);
+      List_long = extract_eigenfn55(GammaF(k).slice(burnin + i), S.t(), H.t(), splineS, splineS_int_sqrt, splineS_int_sqrt_inv, splineT_int, Phi_trapz, numeig);
       eigvecFunc_temp = Rcpp::as<arma::mat>(List_func["eigenfn"]);
       eigvalFunc_temp = Rcpp::as<arma::vec>(List_func["eigenval"]);
       eigvecLong_temp = Rcpp::as<arma::mat>(List_long["eigenfn"]);
@@ -185,8 +195,8 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
       
       //H_func.zeros();
       //H_long.zeros();
-}
     }
+  }
   postcov = postcov / (nchains * (iter - burnin));
   
   arma::colvec postmean = arma::mean(meanM, 1);
@@ -242,6 +252,7 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
     eigvecLonglower.col(j) = eigvecLongmean.col(j) - a * eigvecLongsd.col(j);
   }
   
+  Rcpp::Rcout << "All done!" << std::endl;
   
   return Rcpp::List::create(//Rcpp::Named("meanM", meanM),
     Rcpp::Named("postmean", postmean),
@@ -264,6 +275,7 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
   //Rcpp::Named("postcov_SE", postcov_SE));
 }
 
+<<<<<<< HEAD
 // [[Rcpp::export]]
 arma::vec integrated_latent(arma::mat latent, arma::vec times){
   arma::uword latent_dim = latent.n_cols;
@@ -305,3 +317,5 @@ Rcpp::List extract_eigenfn(arma::mat latent, arma::mat S, arma::mat H, arma::mat
   return(Rcpp::List::create(Rcpp::Named("eigenfn", eigen_spline), Rcpp::Named("eigenval", eigval)));
 }
 
+=======
+>>>>>>> classes

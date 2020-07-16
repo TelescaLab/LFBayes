@@ -25,24 +25,12 @@ test1 <- function(observed, S) {
     invisible(.Call(`_LFBayes_test1`, observed, S))
 }
 
-eigenLF <- function(splineS, splineT, mod, numeig, burnin) {
-    .Call(`_LFBayes_eigenLF`, splineS, splineT, mod, numeig, burnin)
+LFB_post <- function(splineS, splineT, mod, numeig, iter, burnin, nchains, s, t) {
+    .Call(`_LFBayes_LFB_post`, splineS, splineT, mod, numeig, iter, burnin, nchains, s, t)
 }
 
 eigenLFChains <- function(splineS, splineT, mod, numeig, iter, burnin, nchains, s, t, alpha) {
     .Call(`_LFBayes_eigenLFChains`, splineS, splineT, mod, numeig, iter, burnin, nchains, s, t, alpha)
-}
-
-integrated_latent <- function(latent, times) {
-    .Call(`_LFBayes_integrated_latent`, latent, times)
-}
-
-integrated <- function(spline, times) {
-    .Call(`_LFBayes_integrated`, spline, times)
-}
-
-extract_eigenfn <- function(latent, S, H, spline, spline_int_sqrt, spline_int_sqrt_inv, spline_int, latent_trapz, numeig) {
-    .Call(`_LFBayes_extract_eigenfn`, latent, S, H, spline, spline_int_sqrt, spline_int_sqrt_inv, spline_int, latent_trapz, numeig)
 }
 
 getMarginalFunc <- function(cov, ns, nt) {
@@ -299,5 +287,17 @@ updateGammaPCA <- function(Eta, Lambda, Sigma, Delta, Alpha, Theta) {
 
 gam_trunc_left <- function(a, b, cut) {
     .Call(`_LFBayes_gam_trunc_left`, a, b, cut)
+}
+
+integrated_latent55 <- function(latent, times) {
+    .Call(`_LFBayes_integrated_latent55`, latent, times)
+}
+
+integrated55 <- function(spline, times) {
+    .Call(`_LFBayes_integrated55`, spline, times)
+}
+
+extract_eigenfn55 <- function(latent, S, H, spline, spline_int_sqrt, spline_int_sqrt_inv, spline_int, latent_trapz, numeig) {
+    .Call(`_LFBayes_extract_eigenfn55`, latent, S, H, spline, spline_int_sqrt, spline_int_sqrt_inv, spline_int, latent_trapz, numeig)
 }
 

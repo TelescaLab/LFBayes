@@ -96,9 +96,15 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
   //Rcpp::Rcout << "Starting MCMC..." << std::endl;
   for(int k = 0; k < nchains; k++){
     for(int i = 0; i < iter; i++){
+<<<<<<< HEAD
     //  if(i % 5000 == 0){
      //   Rcpp::Rcout << i << std::endl;
    //   }
+=======
+      if(int(i) % int(floor(double(iter) / 10.0)) == 0){
+        Rcpp::Rcout << 100 * i / iter << '%' << std::endl;
+      }
+>>>>>>> classes
       for(int j = 0; j < thin; j++){
         
         updateGammaSig(Eta, Lambda, DM2, Phi2, Sigma,
@@ -154,7 +160,11 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
   }
   
   
+<<<<<<< HEAD
   //Rcpp::Rcout << "All done!";
+=======
+  Rcpp::Rcout << "All done!" << std::endl;
+>>>>>>> classes
   
   Rcpp::List mod = Rcpp::List::create(Rcpp::Named("Lambda", LambdaF),
                                       Rcpp::Named("Gamma", GammaF),
