@@ -5,7 +5,7 @@ library(MASS)
 library(fdapace)
 library(LFBayes)
 library(pracma)
-library(roahd)
+#library(roahd)
 #setwd("/Users/John/Downloads/LongFunc Code/ChenCode")
 setwd("/Users/John/Documents/Johnstuff/LFBayes/Rfuns")
 
@@ -117,6 +117,32 @@ nchain <- 1 # Number of chains
 neig <- 3 # Number of eigenfunctions for inference
 q1s <- 3 # Number of latent factors for functional dimension
 q2s <- 3 # Number of latent factors for longitudinal dimension
+
+splinenum <- 12
+Bt1 <- bs(t, df = 10, intercept = TRUE)
+Bs1 <- bs(s, df = 12, intercept = TRUE)
+
+x <- mvrnorm(n, mu  = as.vector(mu1), Sigma = Cov)
+sx <- sd(x)
+mx <- mean(x)
+x <- (x-mx)/sx
+Smooth_scaled_cov <- (Cov - errorvar * diag(SS * TT)) / sx^2
+mu <- (mu1 - mx)/sx
+Marg.Long <- getMarginalLong(Smooth_scaled_cov,SS,TT)
+Marg.Func <- getMarginalFunc(Smooth_scaled_cov,SS,TT)
+m1 <- eigen(Marg.Long)$vectors[,1:3] # Marginal longitudinal eigenvectors
+m2 <- eigen(Marg.Func)$vectors[,1:3] # Marginal functional eigenvectors
+y <- lapply(1:n, function(i) x[i,])
+missing <- list()
+for(ii in 1:n){
+  missing[[ii]] <- numeric(0)
+}
+X <- rep(1,n)
+dim(X) <- c(n,1)
+MCMC <- mcmcWeakChains(y, missing, X, Bs1, Bt1, 3, 4, 5000, thin, burnin, nchain)
+MCMC_eigen <- eigenLFChains(Bs1, Bt1, MCMC, neig, 5000, 1000, nchain,s,t)
+MCMC_eigen <- LFB_post(Bs1, Bt1, MCMC, neig, 5000, 1000, nchain, s, t)
+
 total_results <- array(0, dim = c(15, 500, 4))
 for(j in 2:4){
   for(i in num_i[j]:500){
@@ -166,8 +192,8 @@ for(j in 2:4){
     }
     X <- rep(1,n)
     dim(X) <- c(n,1)
-    MCMC <- mcmcWeakChains(y, missing, X, Bs1, Bt1, 3, 3, 20000, thin, burnin, nchain)
-    MCMC_eigen <- eigenLFChains(Bs1, Bt1, MCMC, neig, 20000, 5000, nchain,s,t)
+    MCMC <- mcmcWeakChains(y, missing, X, Bs1, Bt1, 3, 3, 5000, thin, burnin, nchain)
+    MCMC_eigen <- eigenLFChains(Bs1, Bt1, MCMC, neig, 5000, 1000, nchain,s,t)
     signLong <- rep(1,3)
     signLong[1] <- if(sum((MCMC_eigen$eigvecLongmean[,3] + m1[,1])^2) < sum((MCMC_eigen$eigvecLongmean[,3] - m1[,1])^2)) -1 else 1
     signLong[2] <- if(sum((MCMC_eigen$eigvecLongmean[,2] + m1[,2])^2) < sum((MCMC_eigen$eigvecLongmean[,2] - m1[,2])^2)) -1 else 1
