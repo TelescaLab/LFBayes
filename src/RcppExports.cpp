@@ -1140,16 +1140,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_calculate_BIC_Missing", (DL_FUNC) &_LFBayes_calculate_BIC_Missing, 8},
     {"_LFBayes_calculate_DIC_Missing", (DL_FUNC) &_LFBayes_calculate_DIC_Missing, 8},
     {"_LFBayes_test1", (DL_FUNC) &_LFBayes_test1, 2},
-<<<<<<< HEAD
-    {"_LFBayes_eigenLF", (DL_FUNC) &_LFBayes_eigenLF, 5},
-    {"_LFBayes_eigenLFChains", (DL_FUNC) &_LFBayes_eigenLFChains, 10},
-    {"_LFBayes_integrated_latent", (DL_FUNC) &_LFBayes_integrated_latent, 2},
-    {"_LFBayes_integrated", (DL_FUNC) &_LFBayes_integrated, 2},
-    {"_LFBayes_extract_eigenfn", (DL_FUNC) &_LFBayes_extract_eigenfn, 9},
-=======
     {"_LFBayes_LFB_post", (DL_FUNC) &_LFBayes_LFB_post, 9},
-    {"_LFBayes_eigenLFChains", (DL_FUNC) &_LFBayes_eigenLFChains, 9},
->>>>>>> classes
+    {"_LFBayes_eigenLFChains", (DL_FUNC) &_LFBayes_eigenLFChains, 10},
     {"_LFBayes_getMarginalFunc", (DL_FUNC) &_LFBayes_getMarginalFunc, 3},
     {"_LFBayes_getMarginalLong", (DL_FUNC) &_LFBayes_getMarginalLong, 3},
     {"_LFBayes_loglik", (DL_FUNC) &_LFBayes_loglik, 9},
