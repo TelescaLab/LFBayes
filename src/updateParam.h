@@ -2,6 +2,7 @@
 #define MODSTRING_H
 
 #include <RcppArmadillo.h>
+
 void updateLambda(arma::cube &eta, arma::mat &Gamma, arma::vec Delta, arma::mat &Phi, arma::vec sigma1, arma::vec sigma2, arma::cube &theta, arma::mat &Lambda);
 arma::mat updateLambda2(arma::mat Theta, arma::mat eta, arma::vec Sigma, arma::vec Tau);
 arma::mat updateLambda3(arma::mat Theta, arma::mat eta, arma::vec Sigma, arma::mat Phi, arma::vec Delta);
