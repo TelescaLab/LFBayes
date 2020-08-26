@@ -25,10 +25,6 @@ test1 <- function(observed, S) {
     invisible(.Call(`_LFBayes_test1`, observed, S))
 }
 
-LFB_post <- function(splineS, splineT, mod, numeig, iter, burnin, nchains, s, t) {
-    .Call(`_LFBayes_LFB_post`, splineS, splineT, mod, numeig, iter, burnin, nchains, s, t)
-}
-
 eigenLFChains <- function(splineS, splineT, mod, numeig, iter, burnin, nchains, s, t, alpha) {
     .Call(`_LFBayes_eigenLFChains`, splineS, splineT, mod, numeig, iter, burnin, nchains, s, t, alpha)
 }
@@ -45,20 +41,8 @@ loglik <- function(y, X, Bs, Bt, missing, Theta, Varphi, iter, burnin) {
     .Call(`_LFBayes_loglik`, y, X, Bs, Bt, missing, Theta, Varphi, iter, burnin)
 }
 
-mcmcWeak <- function(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin) {
-    .Call(`_LFBayes_mcmcWeak`, y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin)
-}
-
 mcmcWeakChains <- function(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains, test) {
     .Call(`_LFBayes_mcmcWeakChains`, y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains, test)
-}
-
-mcmcWeakChainsPCA <- function(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains) {
-    .Call(`_LFBayes_mcmcWeakChainsPCA`, y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains)
-}
-
-timesTwo <- function(x) {
-    .Call(`_LFBayes_timesTwo`, x)
 }
 
 convertToPrecision <- function(Delta, q1, q2) {
@@ -297,7 +281,7 @@ integrated55 <- function(spline, times) {
     .Call(`_LFBayes_integrated55`, spline, times)
 }
 
-extract_eigenfn55 <- function(latent, S, H, spline, spline_int_sqrt, spline_int_sqrt_inv, spline_int, latent_trapz, numeig) {
-    .Call(`_LFBayes_extract_eigenfn55`, latent, S, H, spline, spline_int_sqrt, spline_int_sqrt_inv, spline_int, latent_trapz, numeig)
+extract_eigenfn <- function(latent, S, H, spline, spline_int_sqrt, spline_int_sqrt_inv, spline_int, latent_trapz, numeig) {
+    .Call(`_LFBayes_extract_eigenfn`, latent, S, H, spline, spline_int_sqrt, spline_int_sqrt_inv, spline_int, latent_trapz, numeig)
 }
 

@@ -1,5 +1,7 @@
 #include <RcppArmadillo.h>
-#include <omp.h>
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::plugins(openmp)]]
 // [[Rcpp::export]]

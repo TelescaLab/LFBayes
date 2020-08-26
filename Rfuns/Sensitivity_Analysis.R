@@ -7,7 +7,7 @@ library(LFBayes)
 library(pracma)
 #library(roahd)
 #setwd("/Users/John/Downloads/LongFunc Code/ChenCode")
-setwd("/Users/John/Documents/Johnstuff/LFBayes/Rfuns")
+setwd("/Users/johnshamshoian/Documents/R_projects/LFBayes/Rfuns")
 
 
 errorvar <- .025
@@ -128,7 +128,7 @@ mx <- mean(x)
 x <- (x-mx)/sx
 Smooth_scaled_cov <- (Cov - errorvar * diag(SS * TT)) / sx^2
 mu <- (mu1 - mx)/sx
-Marg.Long <- getMarginalLong(Smooth_scaled_cov,SS,TT)
+Marg.Long <- LFBayes::getMarginalLong(Smooth_scaled_cov,SS,TT)
 Marg.Func <- getMarginalFunc(Smooth_scaled_cov,SS,TT)
 m1 <- eigen(Marg.Long)$vectors[,1:3] # Marginal longitudinal eigenvectors
 m2 <- eigen(Marg.Func)$vectors[,1:3] # Marginal functional eigenvectors
@@ -139,9 +139,8 @@ for(ii in 1:n){
 }
 X <- rep(1,n)
 dim(X) <- c(n,1)
-MCMC <- mcmcWeakChains(y, missing, X, Bs1, Bt1, 3, 4, 5000, thin, burnin, nchain)
-MCMC_eigen <- eigenLFChains(Bs1, Bt1, MCMC, neig, 5000, 1000, nchain,s,t)
-MCMC_eigen <- LFB_post(Bs1, Bt1, MCMC, neig, 5000, 1000, nchain, s, t)
+MCMC <- mcmcWeakChains(y, missing, X, Bs1, Bt1, 3, 4, 5000, thin, burnin, nchain, 1)
+MCMC_eigen <- eigenLFChains(Bs1, Bt1, MCMC, neig, 5000, 1000, nchain,s,t, .05)
 
 total_results <- array(0, dim = c(15, 500, 4))
 for(j in 2:4){
@@ -919,3 +918,8 @@ plot(evecemp[,3],type="l")
 lines(resProduct$psi[,3],col="red")
 lines(evecsp[,3],col="blue")
 lines(-evecth[,3],col="green")
+
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("Biobase")

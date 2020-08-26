@@ -125,8 +125,8 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
       eigvecFunc_temp = splineT * splineT_int_sqrt_inv * Func_weight.cols(splineT.n_cols - numeig, splineT.n_cols - 1);
       eigvecLong_temp = splineS * splineS_int_sqrt_inv * Long_weight.cols(splineS.n_cols - numeig, splineS.n_cols - 1);
       */
-      List_func = extract_eigenfn55(LambdaF(k).slice(burnin + i), S, H, splineT, splineT_int_sqrt, splineT_int_sqrt_inv, splineS_int, Psi_trapz, numeig);
-      List_long = extract_eigenfn55(GammaF(k).slice(burnin + i), S.t(), H.t(), splineS, splineS_int_sqrt, splineS_int_sqrt_inv, splineT_int, Phi_trapz, numeig);
+      List_func = extract_eigenfn(LambdaF(k).slice(burnin + i), S, H, splineT, splineT_int_sqrt, splineT_int_sqrt_inv, splineS_int, Psi_trapz, numeig);
+      List_long = extract_eigenfn(GammaF(k).slice(burnin + i), S.t(), H.t(), splineS, splineS_int_sqrt, splineS_int_sqrt_inv, splineT_int, Phi_trapz, numeig);
       eigvecFunc_temp = Rcpp::as<arma::mat>(List_func["eigenfn"]);
       eigvalFunc_temp = Rcpp::as<arma::vec>(List_func["eigenval"]);
       eigvecLong_temp = Rcpp::as<arma::mat>(List_long["eigenfn"]);

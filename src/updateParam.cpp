@@ -1,8 +1,9 @@
 #include <RcppArmadillo.h>
 #include <cmath>
 #include <typeinfo>
-#include <omp.h>
-
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
 // [[Rcpp::export]]
 arma::mat convertToPrecision(arma::vec Delta, arma::uword q1, arma::uword q2);
@@ -1147,8 +1148,8 @@ arma::vec updateSigma1(arma::cube &eta, arma::cube &theta, arma::mat &Lambda, ar
 }
 
 arma::vec updateSigma2(arma::cube &eta, arma::cube &theta, arma::mat &Lambda, arma::mat &Gamma, arma::vec sigma1){
-  double asig2 = .01;
-  double bsig2 = .01;
+  double asig2 = 1;
+  double bsig2 = 1;
   int pstar = Gamma.n_rows;
   int n = eta.n_slices;
   int p = Lambda.n_rows;

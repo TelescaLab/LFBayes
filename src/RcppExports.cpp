@@ -103,25 +103,6 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// LFB_post
-Rcpp::List LFB_post(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, arma::uword iter, arma::uword burnin, arma::uword nchains, arma::vec s, arma::vec t);
-RcppExport SEXP _LFBayes_LFB_post(SEXP splineSSEXP, SEXP splineTSEXP, SEXP modSEXP, SEXP numeigSEXP, SEXP iterSEXP, SEXP burninSEXP, SEXP nchainsSEXP, SEXP sSEXP, SEXP tSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type mod(modSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type numeig(numeigSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type iter(iterSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type burnin(burninSEXP);
-    Rcpp::traits::input_parameter< arma::uword >::type nchains(nchainsSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type s(sSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type t(tSEXP);
-    rcpp_result_gen = Rcpp::wrap(LFB_post(splineS, splineT, mod, numeig, iter, burnin, nchains, s, t));
-    return rcpp_result_gen;
-END_RCPP
-}
 // eigenLFChains
 Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains, arma::vec s, arma::vec t, double alpha);
 RcppExport SEXP _LFBayes_eigenLFChains(SEXP splineSSEXP, SEXP splineTSEXP, SEXP modSEXP, SEXP numeigSEXP, SEXP iterSEXP, SEXP burninSEXP, SEXP nchainsSEXP, SEXP sSEXP, SEXP tSEXP, SEXP alphaSEXP) {
@@ -187,26 +168,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// mcmcWeak
-Rcpp::List mcmcWeak(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin);
-RcppExport SEXP _LFBayes_mcmcWeak(SEXP ySEXP, SEXP missingSEXP, SEXP XSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP q1SEXP, SEXP q2SEXP, SEXP iterSEXP, SEXP thinSEXP, SEXP burninSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::field<arma::vec> >::type y(ySEXP);
-    Rcpp::traits::input_parameter< arma::field<arma::vec> >::type missing(missingSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
-    Rcpp::traits::input_parameter< int >::type q1(q1SEXP);
-    Rcpp::traits::input_parameter< int >::type q2(q2SEXP);
-    Rcpp::traits::input_parameter< int >::type iter(iterSEXP);
-    Rcpp::traits::input_parameter< int >::type thin(thinSEXP);
-    Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmcWeak(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin));
-    return rcpp_result_gen;
-END_RCPP
-}
 // mcmcWeakChains
 Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin, int nchains, int test);
 RcppExport SEXP _LFBayes_mcmcWeakChains(SEXP ySEXP, SEXP missingSEXP, SEXP XSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP q1SEXP, SEXP q2SEXP, SEXP iterSEXP, SEXP thinSEXP, SEXP burninSEXP, SEXP nchainsSEXP, SEXP testSEXP) {
@@ -226,38 +187,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type nchains(nchainsSEXP);
     Rcpp::traits::input_parameter< int >::type test(testSEXP);
     rcpp_result_gen = Rcpp::wrap(mcmcWeakChains(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains, test));
-    return rcpp_result_gen;
-END_RCPP
-}
-// mcmcWeakChainsPCA
-Rcpp::List mcmcWeakChainsPCA(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin, int nchains);
-RcppExport SEXP _LFBayes_mcmcWeakChainsPCA(SEXP ySEXP, SEXP missingSEXP, SEXP XSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP q1SEXP, SEXP q2SEXP, SEXP iterSEXP, SEXP thinSEXP, SEXP burninSEXP, SEXP nchainsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::field<arma::vec> >::type y(ySEXP);
-    Rcpp::traits::input_parameter< arma::field<arma::vec> >::type missing(missingSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type splineS(splineSSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type splineT(splineTSEXP);
-    Rcpp::traits::input_parameter< int >::type q1(q1SEXP);
-    Rcpp::traits::input_parameter< int >::type q2(q2SEXP);
-    Rcpp::traits::input_parameter< int >::type iter(iterSEXP);
-    Rcpp::traits::input_parameter< int >::type thin(thinSEXP);
-    Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
-    Rcpp::traits::input_parameter< int >::type nchains(nchainsSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmcWeakChainsPCA(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains));
-    return rcpp_result_gen;
-END_RCPP
-}
-// timesTwo
-double timesTwo(NumericVector x);
-RcppExport SEXP _LFBayes_timesTwo(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(timesTwo(x));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1113,9 +1042,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// extract_eigenfn55
-Rcpp::List extract_eigenfn55(arma::mat latent, arma::mat S, arma::mat H, arma::mat spline, arma::mat spline_int_sqrt, arma::mat spline_int_sqrt_inv, arma::mat spline_int, arma::vec latent_trapz, arma::uword numeig);
-RcppExport SEXP _LFBayes_extract_eigenfn55(SEXP latentSEXP, SEXP SSEXP, SEXP HSEXP, SEXP splineSEXP, SEXP spline_int_sqrtSEXP, SEXP spline_int_sqrt_invSEXP, SEXP spline_intSEXP, SEXP latent_trapzSEXP, SEXP numeigSEXP) {
+// extract_eigenfn
+Rcpp::List extract_eigenfn(arma::mat latent, arma::mat S, arma::mat H, arma::mat spline, arma::mat spline_int_sqrt, arma::mat spline_int_sqrt_inv, arma::mat spline_int, arma::vec latent_trapz, arma::uword numeig);
+RcppExport SEXP _LFBayes_extract_eigenfn(SEXP latentSEXP, SEXP SSEXP, SEXP HSEXP, SEXP splineSEXP, SEXP spline_int_sqrtSEXP, SEXP spline_int_sqrt_invSEXP, SEXP spline_intSEXP, SEXP latent_trapzSEXP, SEXP numeigSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -1128,7 +1057,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type spline_int(spline_intSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type latent_trapz(latent_trapzSEXP);
     Rcpp::traits::input_parameter< arma::uword >::type numeig(numeigSEXP);
-    rcpp_result_gen = Rcpp::wrap(extract_eigenfn55(latent, S, H, spline, spline_int_sqrt, spline_int_sqrt_inv, spline_int, latent_trapz, numeig));
+    rcpp_result_gen = Rcpp::wrap(extract_eigenfn(latent, S, H, spline, spline_int_sqrt, spline_int_sqrt_inv, spline_int, latent_trapz, numeig));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1140,15 +1069,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_calculate_BIC_Missing", (DL_FUNC) &_LFBayes_calculate_BIC_Missing, 8},
     {"_LFBayes_calculate_DIC_Missing", (DL_FUNC) &_LFBayes_calculate_DIC_Missing, 8},
     {"_LFBayes_test1", (DL_FUNC) &_LFBayes_test1, 2},
-    {"_LFBayes_LFB_post", (DL_FUNC) &_LFBayes_LFB_post, 9},
     {"_LFBayes_eigenLFChains", (DL_FUNC) &_LFBayes_eigenLFChains, 10},
     {"_LFBayes_getMarginalFunc", (DL_FUNC) &_LFBayes_getMarginalFunc, 3},
     {"_LFBayes_getMarginalLong", (DL_FUNC) &_LFBayes_getMarginalLong, 3},
     {"_LFBayes_loglik", (DL_FUNC) &_LFBayes_loglik, 9},
-    {"_LFBayes_mcmcWeak", (DL_FUNC) &_LFBayes_mcmcWeak, 10},
     {"_LFBayes_mcmcWeakChains", (DL_FUNC) &_LFBayes_mcmcWeakChains, 12},
-    {"_LFBayes_mcmcWeakChainsPCA", (DL_FUNC) &_LFBayes_mcmcWeakChainsPCA, 11},
-    {"_LFBayes_timesTwo", (DL_FUNC) &_LFBayes_timesTwo, 1},
     {"_LFBayes_convertToPrecision", (DL_FUNC) &_LFBayes_convertToPrecision, 3},
     {"_LFBayes_updateBeta2", (DL_FUNC) &_LFBayes_updateBeta2, 3},
     {"_LFBayes_updateBetaProd", (DL_FUNC) &_LFBayes_updateBetaProd, 5},
@@ -1208,7 +1133,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_gam_trunc_left", (DL_FUNC) &_LFBayes_gam_trunc_left, 3},
     {"_LFBayes_integrated_latent55", (DL_FUNC) &_LFBayes_integrated_latent55, 2},
     {"_LFBayes_integrated55", (DL_FUNC) &_LFBayes_integrated55, 2},
-    {"_LFBayes_extract_eigenfn55", (DL_FUNC) &_LFBayes_extract_eigenfn55, 9},
+    {"_LFBayes_extract_eigenfn", (DL_FUNC) &_LFBayes_extract_eigenfn, 9},
     {NULL, NULL, 0}
 };
 
