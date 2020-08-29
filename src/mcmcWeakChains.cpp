@@ -5,11 +5,13 @@
 #ifdef _OPENMP
   #include <omp.h>
 #endif
+// [[Rcpp::depends(RcppProgress)]]
+#include <progress.hpp>
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::export]]
-Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin, int nchains, int test){
+Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin, int nchains){
   // Allocate memory for parameters
-  Rcpp::Rcout << "1" << std::endl;
+  Progress p(iter, true);
   
   int p1 = splineT.n_cols;
   int p2 = splineS.n_cols;
@@ -95,13 +97,11 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
   DM1.ones();
   DM2.ones();
   
-  //Rcpp::Rcout << "Starting MCMC..." << std::endl;
   for(int k = 0; k < nchains; k++){
     for(int i = 0; i < iter; i++){
-      if(int(i) % int(floor(double(iter) / 10.0)) == 0){
-        Rcpp::Rcout << 100 * i / iter << '%' << std::endl;
-      }
+
       for(int j = 0; j < thin; j++){
+        p.increment();
         
         updateGammaSig(Eta, Lambda, DM2, Phi2, Sigma,
                        Theta, Gamma);
@@ -156,7 +156,6 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
   }
   
   
-  Rcpp::Rcout << "All done!" << std::endl;
 
   Rcpp::List mod = Rcpp::List::create(Rcpp::Named("Lambda", LambdaF),
                                       Rcpp::Named("Gamma", GammaF),

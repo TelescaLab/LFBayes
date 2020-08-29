@@ -1,6 +1,8 @@
-args <- 3000
-#args = commandArgs(trailingOnly = TRUE)
+### Call this file in terminal by Rscript simulation.R SEED
+args = commandArgs(trailingOnly = TRUE)
 args <- as.numeric(args[1])
+setwd("/Users/johnshamshoian/Documents/R_projects/LFBayes/Simulation")
+if(!dir.exists(""))
 library(splines)
 library(MASS)
 library(LFBayes)
@@ -271,3 +273,4 @@ if(signFunc[3] == -1){
 } else{
   results[15] <- all(m2[,3] < MCMC_eigen$eigvecFuncupper[,3] & m2[,3] > MCMC_eigen$eigvecFunclower[,3])
 }
+

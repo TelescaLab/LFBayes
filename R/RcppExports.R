@@ -41,8 +41,8 @@ loglik <- function(y, X, Bs, Bt, missing, Theta, Varphi, iter, burnin) {
     .Call(`_LFBayes_loglik`, y, X, Bs, Bt, missing, Theta, Varphi, iter, burnin)
 }
 
-mcmcWeakChains <- function(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains, test) {
-    .Call(`_LFBayes_mcmcWeakChains`, y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains, test)
+mcmcWeakChains <- function(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains) {
+    .Call(`_LFBayes_mcmcWeakChains`, y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains)
 }
 
 convertToPrecision <- function(Delta, q1, q2) {

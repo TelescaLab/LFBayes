@@ -169,8 +169,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // mcmcWeakChains
-Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin, int nchains, int test);
-RcppExport SEXP _LFBayes_mcmcWeakChains(SEXP ySEXP, SEXP missingSEXP, SEXP XSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP q1SEXP, SEXP q2SEXP, SEXP iterSEXP, SEXP thinSEXP, SEXP burninSEXP, SEXP nchainsSEXP, SEXP testSEXP) {
+Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin, int nchains);
+RcppExport SEXP _LFBayes_mcmcWeakChains(SEXP ySEXP, SEXP missingSEXP, SEXP XSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP q1SEXP, SEXP q2SEXP, SEXP iterSEXP, SEXP thinSEXP, SEXP burninSEXP, SEXP nchainsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -185,8 +185,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type thin(thinSEXP);
     Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
     Rcpp::traits::input_parameter< int >::type nchains(nchainsSEXP);
-    Rcpp::traits::input_parameter< int >::type test(testSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmcWeakChains(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains, test));
+    rcpp_result_gen = Rcpp::wrap(mcmcWeakChains(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1073,7 +1072,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_LFBayes_getMarginalFunc", (DL_FUNC) &_LFBayes_getMarginalFunc, 3},
     {"_LFBayes_getMarginalLong", (DL_FUNC) &_LFBayes_getMarginalLong, 3},
     {"_LFBayes_loglik", (DL_FUNC) &_LFBayes_loglik, 9},
-    {"_LFBayes_mcmcWeakChains", (DL_FUNC) &_LFBayes_mcmcWeakChains, 12},
+    {"_LFBayes_mcmcWeakChains", (DL_FUNC) &_LFBayes_mcmcWeakChains, 11},
     {"_LFBayes_convertToPrecision", (DL_FUNC) &_LFBayes_convertToPrecision, 3},
     {"_LFBayes_updateBeta2", (DL_FUNC) &_LFBayes_updateBeta2, 3},
     {"_LFBayes_updateBetaProd", (DL_FUNC) &_LFBayes_updateBetaProd, 5},

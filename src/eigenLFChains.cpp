@@ -38,7 +38,6 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
   arma::mat Long_weight;
   //Rcpp::Environment pracma("package:pracma");
   //Rcpp::Function trapz = pracma["trapz"];
-  Rcpp::Rcout << "2" << std::endl;
 
   arma::vec splineT_trapz(splineT.n_cols);
 
@@ -91,12 +90,8 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
   //eigvecsq = arma::square(eigvec);
   meanM.col(0) = spline * arma::kron(GammaF(0).slice(burnin),
             LambdaF(0).slice(burnin)) * arma::trans(BetaF(0).slice(burnin));
-  Rcpp::Rcout << "Starting post-processing..." << std::endl;
   for(int k = 0; k < nchains; k++){
     for(int i = 0; i < iter - burnin; i++){
-      if(int(i) % int(floor(double(iter - burnin) / 10.0)) == 0){
-        Rcpp::Rcout << 100 * i / (iter - burnin) << '%' << std::endl;
-      }
 
       Psi = splineS * GammaF(k).slice(burnin + i);
       Phi = splineT * LambdaF(k).slice(burnin + i);
@@ -238,8 +233,7 @@ Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, a
     eigvecLonglower.col(j) = eigvecLongmean.col(j) - a * eigvecLongsd.col(j);
   }
   
-  Rcpp::Rcout << "All done!" << std::endl;
-  
+
   return(Rcpp::List::create(//Rcpp::Named("meanM", meanM),
     Rcpp::Named("postmean", postmean),
     Rcpp::Named("postsd", postsd),
