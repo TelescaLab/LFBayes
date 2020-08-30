@@ -24,7 +24,7 @@
 //' @param iter Number of posterior samples to keep
 //' @param burnin Number of burnin samples to discard for posterior inference
 //' @param nchains How many chains to run
-//' @export
+//' @export mcmcWeakChains
 //' @return A list of samples for each parameter. This list can be used as input
 //' to eigenLFChains for further post-processing
 //' @examples

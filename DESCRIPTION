@@ -1,14 +1,21 @@
 Package: LFBayes
 Type: Package
-Title: What the Package Does Using Title Case
+Title: Bayesian Longitudinal Functional Data Analysis
 Version: 1.0
 Date: 2018-11-14
-Author: Your Name
-Maintainer: Your Name <your@email.com>
-Description: More details about what the package does. See
-             <http://cran.r-project.org/doc/manuals/r-release/R-exts.html#The-DESCRIPTION-file> for details on how to
-             write this part.
+Author: John Shamshoian
+Maintainer: John Shamshoian <jshamsho@gmail.com>
+Description: This package is used for analyzing longitudinal functional
+    data in a Bayesian fashion. Longitudinal functional data is functional
+    data repeated over longitudinal time. This package uses Gibbs sampling to draw
+    From the joint posterior and conduct inference. Inferential objects of interest
+    are smoothed 2D means and marginal eigenfunctions in both the longitudinal and
+    Functional directions. Regularization is completed through a Gamma Multiplicative
+    Process Prior on key model quantities. See our manuscript at 
+    https://arxiv.org/pdf/1909.08763.pdf for more details.
 License: GPL (>= 2)
 Imports: Rcpp (>= 0.12.16)
+Suggests:
+    splines
 LinkingTo: Rcpp, RcppArmadillo, RcppProgress
 RoxygenNote: 7.1.1

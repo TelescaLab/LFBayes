@@ -17,7 +17,7 @@
 //' @param nchains number of chains
 //' @param s complete data longitudinal times
 //' @param t complete data functional times
-//' @export
+//' @export eigenLFChains
 //' @return Posterior marginal eigenfunctions, eigenvalues, mean, and 
 //' their associated uncertainty.
 //' @examples

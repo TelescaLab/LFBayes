@@ -12,7 +12,7 @@
 //' @param cov An ns*nt by ns*nt dimensional covariance matrix
 //' @param ns Number of longitudinal points
 //' @param nt Number of functional points
-//' @export
+//' @export getMarginalFunc
 //' @return An nt x nt marginal functional covariance matrix
 //' @examples 
 //' See Root/Simulation
@@ -47,7 +47,7 @@ arma::mat getMarginalFunc(arma::mat &cov, int ns, int nt){
 //' @param cov An ns*nt by ns*nt dimensional covariance matrix
 //' @param ns Number of longitudinal points
 //' @param nt Number of functional points
-//' @export
+//' @export getMarginalLong
 //' @return An ns x ns marginal longitudinal covariance
 //' @examples 
 //' See Root/Simulation

@@ -15,13 +15,13 @@
 #' @param nchains number of chains
 #' @param s complete data longitudinal times
 #' @param t complete data functional times
-#' @export
+#' @export eigenLFChains
 #' @return Posterior marginal eigenfunctions, eigenvalues, mean, and 
 #' their associated uncertainty.
 #' @examples
 #' See the example in Root/Example
 eigenLFChains <- function(splineS, splineT, mod, numeig, iter, burnin, nchains, s, t, alpha) {
-    .Call(`_LFBayes_eigenLFChains`, splineS, splineT, mod, numeig, iter, burnin, nchains, s, t, alpha)
+    .Call('_LFBayes_eigenLFChains', PACKAGE = 'LFBayes', splineS, splineT, mod, numeig, iter, burnin, nchains, s, t, alpha)
 }
 
 #' Get marginal functional covariance matrix
@@ -32,12 +32,12 @@ eigenLFChains <- function(splineS, splineT, mod, numeig, iter, burnin, nchains, 
 #' @param cov An ns*nt by ns*nt dimensional covariance matrix
 #' @param ns Number of longitudinal points
 #' @param nt Number of functional points
-#' @export
+#' @export getMarginalFunc
 #' @return An nt x nt marginal functional covariance matrix
 #' @examples 
 #' See Root/Simulation
 getMarginalFunc <- function(cov, ns, nt) {
-    .Call(`_LFBayes_getMarginalFunc`, cov, ns, nt)
+    .Call('_LFBayes_getMarginalFunc', PACKAGE = 'LFBayes', cov, ns, nt)
 }
 
 #' Get marginal longitudinal covariance matrix
@@ -48,12 +48,12 @@ getMarginalFunc <- function(cov, ns, nt) {
 #' @param cov An ns*nt by ns*nt dimensional covariance matrix
 #' @param ns Number of longitudinal points
 #' @param nt Number of functional points
-#' @export
+#' @export getMarginalLong
 #' @return An ns x ns marginal longitudinal covariance
 #' @examples 
 #' See Root/Simulation
 getMarginalLong <- function(cov, ns, nt) {
-    .Call(`_LFBayes_getMarginalLong`, cov, ns, nt)
+    .Call('_LFBayes_getMarginalLong', PACKAGE = 'LFBayes', cov, ns, nt)
 }
 
 #' Calculate log-likelihood 
@@ -71,11 +71,11 @@ getMarginalLong <- function(cov, ns, nt) {
 #' @param Varphi Posterior draws of Varphi, vector format
 #' @param iter Number of total samples
 #' @param burnin Number of samples to use as burnin
-#' @export
+#' @export loglik
 #' @return A Matrix of size (iter - burnin) x number of observed time points 
 #' over all subjects containing log-likelihood values
 loglik <- function(y, X, Bs, Bt, missing, Theta, Varphi, iter, burnin) {
-    .Call(`_LFBayes_loglik`, y, X, Bs, Bt, missing, Theta, Varphi, iter, burnin)
+    .Call('_LFBayes_loglik', PACKAGE = 'LFBayes', y, X, Bs, Bt, missing, Theta, Varphi, iter, burnin)
 }
 
 #' Run Markov-Chain Monte-Carlo sampling algorithm
@@ -94,12 +94,12 @@ loglik <- function(y, X, Bs, Bt, missing, Theta, Varphi, iter, burnin) {
 #' @param iter Number of posterior samples to keep
 #' @param burnin Number of burnin samples to discard for posterior inference
 #' @param nchains How many chains to run
-#' @export
+#' @export mcmcWeakChains
 #' @return A list of samples for each parameter. This list can be used as input
 #' to eigenLFChains for further post-processing
 #' @examples
 #' See the example in Root/Example
 mcmcWeakChains <- function(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains) {
-    .Call(`_LFBayes_mcmcWeakChains`, y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains)
+    .Call('_LFBayes_mcmcWeakChains', PACKAGE = 'LFBayes', y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains)
 }
 

@@ -14,7 +14,7 @@
 //' @param Varphi Posterior draws of Varphi, vector format
 //' @param iter Number of total samples
 //' @param burnin Number of samples to use as burnin
-//' @export
+//' @export loglik
 //' @return A Matrix of size (iter - burnin) x number of observed time points 
 //' over all subjects containing log-likelihood values
 // [[Rcpp::export]]
