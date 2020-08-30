@@ -4,6 +4,18 @@
 #endif
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::plugins(openmp)]]
+//' Get marginal functional covariance matrix
+//' 
+//' Integrate over the longitudinal dimension to obtain an nt x nt marginal 
+//' covariance matrix
+//' 
+//' @param cov An ns*nt by ns*nt dimensional covariance matrix
+//' @param ns Number of longitudinal points
+//' @param nt Number of functional points
+//' @export
+//' @return An nt x nt marginal functional covariance matrix
+//' @examples 
+//' See Root/Simulation
 // [[Rcpp::export]]
 arma::mat getMarginalFunc(arma::mat &cov, int ns, int nt){
   arma::mat marginalT(nt, nt);
@@ -27,6 +39,18 @@ arma::mat getMarginalFunc(arma::mat &cov, int ns, int nt){
   return(marginalT);
 }
 
+//' Get marginal longitudinal covariance matrix
+//' 
+//' Integrate over the functional dimension to obtain an ns x ns marginal 
+//' covariance matrix
+//' 
+//' @param cov An ns*nt by ns*nt dimensional covariance matrix
+//' @param ns Number of longitudinal points
+//' @param nt Number of functional points
+//' @export
+//' @return An ns x ns marginal longitudinal covariance
+//' @examples 
+//' See Root/Simulation
 // [[Rcpp::export]]
 arma::mat getMarginalLong(arma::mat cov, int ns, int nt){
   arma::mat marginalS(ns, ns);
@@ -34,7 +58,8 @@ arma::mat getMarginalLong(arma::mat cov, int ns, int nt){
   //#pragma omp parallel for schedule(static)
   for(int j = 0; j < ns; j++){
     for(int k = 0; k < ns; k++){
-      marginalS(j,k) = arma::accu(cov.submat(j * nt, k * nt, (j + 1) * nt - 1, (k + 1) * nt - 1).diag()) / nt;
+      marginalS(j,k) = arma::accu(cov.submat(j * nt, k * nt, (j + 1) * 
+        nt - 1, (k + 1) * nt - 1).diag()) / nt;
     }
   }
   return marginalS;

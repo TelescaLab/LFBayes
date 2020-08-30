@@ -99,8 +99,8 @@ small_data %>%
 ```{r}
 ### MCMC control parameters
 
-iter <- 5000 # Number of iterations
-burnin <- 1000 # Burnin iterations
+iter <- 500 # Number of iterations
+burnin <- 100 # Burnin iterations
 thin <- 1 # Thinning for each chain
 nchain <- 1 # Number of chains
 q1s <- 3 # Number of latent factors for functional dimension

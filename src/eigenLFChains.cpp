@@ -3,8 +3,30 @@
 #include <typeinfo>
 #include "utility.h"
 // [[Rcpp::depends(RcppArmadillo)]]
+//' Post-process MCMC samples
+//'
+//' This function will post-process posterior draws from an object returned from
+//' mcmcWeakChains.
+//'
+//' @param splineS basis matrix in the longitudinal direction
+//' @param splineT basis matrix in the functional direction
+//' @param mod an object returned from mcmcWeakChains
+//' @param numeig number of eigenfunctions to infer
+//' @param iter number of total iterations in the original mcmc
+//' @param burnin number of these iterations to use as burnin
+//' @param nchains number of chains
+//' @param s complete data longitudinal times
+//' @param t complete data functional times
+//' @export
+//' @return Posterior marginal eigenfunctions, eigenvalues, mean, and 
+//' their associated uncertainty.
+//' @examples
+//' See the example in Root/Example
 // [[Rcpp::export]]
-Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains, arma::vec s, arma::vec t, double alpha){
+Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT,
+                         Rcpp::List mod, arma::uword numeig, int iter,
+                         int burnin, int nchains, arma::vec s,
+                         arma::vec t, double alpha){
 
   arma::field<arma::cube> LambdaF = mod["Lambda"];
   arma::field<arma::cube> GammaF = mod["Gamma"];

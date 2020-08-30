@@ -1,15 +1,39 @@
-#include <RcppArmadillo.h>
 #include <cmath>
 #include <typeinfo>
-#include "updateParam.h"
-#ifdef _OPENMP
-  #include <omp.h>
-#endif
-// [[Rcpp::depends(RcppProgress)]]
+#include <RcppArmadillo.h>
 #include <progress.hpp>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+#include "updateParam.h"
+// [[Rcpp::depends(RcppProgress)]]
 // [[Rcpp::depends(RcppArmadillo)]]
+//' Run Markov-Chain Monte-Carlo sampling algorithm
+//' 
+//' This function will generate samples from the posterior distribution.
+//' 
+//' @param y A list of of length n containing responses
+//' @param missing A list of length n containing missing indices for each
+//' response
+//' @param X An n by p design matrix
+//' @param splineS Basis matrix for longitudinal direction
+//' @param splineT Basis matrix for functional direction
+//' @param q1 Number of latent factors for longitudinal direction
+//' @param q2 Number of latent factors for functional direction
+//' @param thin Keep every thin samples
+//' @param iter Number of posterior samples to keep
+//' @param burnin Number of burnin samples to discard for posterior inference
+//' @param nchains How many chains to run
+//' @export
+//' @return A list of samples for each parameter. This list can be used as input
+//' to eigenLFChains for further post-processing
+//' @examples
+//' See the example in Root/Example
 // [[Rcpp::export]]
-Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin, int nchains){
+Rcpp::List mcmcWeakChains(arma::field<arma::vec> y,
+                          arma::field<arma::vec> missing, arma::mat X,
+                          arma::mat splineS, arma::mat splineT, int q1,
+                          int q2, int iter, int thin, int burnin, int nchains){
   // Allocate memory for parameters
   Progress p(iter, true);
   
@@ -31,12 +55,12 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
   arma::field<arma::cube> HF(nchains);
   arma::field<arma::cube> EF(nchains);
   for(arma::uword i = 0; i < nchains; i++){
-    LambdaF(i) = arma::cube(p1, q1, iter);
-    GammaF(i) = arma::cube(p2, q2, iter);
-    Phi1F(i) = arma::cube(p1, q1, iter);
-    Phi2F(i) = arma::cube(p2, q2, iter);
-    DM1F(i) = arma::mat(q1, iter);
-    DM2F(i) = arma::mat(q2, iter);
+    LambdaF(i) = arma::cube(p1, q2, iter);
+    GammaF(i) = arma::cube(p2, q1, iter);
+    Phi1F(i) = arma::cube(p1, q2, iter);
+    Phi2F(i) = arma::cube(p2, q1, iter);
+    DM1F(i) = arma::mat(q2, iter);
+    DM2F(i) = arma::mat(q1, iter);
     SigmaF(i) = arma::cube(p1, p2, iter);
     varphiF(i) = arma::vec(iter);
     a1LF(i) = arma::vec(iter);
@@ -48,12 +72,12 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
     EF(i) = arma::cube(q1 * q2, X.n_cols, iter);
     
   }
-  arma::mat Lambda(p1, q1);
-  arma::mat Gamma(p2, q2);
-  arma::mat Phi1(p1, q1);
-  arma::mat Phi2(p2,q2);
-  arma::vec DM1(q1);
-  arma::vec DM2(q2);
+  arma::mat Lambda(p1, q2);
+  arma::mat Gamma(p2, q1);
+  arma::mat Phi1(p1, q2);
+  arma::mat Phi2(p2,q1);
+  arma::vec DM1(q2);
+  arma::vec DM2(q1);
   arma::mat Sigma(p1,p2);
   double a1Ld = 1;
   double a2Ld = 1;
@@ -67,17 +91,18 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
   arma::field<arma::cube> thetaF(nchains, iter);
   for(int i = 0; i < nchains; i++){
     for(int j = 0; j < iter; j++){
-      etaF(i,j) = arma::cube(q1, q2, X.n_rows);
+      etaF(i,j) = arma::cube(q2, q1, X.n_rows);
       thetaF(i,j) = arma::cube(p1, p2, X.n_rows);
     }
     etaF(i, 0).randn();
     thetaF(i, 0).randn();
   }
-  arma::cube Eta(q1, q2, X.n_rows);
+  arma::cube Eta(q2, q1, X.n_rows);
   arma::cube Theta(p1, p2, X.n_rows);
   arma::mat imputedY(splineS.n_rows * splineT.n_rows, X.n_rows);
   for(arma::uword i = 0; i < X.n_rows; i++){
-    imputedY.col(i) = initializeY(y(i), missing(i), splineS.n_rows, splineT.n_rows);
+    imputedY.col(i) = initializeY(y(i), missing(i),
+                 splineS.n_rows, splineT.n_rows);
   }
   arma::mat initialY = imputedY;
   // Set initial values
@@ -99,7 +124,11 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
   
   for(int k = 0; k < nchains; k++){
     for(int i = 0; i < iter; i++){
-
+      if (Progress::check_abort() ){
+        Rcpp::Rcout << "MCMC aborted" << std::endl;
+        
+        return NULL;
+      }
       for(int j = 0; j < thin; j++){
         p.increment();
         
@@ -114,11 +143,6 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
         
         Phi1 = updatePhi(Lambda, DM1);
         DM1 = updateDelta(Lambda, Phi1, DM1, a1Ld, a2Ld);
-         
-        //Lambda = updateLambdaSmoothDSig(Eta, Gamma, Sigma, DM1, Theta);
-        //Gamma = updateGammaSmoothDSig(Eta, Lambda, Sigma, DM2, Theta);
-        //DM1 = updateDeltaProdTemp(Lambda, DM1, a1Ld, a2Ld);
-        //DM2 = updateDeltaProdTemp(Gamma, DM2, a1Ld, a2Ld);
         
         a1Ld = updatea1(DM1, a1Ld);
         a2Ld = updatea2(DM1, a2Ld);
@@ -127,10 +151,8 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
         Sigma = updateSigma(Lambda, Gamma, Theta, Eta);
         V = updateVarphi(Theta, splineS, splineT, imputedY);
         updateEta3Sig(Gamma, Lambda, Sigma, Theta, H, X, Beta, Eta);
-        //updateEtaSig(Lambda, Gamma, Sigma, H, splineS, splineT, imputedY, V, Beta, X, Eta);
-        if(i % 10 == 0){
-          Theta = updateThetaSig(Lambda, Gamma, Sigma, Eta, splineS, splineT, imputedY, V);
-        }
+        Theta = updateThetaSig(Lambda, Gamma, Sigma, Eta,
+                               splineS, splineT, imputedY, V);
         H = updateH(Eta, Beta, X);
         updateBeta(Eta, H, E, X, Beta);
         E = updateE(Beta);
@@ -142,14 +164,7 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
       SigmaF(k).slice(i) = Sigma;
       HF(k).slice(i) = H;
       BetaF(k).slice(i) = Beta;
-      
-      
-      //DM1F(k).col(i) = DM1;
-      //DM2F(k).col(i) = DM2;
-      //Phi1F(k).slice(i) = Phi1;
-      //Phi2F(k).slice(i) = Phi2;
       varphiF(k)(i) = V;
-      //etaF(k, i) = Eta;
       thetaF(k, i) = Theta;
       
     }
@@ -159,33 +174,19 @@ Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missi
 
   Rcpp::List mod = Rcpp::List::create(Rcpp::Named("Lambda", LambdaF),
                                       Rcpp::Named("Gamma", GammaF),
-                                      Rcpp::Named("H", HF), Rcpp::Named("Sigma", SigmaF),
-                                      Rcpp::Named("Beta", BetaF), Rcpp::Named("Varphi", varphiF),
-                                      Rcpp::Named("initialY", initialY), Rcpp::Named("imputedY", imputedY),
-                                      
+                                      Rcpp::Named("H", HF),
+                                      Rcpp::Named("Sigma", SigmaF),
+                                      Rcpp::Named("Beta", BetaF),
+                                      Rcpp::Named("Varphi", varphiF),
+                                      Rcpp::Named("initialY", initialY),
+                                      Rcpp::Named("imputedY", imputedY),
                                       Rcpp::Named("Theta", thetaF),
+                                      Rcpp::Named("Delta1", DM1F),
+                                      Rcpp::Named("Delta2", DM2F)
+                                      );
                                       
-                                      Rcpp::Named("Delta1", DM1F), Rcpp::Named("Delta2", DM2F));
-                                      /*
-                                      Rcpp::Named("Eta", etaF), Rcpp::Named("Phi1", Phi1F),
-                                      Rcpp::Named("Phi2", Phi2F), Rcpp::Named("initialY", initialY),
-                                      Rcpp::Named("Varphi", varphiF), Rcpp::Named("imputedY", imputedY));
-                                      */
   
   return(mod);
-  //return(eigenLFChains(splineS, splineT, mod, 3, iter, burnin, nchains));
-  //return(eigenLFC)
-  /*
-  //Rcpp::Named("Delta1", Delta1),
-  //Rcpp::Named("Delta2", Delta2),
-  //Rcpp::Named("Tau1", Tau1),
-  //Rcpp::Named("Tau2", Tau2),
-  //Rcpp::Named("imputedY", imputedY), Rcpp::Named("initialY", initialY),
-  //Rcpp::Named("a1L", a1L), Rcpp::Named("a2L", a2L),
-  //Rcpp::Named("a1G", a1G), Rcpp::Named("a2G", a2G));
-  //Rcpp::Rcout << arma::size(imputedY);
-  //return( eigenLF(splineS, splineT, mod, 3, burnin));
-  */
   
 }
 

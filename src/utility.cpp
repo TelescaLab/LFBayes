@@ -23,29 +23,6 @@ arma::mat integrated(arma::mat spline, arma::vec times){
   return(spline_int);
 }
 
-// [[Rcpp::export]]
-arma::vec integrated_latent55(arma::mat latent, arma::vec times){
-  arma::uword latent_dim = latent.n_cols;
-  arma::vec latent_int(latent_dim);
-  for(arma::uword i = 0; i < latent_dim; i++){
-    latent_int(i) = arma::as_scalar(trapz(times, latent.col(i) % latent.col(i)));
-  }
-  return(latent_int);
-}
-
-// [[Rcpp::export]]
-arma::mat integrated55(arma::mat spline, arma::vec times){
-  arma::uword spline_dim = spline.n_cols;
-  arma::mat spline_int(spline_dim, spline_dim);
-  for(arma::uword i = 0; i < spline_dim; i++){
-    for(arma::uword j = 0; j < spline_dim; j++){
-      spline_int(i, j) = arma::as_scalar(trapz(times, spline.col(i) % spline.col(j)));
-    }
-  }
-  return(spline_int);
-}
-
-// [[Rcpp::export]]
 Rcpp::List extract_eigenfn(arma::mat latent, arma::mat S, arma::mat H, arma::mat spline,
                              arma::mat spline_int_sqrt, arma::mat spline_int_sqrt_inv,
                              arma::mat spline_int, arma::vec latent_trapz, arma::uword numeig){
