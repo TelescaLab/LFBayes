@@ -3,7 +3,10 @@ Type: Package
 Title: Bayesian Longitudinal Functional Data Analysis
 Version: 1.0
 Date: 2018-11-14
-Author: John Shamshoian
+Authors@R: as.person(c(
+    "John Shamshoian <jshamsho@gmail.com> [aut, cre]", 
+    "Donatello Telesca <dtelesca@gmail.com> [aut]"
+  ))
 Maintainer: John Shamshoian <jshamsho@gmail.com>
 Description: This package is used for analyzing longitudinal functional
     data in a Bayesian fashion. Longitudinal functional data is functional
