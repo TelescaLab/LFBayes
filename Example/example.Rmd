@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "Bayesian longitudinal functional data analysis example"
 output:
   html_document:
     df_print: paged
@@ -90,9 +90,7 @@ small_data %>%
   geom_line(aes(linetype = factor(long_time))) +
   facet_wrap(. ~ id, labeller = labeller(id = id.labs)) + 
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), 
-        strip.background = element_rect(
-        color="black", fill="#FFFFFF")) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
   labs(x = "Functional time", y = "Response", linetype = "Longitudinal time") +
   scale_linetype_discrete(labels = round(c(s[5], s[10], s[15]), 2))
 ```
@@ -161,7 +159,8 @@ axz <- list(
 
 fig <- plot_ly() %>%
   add_surface(z = ~postmean, x = s, y = t) %>%
-  layout(scene = list(xaxis=axx,yaxis=axy,zaxis=axz, aspectratio = list(x = .9, y = .8, z = 1))) %>%
+  layout(scene = list(xaxis=axx,yaxis=axy,zaxis=axz,
+                      aspectratio = list(x = .9, y = .8, z = 1))) %>%
   hide_colorbar()
 fig
 
@@ -179,8 +178,7 @@ eigenfunction_tibble %>%
   facet_grid(type ~ number, labeller = labeller(number = number.labs)) +
   scale_linetype_manual(values=c("dashed", "solid", "dashed"))+
   theme_bw() +
-  theme(legend.position = "none", strip.background = element_rect(
-        color="black", fill="#FFFFFF"), 
+  theme(legend.position = "none",
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
   
 ```
