@@ -7,7 +7,8 @@ output:
     keep_md: true
 ---
 
-This notebook runs a longitudinal-functional analysis on simulated data.
+# Introduction
+Longitudinal functional data is correlated functional data repeatedly observed over longitudinal time. We adopt a weak-separability approach to account for the within function and between function covariation. This approach allows for estimation of interpretable marginal covariance operators and time-varying functional means. In this example we simulate longitudinal functional data for 60 subjects with 20 within-function time points and 20 longitudinal points. We display some example curves of the raw data, estimate time-varying means with 95% simultaneous credible bands, and estimate marginal eigenfunctions with 95% simultaneous credible bands. Please see our Biostatistics manuscript "Bayesian analysis of longitudinal and multidimensional functional data" by Shamshoian et al. (2020) for more information. This notebook provides a minimally working example demonstrating the proposed methodology.
 
 ```{r, message = FALSE}
 library(tidyverse)
@@ -18,6 +19,7 @@ library(LFBayes)
 library(plotly)
 ```
 
+Users are required to construct their own basis functions for longitudinal and functional dimensions. 
 ```{r}
 ### Control parameters
 
@@ -53,9 +55,9 @@ Cov <- kronecker(Bs%*%Gamma, Bt%*%Lambda)%*%H%*%
   t(kronecker(Bs%*%Gamma, Bt%*%Lambda)) + errorvar * diag(SS * TT)
 ```
 
+The time-varying mean is allowed to vary with covariates. In this example we do not include covariates so we only have an intercept term.
 ```{r}
 ### Generate data from model
-
 x <- mvrnorm(n, mu  = as.vector(mu1), Sigma = Cov)
 sx <- sd(x)
 mx <- mean(x)
@@ -70,6 +72,7 @@ for(ii in 1:n){
 X <- cbind(rep(1, n))
 ```
 
+We plot the first 6 subjects functional response data over several longitudinal times.
 ```{r, fig.width=8, fig.height=4}
 ### Visualize a few trajectories
 
@@ -99,9 +102,9 @@ small_data %>%
 ```{r}
 ### MCMC control parameters
 
-iter <- 500 # Number of iterations
-burnin <- 100 # Burnin iterations
-thin <- 1 # Thinning for each chain
+iter <- 10000 # Number of iterations
+burnin <- 5000 # Burnin iterations
+thin <- 5 # Thinning for each chain
 nchain <- 1 # Number of chains
 q1s <- 3 # Number of latent factors for functional dimension
 q2s <- 3 # Number of latent factors for longitudinal dimension
@@ -111,73 +114,64 @@ neig <- 3 # Number of eigenfunctions for inference
 
 ```{r}
 ### Processing
-
-MCMC <- mcmcWeakChains(y, missing, X, Bs1, Bt1,
+posterior_samples <- run_mcmc(y, missing, X, Bs1, Bt1,
                        q1s, q2s, iter, thin, burnin, nchain)
-MCMC_eigen <- eigenLFChains(Bs1, Bt1, MCMC, neig,
+posterior_summaries <- get_posterior_summaries(Bs1, Bt1, posterior_samples, neig,
                             iter, burnin, nchain, s, t, alpha)
 ```
 
 ```{r}
 ### Prepare data for plotting
-postmean <- matrix(MCMC_eigen$postmean, nrow = TT, ncol = SS)
+mean_tibble <- tibble(func_time = rep(t, SS * 3), long_time = rep(rep(s, each = TT), 3),
+                      value =   c(posterior_summaries$lower, posterior_summaries$postmean, posterior_summaries$upper),
+                      bound = rep(c("lower", "mean", "upper"), each = SS * TT))
+postmean <- matrix(posterior_summaries$postmean, nrow = TT, ncol = SS)
 fig <- plot_ly(z = ~postmean, x = s, y = t) %>% add_surface()
 eigenfunction_tibble <- tibble(time = numeric(), type = character(),
                                value = numeric(), bound = character(),
                                number = numeric())
 eigenfunction_tibble <- eigenfunction_tibble %>%
-  add_row(value = c(MCMC_eigen$eigvecFuncmean,
-                    MCMC_eigen$eigvecFunclower,
-                    MCMC_eigen$eigvecFuncupper),
+  add_row(value = c(posterior_summaries$eigvecFuncmean,
+                    posterior_summaries$eigvecFunclower,
+                    posterior_summaries$eigvecFuncupper),
           number = rep(rep(1:neig, each = TT), 3),
           bound = rep(c("mean", "lower", "upper"), each = neig * TT),
           type = "Functional",
           time = rep(t, 3 * neig)) %>%
-  add_row(value = c(MCMC_eigen$eigvecLongmean,
-                    MCMC_eigen$eigvecLonglower,
-                    MCMC_eigen$eigvecLongupper),
+  add_row(value = c(posterior_summaries$eigvecLongmean,
+                    posterior_summaries$eigvecLonglower,
+                    posterior_summaries$eigvecLongupper),
           number = rep(rep(1:neig, each = SS), 3),
           bound = rep(c("mean", "lower", "upper"), each = neig * SS),
           type = "Longitudinal",
           time = rep(s, 3 * neig))
-
-
 ```
 
-```{r}
-### Plot mean surface
-
-axx <- list(
-  title = "Longitudinal time"
-)
-
-axy <- list(
-  title = "Functional time"
-)
-
-axz <- list(
-  title = "Posterior mean"
-)
-
-fig <- plot_ly() %>%
-  add_surface(z = ~postmean, x = s, y = t) %>%
-  layout(scene = list(xaxis=axx,yaxis=axy,zaxis=axz,
-                      aspectratio = list(x = .9, y = .8, z = 1))) %>%
-  hide_colorbar()
-fig
+```{r, fig.height = 2.5, fig.width = 6.5}
+# Plot time-varying means
+long.labs <- paste("s =", round(c(s[1], s[10], s[20]), 2))
+names(long.labs) <- c(s[1], s[10], s[20])
+mean_tibble %>%
+  filter(long_time %in% c(s[1], s[10], s[20])) %>%
+  ggplot(aes(func_time, value)) +
+  geom_line(aes(linetype = bound)) +
+  facet_wrap(~ long_time, labeller = labeller(long_time = long.labs)) +
+  scale_linetype_manual(values=c("dashed", "solid", "dashed")) +
+  labs(x = "Functional time", y ="Mean", title = "Functional varying mean with 95% credible bands") +
+  theme_bw() + 
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 
-```{r}
-### Plot eigenfunctions
-
-options(repr.plot.width=6, repr.plot.height=3)
+```{r, fig.width=6.5, fig.height=4}
+### Plot marginal functional and longitudinal eigenfunctions
 number.labs <- paste("Eigenfunction", 1:neig)
 names(number.labs) <- c("1":neig)
 eigenfunction_tibble %>%
   ggplot(aes(time, value)) +
   geom_line(aes(linetype = bound)) +
   facet_grid(type ~ number, labeller = labeller(number = number.labs)) +
-  scale_linetype_manual(values=c("dashed", "solid", "dashed"))+
+  scale_linetype_manual(values=c("dashed", "solid", "dashed")) +
   theme_bw() +
   theme(legend.position = "none",
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
@@ -186,10 +180,10 @@ eigenfunction_tibble %>%
 
 ```{r}
 ### Percent variability explained by first few eigenfunctions in functional direction
-100 * rowMeans(MCMC_eigen$eigvalFunc)[p1:(p1-neig+1)]
+100 * rowMeans(posterior_summaries$eigvalFunc)[p1:(p1-neig+1)]
 ```
 
 ```{r}
 ### Percent variability explained by first few eigenfunctions in longitudinal direction
-100 * rowMeans(MCMC_eigen$eigvalLong)[p2:(p2-neig+1)]
+100 * rowMeans(posterior_summaries$eigvalLong)[p2:(p2-neig+1)]
 ```

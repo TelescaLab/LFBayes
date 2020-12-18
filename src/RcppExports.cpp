@@ -6,9 +6,35 @@
 
 using namespace Rcpp;
 
-// eigenLFChains
-Rcpp::List eigenLFChains(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains, arma::vec s, arma::vec t, double alpha);
-RcppExport SEXP _LFBayes_eigenLFChains(SEXP splineSSEXP, SEXP splineTSEXP, SEXP modSEXP, SEXP numeigSEXP, SEXP iterSEXP, SEXP burninSEXP, SEXP nchainsSEXP, SEXP sSEXP, SEXP tSEXP, SEXP alphaSEXP) {
+// get_marginal_func
+arma::mat get_marginal_func(arma::mat& cov, int ns, int nt);
+RcppExport SEXP _LFBayes_get_marginal_func(SEXP covSEXP, SEXP nsSEXP, SEXP ntSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat& >::type cov(covSEXP);
+    Rcpp::traits::input_parameter< int >::type ns(nsSEXP);
+    Rcpp::traits::input_parameter< int >::type nt(ntSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_marginal_func(cov, ns, nt));
+    return rcpp_result_gen;
+END_RCPP
+}
+// get_marginal_long
+arma::mat get_marginal_long(arma::mat cov, int ns, int nt);
+RcppExport SEXP _LFBayes_get_marginal_long(SEXP covSEXP, SEXP nsSEXP, SEXP ntSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type cov(covSEXP);
+    Rcpp::traits::input_parameter< int >::type ns(nsSEXP);
+    Rcpp::traits::input_parameter< int >::type nt(ntSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_marginal_long(cov, ns, nt));
+    return rcpp_result_gen;
+END_RCPP
+}
+// get_posterior_summaries
+Rcpp::List get_posterior_summaries(arma::mat splineS, arma::mat splineT, Rcpp::List mod, arma::uword numeig, int iter, int burnin, int nchains, arma::vec s, arma::vec t, double alpha);
+RcppExport SEXP _LFBayes_get_posterior_summaries(SEXP splineSSEXP, SEXP splineTSEXP, SEXP modSEXP, SEXP numeigSEXP, SEXP iterSEXP, SEXP burninSEXP, SEXP nchainsSEXP, SEXP sSEXP, SEXP tSEXP, SEXP alphaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -22,33 +48,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type s(sSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type t(tSEXP);
     Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    rcpp_result_gen = Rcpp::wrap(eigenLFChains(splineS, splineT, mod, numeig, iter, burnin, nchains, s, t, alpha));
-    return rcpp_result_gen;
-END_RCPP
-}
-// getMarginalFunc
-arma::mat getMarginalFunc(arma::mat& cov, int ns, int nt);
-RcppExport SEXP _LFBayes_getMarginalFunc(SEXP covSEXP, SEXP nsSEXP, SEXP ntSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat& >::type cov(covSEXP);
-    Rcpp::traits::input_parameter< int >::type ns(nsSEXP);
-    Rcpp::traits::input_parameter< int >::type nt(ntSEXP);
-    rcpp_result_gen = Rcpp::wrap(getMarginalFunc(cov, ns, nt));
-    return rcpp_result_gen;
-END_RCPP
-}
-// getMarginalLong
-arma::mat getMarginalLong(arma::mat cov, int ns, int nt);
-RcppExport SEXP _LFBayes_getMarginalLong(SEXP covSEXP, SEXP nsSEXP, SEXP ntSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type cov(covSEXP);
-    Rcpp::traits::input_parameter< int >::type ns(nsSEXP);
-    Rcpp::traits::input_parameter< int >::type nt(ntSEXP);
-    rcpp_result_gen = Rcpp::wrap(getMarginalLong(cov, ns, nt));
+    rcpp_result_gen = Rcpp::wrap(get_posterior_summaries(splineS, splineT, mod, numeig, iter, burnin, nchains, s, t, alpha));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -71,9 +71,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// mcmcWeakChains
-Rcpp::List mcmcWeakChains(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin, int nchains);
-RcppExport SEXP _LFBayes_mcmcWeakChains(SEXP ySEXP, SEXP missingSEXP, SEXP XSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP q1SEXP, SEXP q2SEXP, SEXP iterSEXP, SEXP thinSEXP, SEXP burninSEXP, SEXP nchainsSEXP) {
+// run_mcmc
+Rcpp::List run_mcmc(arma::field<arma::vec> y, arma::field<arma::vec> missing, arma::mat X, arma::mat splineS, arma::mat splineT, int q1, int q2, int iter, int thin, int burnin, int nchains);
+RcppExport SEXP _LFBayes_run_mcmc(SEXP ySEXP, SEXP missingSEXP, SEXP XSEXP, SEXP splineSSEXP, SEXP splineTSEXP, SEXP q1SEXP, SEXP q2SEXP, SEXP iterSEXP, SEXP thinSEXP, SEXP burninSEXP, SEXP nchainsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -88,17 +88,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type thin(thinSEXP);
     Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
     Rcpp::traits::input_parameter< int >::type nchains(nchainsSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmcWeakChains(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains));
+    rcpp_result_gen = Rcpp::wrap(run_mcmc(y, missing, X, splineS, splineT, q1, q2, iter, thin, burnin, nchains));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_LFBayes_eigenLFChains", (DL_FUNC) &_LFBayes_eigenLFChains, 10},
-    {"_LFBayes_getMarginalFunc", (DL_FUNC) &_LFBayes_getMarginalFunc, 3},
-    {"_LFBayes_getMarginalLong", (DL_FUNC) &_LFBayes_getMarginalLong, 3},
+    {"_LFBayes_get_marginal_func", (DL_FUNC) &_LFBayes_get_marginal_func, 3},
+    {"_LFBayes_get_marginal_long", (DL_FUNC) &_LFBayes_get_marginal_long, 3},
+    {"_LFBayes_get_posterior_summaries", (DL_FUNC) &_LFBayes_get_posterior_summaries, 10},
     {"_LFBayes_loglik", (DL_FUNC) &_LFBayes_loglik, 9},
-    {"_LFBayes_mcmcWeakChains", (DL_FUNC) &_LFBayes_mcmcWeakChains, 11},
+    {"_LFBayes_run_mcmc", (DL_FUNC) &_LFBayes_run_mcmc, 11},
     {NULL, NULL, 0}
 };
 

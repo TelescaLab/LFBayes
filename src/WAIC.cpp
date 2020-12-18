@@ -1,13 +1,13 @@
 #include <RcppArmadillo.h>
 
 double mydnorm(arma::vec X, arma::vec mu, arma::mat Sigma, int givelog);
-double dmvnrm_arma(arma::vec x,  
-                   arma::vec mean,  
+double dmvnrm_arma(arma::vec x,
+                   arma::vec mean,
                    arma::mat sigma,
                    bool logd);
 
 
-Rcpp::List calculate_WAIC(arma::mat Y, arma::mat X,
+Rcpp::List calculate_waic(arma::mat Y, arma::mat X,
                           Rcpp::List mod, arma::mat splineS,
                           arma::mat splineT, arma::uword burnin){
   double LPPD = 0;
@@ -38,14 +38,14 @@ Rcpp::List calculate_WAIC(arma::mat Y, arma::mat X,
       meanvec = arma::vectorise(splineT * Lambda(k).slice(i) *
         arma::reshape(meantemp, q1, q2) *
         arma::trans(Gamma(k).slice(i)) * arma::trans(splineS));
-      varmat = arma::diagmat(arma::ones<arma::vec>(Y.col(0).n_elem) * .1) + 
-        arma::kron(splineS, splineT) * 
+      varmat = arma::diagmat(arma::ones<arma::vec>(Y.col(0).n_elem) * .1) +
+        arma::kron(splineS, splineT) *
         arma::inv(arma::diagmat(arma::vectorise(Sigma(k).slice(i)))) *
-        arma::kron(splineS.t(), splineT.t()) + 
-        arma::kron(splineS, splineT) * 
+        arma::kron(splineS.t(), splineT.t()) +
+        arma::kron(splineS, splineT) *
         arma::kron(Gamma(k).slice(i), Lambda(k).slice(i)) *
-        arma::inv(arma::diagmat(H(k).slice(i))) * 
-        arma::kron(arma::trans(Gamma(k).slice(i)), 
+        arma::inv(arma::diagmat(H(k).slice(i))) *
+        arma::kron(arma::trans(Gamma(k).slice(i)),
                    arma::trans(Lambda(k).slice(i))) *
         arma::kron(splineS.t(), splineT.t());
       for(arma::uword s = 0; s < nsubject; s++){
@@ -58,7 +58,7 @@ Rcpp::List calculate_WAIC(arma::mat Y, arma::mat X,
     LPPD  = LPPD + log(arma::mean(L.col(s)));
     a = log(arma::mean(L.col(s)));
     b = arma::mean(arma::log(L.col(s)));
-    
+
     P_1 = P_1 + 2 * (a - b);
     P_2 = P_2 + arma::var(arma::log(L.col(s)));
   }
@@ -110,7 +110,7 @@ Rcpp::List calculate_BIC(arma::mat Y, arma::mat X,
         arma::trans(arma::kron(Gamma(k).slice(i), Lambda(k).slice(i)))) *
         spline.t() +
         spline * arma::solve(
-            arma::diagmat(arma::vectorise(Sigma(k).slice(i))), spline.t()) + 
+            arma::diagmat(arma::vectorise(Sigma(k).slice(i))), spline.t()) +
         arma::diagmat(arma::ones<arma::vec>(Y.col(0).n_elem) *
         1.0 / Varphi(k)(i));
       meanvec = meanvec + meantemp2;
@@ -120,19 +120,19 @@ Rcpp::List calculate_BIC(arma::mat Y, arma::mat X,
   }
   postcov = postcov / counter;
   meanvec = meanvec / counter;
-  
+
   for(arma::uword s = 0; s < nsubject; s++){
     llik = llik + dmvnrm_arma(Y.col(s), meanvec, postcov, 1);
   }
-  
-  BIC1 = log(nsubject) * ((p1 * q1) + (p2 * q2) + (q1 * q2) + 
+
+  BIC1 = log(nsubject) * ((p1 * q1) + (p2 * q2) + (q1 * q2) +
     (q1 * q2) + (p1 * p2) + 1) - 2 * llik;
-  BIC2 = log(nsubject * splineS.n_rows * splineT.n_rows) * 
-    ((p1 * q1) + (p2 * q2) + (q1 * q2) + 1) + 
+  BIC2 = log(nsubject * splineS.n_rows * splineT.n_rows) *
+    ((p1 * q1) + (p2 * q2) + (q1 * q2) + 1) +
     log(nsubject) * ((p1 * p2) + (q1 * q2)) - 2 * llik;
   return(Rcpp::List::create(Rcpp::Named("BIC1", BIC1),
-                            Rcpp::Named("BIC2", BIC2), 
-                            Rcpp::Named("LogLik", llik), 
+                            Rcpp::Named("BIC2", BIC2),
+                            Rcpp::Named("LogLik", llik),
                             Rcpp::Named("postcov", postcov),
                             Rcpp::Named("meanvec", meanvec)));
 }
@@ -177,7 +177,7 @@ Rcpp::List calculate_DIC(arma::mat Y, arma::mat X,
         arma::trans(arma::kron(Gamma(k).slice(i),
                                Lambda(k).slice(i)))) * spline.t() +
         spline * arma::solve(
-            arma::diagmat(arma::vectorise(Sigma(k).slice(i))), spline.t()) + 
+            arma::diagmat(arma::vectorise(Sigma(k).slice(i))), spline.t()) +
         arma::diagmat(arma::ones<arma::vec>(
             Y.col(0).n_elem) * 1.0 / Varphi(k)(i));
       meanvec = meanvec + meantemp2;
@@ -191,7 +191,7 @@ Rcpp::List calculate_DIC(arma::mat Y, arma::mat X,
   loglikiter = loglikiter / counter;
   postcov = postcov / counter;
   meanvec = meanvec / counter;
-  
+
   for(arma::uword s = 0; s < nsubject; s++){
     loglik = loglik + dmvnrm_arma(Y.col(s), meanvec, postcov, 1);
   }
@@ -239,7 +239,7 @@ Rcpp::List calculate_BIC_Missing(arma::field<arma::vec> Y,
     for(arma::uword i = burnin; i < iter; i = i + thin){
       Rcpp::Rcout << i << std::endl;
       meantemp1 = arma::trans(Beta(k).slice(i)) * X.row(0);
-      meantemp2 = arma::vectorise(splineT * 
+      meantemp2 = arma::vectorise(splineT *
         Lambda(k).slice(i) * arma::reshape(meantemp1, q1, q2) *
         arma::trans(Gamma(k).slice(i)) * arma::trans(splineS));
       cov = spline * (arma::kron(Gamma(k).slice(i), Lambda(k).slice(i)) *
@@ -247,8 +247,8 @@ Rcpp::List calculate_BIC_Missing(arma::field<arma::vec> Y,
         arma::trans(arma::kron(Gamma(k).slice(i), Lambda(k).slice(i)))) *
         spline.t() +
         spline * arma::solve(arma::diagmat(arma::vectorise(Sigma(k).slice(i))),
-                             spline.t()) + 
-        arma::diagmat(arma::ones<arma::vec>(splineT.n_rows * 
+                             spline.t()) +
+        arma::diagmat(arma::ones<arma::vec>(splineT.n_rows *
         splineS.n_rows) * 1.0 / Varphi(k)(i));
       meanvec = meanvec + meantemp2;
       postcov = postcov + cov;
@@ -257,21 +257,21 @@ Rcpp::List calculate_BIC_Missing(arma::field<arma::vec> Y,
   }
   postcov = postcov / counter;
   meanvec = meanvec / counter;
-  
+
   for(arma::uword s = 0; s < nsubject; s++){
     arma::vec mymeanpost = meanvec.elem(observed(s));
     arma::mat mycovpost = postcov.submat(observed(s), observed(s));
     llik = llik + dmvnrm_arma(Y(s), mymeanpost, mycovpost, 1);
     numelem = numelem + observed(s).n_elem;
   }
-  
-  BIC1 = log(nsubject) * ((p1 * q1) + (p2 * q2) + (q1 * q2) + 
+
+  BIC1 = log(nsubject) * ((p1 * q1) + (p2 * q2) + (q1 * q2) +
     (q1 * q2) + (p1 * p2) + 1) - 2 * llik;
-  BIC2 = log(numelem) * ((p1 * q1) + (p2 * q2) + (q1 * q2) + 1) + 
+  BIC2 = log(numelem) * ((p1 * q1) + (p2 * q2) + (q1 * q2) + 1) +
     log(nsubject) * ((p1 * p2) + (q1 * q2)) - 2 * llik;
   return(Rcpp::List::create(Rcpp::Named("BIC1", BIC1),
-                            Rcpp::Named("BIC2", BIC2), 
-                            Rcpp::Named("LogLik", llik), 
+                            Rcpp::Named("BIC2", BIC2),
+                            Rcpp::Named("LogLik", llik),
                             Rcpp::Named("postcov", postcov),
                             Rcpp::Named("meanvec", meanvec)));
 }
@@ -319,7 +319,7 @@ Rcpp::List calculate_DIC_Missing(arma::field<arma::vec> Y,
         arma::trans(arma::kron(Gamma(k).slice(i), Lambda(k).slice(i)))) *
         spline.t() +
         spline * arma::solve(arma::diagmat(arma::vectorise(Sigma(k).slice(i))),
-                             spline.t()) + 
+                             spline.t()) +
         arma::diagmat(arma::ones<arma::vec>(splineT.n_rows * splineS.n_rows) *
         1.0 / Varphi(k)(i));
       meanvec = meanvec + meantemp2;
@@ -335,7 +335,7 @@ Rcpp::List calculate_DIC_Missing(arma::field<arma::vec> Y,
   loglikiter = loglikiter / counter;
   postcov = postcov / counter;
   meanvec = meanvec / counter;
-  
+
   for(arma::uword s = 0; s < nsubject; s++){
     arma::vec mymeanpost = meanvec.elem(observed(s));
     arma::mat mycovpost = postcov.submat(observed(s), observed(s));
@@ -351,24 +351,23 @@ Rcpp::List calculate_DIC_Missing(arma::field<arma::vec> Y,
 }
 
 
-double dmvnrm_arma(arma::vec x,  
-                   arma::vec mean,  
-                   arma::mat sigma, 
-                   bool logd = false) { 
+double dmvnrm_arma(arma::vec x,
+                   arma::vec mean,
+                   arma::mat sigma,
+                   bool logd = false) {
   double xlen = x.n_elem;
   double out;
   double log2pi = std::log(2.0 * M_PI);
   arma::mat rooti = arma::trans(arma::inv(trimatu(arma::chol(sigma))));
   double rootisum = arma::sum(log(rooti.diag()));
   double constants = -(static_cast<double>(xlen)/2.0) * log2pi;
-  
-  arma::vec z = rooti * (x - mean);    
+
+  arma::vec z = rooti * (x - mean);
   out = constants - 0.5 * arma::sum(z%z) + rootisum;
-  
-  
+
+
   if (logd == false) {
     out = exp(out);
   }
   return(out);
 }
-

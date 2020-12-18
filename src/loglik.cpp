@@ -1,9 +1,9 @@
 #include <RcppArmadillo.h>
-//' Calculate log-likelihood 
-//' 
+//' Calculate log-likelihood
+//'
 //' Calculates log-likelihood after obtaining draws from the joint posterior
-//' distribution. Use after running mcmcWeakChains.
-//' 
+//' distribution. Use after running run_mcmc.
+//'
 //' @param y A list of of length n containing responses
 //' @param X An n x p design matrix
 //' @param Bs Basis matrix for longitudinal direction
@@ -15,7 +15,7 @@
 //' @param iter Number of total samples
 //' @param burnin Number of samples to use as burnin
 //' @export loglik
-//' @return A Matrix of size (iter - burnin) x number of observed time points 
+//' @return A Matrix of size (iter - burnin) x number of observed time points
 //' over all subjects containing log-likelihood values
 // [[Rcpp::export]]
 arma::mat loglik(arma::vec y, arma::mat X, arma::mat Bs, arma::mat Bt,
@@ -39,14 +39,14 @@ arma::mat loglik(arma::vec y, arma::mat X, arma::mat Bs, arma::mat Bt,
   }
   arma::uvec obs = arma::find(missing_indicator == 0);
   arma::uword nsim = iter - burnin;
-  arma::uword num_not_missing = ntot - 
+  arma::uword num_not_missing = ntot -
     arma::uword(arma::sum(missing_indicator));
   arma::vec fit(ntot);
   arma::mat logliks(nsim, num_not_missing);
-  
+
   for(arma::uword i = 0; i < nsim; i++){
     for(arma::uword j = 0; j < nsub; j++){
-      fit.subvec(ns * nt * j, ns * nt * (j + 1) - 1) = 
+      fit.subvec(ns * nt * j, ns * nt * (j + 1) - 1) =
         arma::vectorise(Bt * Theta(i).slice(j) * Bs.t());
     }
       logliks.row(i) = arma::trans(

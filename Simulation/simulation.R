@@ -159,8 +159,8 @@ mx <- mean(x)
 x <- (x-mx)/sx
 Smooth_scaled_cov <- (Cov - errorvar * diag(SS * TT)) / sx^2
 mu <- (mu1 - mx)/sx
-Marg.Long <- getMarginalLong(Smooth_scaled_cov,SS,TT)
-Marg.Func <- getMarginalFunc(Smooth_scaled_cov,SS,TT)
+Marg.Long <- get_marginal_long(Smooth_scaled_cov,SS,TT)
+Marg.Func <- get_marginal_func(Smooth_scaled_cov,SS,TT)
 m1 <- eigen(Marg.Long)$vectors[,1:3] # Marginal longitudinal eigenvectors
 m2 <- eigen(Marg.Func)$vectors[,1:3] # Marginal functional eigenvectors
 y <- lapply(1:n, function(i) x[i,])
@@ -171,66 +171,66 @@ for(ii in 1:n){
 X <- rep(1,n)
 dim(X) <- c(n,1)
 cat("\n")
-MCMC <- mcmcWeakChains(y, missing, X, Bs1, Bt1,
+posterior_samples <- run_mcmc(y, missing, X, Bs1, Bt1,
                        q1s, q2s, iter, thin, burnin, nchain)
-MCMC_eigen <- eigenLFChains(Bs1, Bt1, MCMC, neig,
+posterior_summaries <- get_posterior_summaries(Bs1, Bt1, posterior_samples, neig,
                             iter, burnin, nchain, s, t, alpha)
 
 signLong <- rep(1,3)
-signLong[1] <- if(sum((MCMC_eigen$eigvecLongmean[,1] + m1[,1])^2) < sum((MCMC_eigen$eigvecLongmean[,1] - m1[,1])^2)) -1 else 1
-signLong[2] <- if(sum((MCMC_eigen$eigvecLongmean[,2] + m1[,2])^2) < sum((MCMC_eigen$eigvecLongmean[,2] - m1[,2])^2)) -1 else 1
-signLong[3] <- if(sum((MCMC_eigen$eigvecLongmean[,3] + m1[,3])^2) < sum((MCMC_eigen$eigvecLongmean[,3] - m1[,3])^2)) -1 else 1
+signLong[1] <- if(sum((posterior_summaries$eigvecLongmean[,1] + m1[,1])^2) < sum((posterior_summaries$eigvecLongmean[,1] - m1[,1])^2)) -1 else 1
+signLong[2] <- if(sum((posterior_summaries$eigvecLongmean[,2] + m1[,2])^2) < sum((posterior_summaries$eigvecLongmean[,2] - m1[,2])^2)) -1 else 1
+signLong[3] <- if(sum((posterior_summaries$eigvecLongmean[,3] + m1[,3])^2) < sum((posterior_summaries$eigvecLongmean[,3] - m1[,3])^2)) -1 else 1
 
 signFunc <- rep(1,3)
-signFunc[1] <- if(sum((MCMC_eigen$eigvecFuncmean[,1] + m2[,1])^2) < sum((MCMC_eigen$eigvecFuncmean[,1] - m2[,1])^2)) -1 else 1
-signFunc[2] <- if(sum((MCMC_eigen$eigvecFuncmean[,2] + m2[,2])^2) < sum((MCMC_eigen$eigvecFuncmean[,2] - m2[,2])^2)) -1 else 1
-signFunc[3] <- if(sum((MCMC_eigen$eigvecFuncmean[,3] + m2[,3])^2) < sum((MCMC_eigen$eigvecFuncmean[,3] - m2[,3])^2)) -1 else 1
+signFunc[1] <- if(sum((posterior_summaries$eigvecFuncmean[,1] + m2[,1])^2) < sum((posterior_summaries$eigvecFuncmean[,1] - m2[,1])^2)) -1 else 1
+signFunc[2] <- if(sum((posterior_summaries$eigvecFuncmean[,2] + m2[,2])^2) < sum((posterior_summaries$eigvecFuncmean[,2] - m2[,2])^2)) -1 else 1
+signFunc[3] <- if(sum((posterior_summaries$eigvecFuncmean[,3] + m2[,3])^2) < sum((posterior_summaries$eigvecFuncmean[,3] - m2[,3])^2)) -1 else 1
 
 # Evaluate
 results <- numeric(15)
-results[1] <- sum((mu - as.numeric(MCMC_eigen$postmean))^2) / sum(mu^2)
-results[2] <- all(mu < MCMC_eigen$upper & mu > MCMC_eigen$lower)
+results[1] <- sum((mu - as.numeric(posterior_summaries$postmean))^2) / sum(mu^2)
+results[2] <- all(mu < posterior_summaries$upper & mu > posterior_summaries$lower)
 
 # Eignfn in longitudinal direction
-results[3] <- sum((m1[,1] - signLong[1] * MCMC_eigen$eigvecLongmean[,1])^2)
-results[4] <- sum((m1[,2] - signLong[2] * MCMC_eigen$eigvecLongmean[,2])^2)
-results[5] <- sum((m1[,3] - signLong[3] * MCMC_eigen$eigvecLongmean[,3])^2)
+results[3] <- sum((m1[,1] - signLong[1] * posterior_summaries$eigvecLongmean[,1])^2)
+results[4] <- sum((m1[,2] - signLong[2] * posterior_summaries$eigvecLongmean[,2])^2)
+results[5] <- sum((m1[,3] - signLong[3] * posterior_summaries$eigvecLongmean[,3])^2)
 
 if(signLong[1] == -1){
-  results[6] <- all(m1[,1] > -MCMC_eigen$eigvecLongupper[,1] & m1[,1] < -MCMC_eigen$eigvecLonglower[,1])
+  results[6] <- all(m1[,1] > -posterior_summaries$eigvecLongupper[,1] & m1[,1] < -posterior_summaries$eigvecLonglower[,1])
 } else{
-  results[6] <- all(m1[,1] < MCMC_eigen$eigvecLongupper[,1] & m1[,1] > MCMC_eigen$eigvecLonglower[,1])
+  results[6] <- all(m1[,1] < posterior_summaries$eigvecLongupper[,1] & m1[,1] > posterior_summaries$eigvecLonglower[,1])
 }
 if(signLong[2] == -1){
-  results[7] <- all(m1[,2] > -MCMC_eigen$eigvecLongupper[,2] & m1[,2] < -MCMC_eigen$eigvecLonglower[,2])
+  results[7] <- all(m1[,2] > -posterior_summaries$eigvecLongupper[,2] & m1[,2] < -posterior_summaries$eigvecLonglower[,2])
 } else{
-  results[7] <- all(m1[,2] < MCMC_eigen$eigvecLongupper[,2] & m1[,2] > MCMC_eigen$eigvecLonglower[,2])
+  results[7] <- all(m1[,2] < posterior_summaries$eigvecLongupper[,2] & m1[,2] > posterior_summaries$eigvecLonglower[,2])
 }
 if(signLong[3] == -1){
-  results[8] <- all(m1[,3] > -MCMC_eigen$eigvecLongupper[,3] & m1[,3] < -MCMC_eigen$eigvecLonglower[,3])
+  results[8] <- all(m1[,3] > -posterior_summaries$eigvecLongupper[,3] & m1[,3] < -posterior_summaries$eigvecLonglower[,3])
 } else{
-  results[8] <- all(m1[,3] < MCMC_eigen$eigvecLongupper[,3] & m1[,3] > MCMC_eigen$eigvecLonglower[,3])
+  results[8] <- all(m1[,3] < posterior_summaries$eigvecLongupper[,3] & m1[,3] > posterior_summaries$eigvecLonglower[,3])
 }
 
 # Eignfn in functional direction
-results[9] <- sum((m2[,1] - signFunc[1] * MCMC_eigen$eigvecFuncmean[,1])^2)
-results[10] <- sum((m2[,2] - signFunc[2] * MCMC_eigen$eigvecFuncmean[,2])^2)
-results[11] <- sum((m2[,3] - signFunc[3] * MCMC_eigen$eigvecFuncmean[,3])^2)
+results[9] <- sum((m2[,1] - signFunc[1] * posterior_summaries$eigvecFuncmean[,1])^2)
+results[10] <- sum((m2[,2] - signFunc[2] * posterior_summaries$eigvecFuncmean[,2])^2)
+results[11] <- sum((m2[,3] - signFunc[3] * posterior_summaries$eigvecFuncmean[,3])^2)
 
 if(signFunc[1] == -1){
-  results[12] <- all(m2[,1] > -MCMC_eigen$eigvecFuncupper[,1] & m2[,1] < -MCMC_eigen$eigvecFunclower[,1])
+  results[12] <- all(m2[,1] > -posterior_summaries$eigvecFuncupper[,1] & m2[,1] < -posterior_summaries$eigvecFunclower[,1])
 } else{
-  results[12] <- all(m2[,1] < MCMC_eigen$eigvecFuncupper[,1] & m2[,1] > MCMC_eigen$eigvecFunclower[,1])
+  results[12] <- all(m2[,1] < posterior_summaries$eigvecFuncupper[,1] & m2[,1] > posterior_summaries$eigvecFunclower[,1])
 }
 if(signFunc[2] == -1){
-  results[13] <- all(m2[,2] > -MCMC_eigen$eigvecFuncupper[,2] & m2[,2] < -MCMC_eigen$eigvecFunclower[,2])
+  results[13] <- all(m2[,2] > -posterior_summaries$eigvecFuncupper[,2] & m2[,2] < -posterior_summaries$eigvecFunclower[,2])
 } else{
-  results[13] <- all(m2[,2] < MCMC_eigen$eigvecFuncupper[,2] & m2[,2] > MCMC_eigen$eigvecFunclower[,2])
+  results[13] <- all(m2[,2] < posterior_summaries$eigvecFuncupper[,2] & m2[,2] > posterior_summaries$eigvecFunclower[,2])
 }
 if(signFunc[3] == -1){
-  results[14] <- all(m2[,3] > -MCMC_eigen$eigvecFuncupper[,3] & m2[,3] < -MCMC_eigen$eigvecFunclower[,3])
+  results[14] <- all(m2[,3] > -posterior_summaries$eigvecFuncupper[,3] & m2[,3] < -posterior_summaries$eigvecFunclower[,3])
 } else{
-  results[14] <- all(m2[,3] < MCMC_eigen$eigvecFuncupper[,3] & m2[,3] > MCMC_eigen$eigvecFunclower[,3])
+  results[14] <- all(m2[,3] < posterior_summaries$eigvecFuncupper[,3] & m2[,3] > posterior_summaries$eigvecFunclower[,3])
 }
 
 # result 1: relative squared error of mean

@@ -27,10 +27,10 @@ response}
 \item{burnin}{Number of samples to use as burnin}
 }
 \value{
-A Matrix of size (iter - burnin) x number of observed time points 
+A Matrix of size (iter - burnin) x number of observed time points
 over all subjects containing log-likelihood values
 }
 \description{
 Calculates log-likelihood after obtaining draws from the joint posterior
-distribution. Use after running mcmcWeakChains.
+distribution. Use after running run_mcmc.
 }
