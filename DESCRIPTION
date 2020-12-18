@@ -1,21 +1,15 @@
 Package: LFBayes
 Type: Package
-Title: Bayesian Longitudinal Functional Data Analysis
+Title: Bayesian analysis of longitudinal and multidimensional functional data
 Version: 1.0
-Date: 2018-11-14
-Authors@R: as.person(c(
-    "John Shamshoian <jshamsho@gmail.com> [aut, cre]", 
-    "Donatello Telesca <dtelesca@gmail.com> [aut]"
-  ))
+Date: 2020-12-17
+Authors@R: c(person("John", "Shamshoian", email = "jshamsho@gmail.com",
+                    role = c("aut", "cre")),
+             person("Damla", "Senturk", role = c("aut")),
+             person("Shafali", "Jeste", role = c("aut")),
+             person("Donatello", "Telesca", role = c("aut")))
 Maintainer: John Shamshoian <jshamsho@gmail.com>
-Description: This package is used for analyzing longitudinal functional
-    data in a Bayesian fashion. Longitudinal functional data is functional
-    data repeated over longitudinal time. This package uses Gibbs sampling to draw
-    From the joint posterior and conduct inference. Inferential objects of interest
-    are smoothed 2D means and marginal eigenfunctions in both the longitudinal and
-    Functional directions. Regularization is completed through a Gamma Multiplicative
-    Process Prior on key model quantities. See our manuscript at 
-    https://arxiv.org/pdf/1909.08763.pdf for more details.
+Description: Longitudinal functional data is functional data repeated over longitudinal time. This package implements the methodology proposed  in "Bayesian analysis of longitudinal and multimdensional functional data" by Shamshoian et al. (2020). The use of a weak-separability allows for a computationally scalable algorithm and extracting interpretable marginal covariances and patterns of covariation. The methodology also yields subject-specific latent trajectories and covariate-adjusted mean functions. Simultaneous credible bands are easily available for all quantities of interest.The sampling algorithm is compiled with Rcpp for speed. Regularization is induced by the prior via the Gamma Multiplicative Process. The sampling algorithm is compiled with Cpp for speed gains. Please see the example folder for a quick guide on how to use this package.
 License: GPL (>= 2)
 Imports: Rcpp (>= 0.12.16)
 Suggests:

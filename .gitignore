@@ -3,7 +3,7 @@
 *.RData
 *.Ruserdata
 *.o
-.ipynb_checkpoints
+.ipynb_checkpoints/
 .Rproj.user
 ERP/
 fertility/

@@ -1,8 +1,8 @@
 ---
 title: "Bayesian longitudinal functional data analysis example"
-output:
-  html_document:
-    df_print: paged
+author: John Shamshoian
+date: December 17, 2020
+output: github_document
 ---
 
 This notebook runs a longitudinal-functional analysis on simulated data.
@@ -20,7 +20,7 @@ library(plotly)
 ### Control parameters
 
 set.seed(999)
-source("/Users/johnshamshoian/Documents/R_projects/LFBayes/Rfuns/Example/Simulation_funcs.R")
+source("/Users/johnshamshoian/Documents/R_projects/LFBayes/Example/Simulation_funcs.R")
 errorvar <- .025
 SS <- 20
 TT <- 20
@@ -162,7 +162,9 @@ fig <- plot_ly() %>%
   layout(scene = list(xaxis=axx,yaxis=axy,zaxis=axz,
                       aspectratio = list(x = .9, y = .8, z = 1))) %>%
   hide_colorbar()
-fig
+htmlwidgets::saveWidget(fig, "index.html")
+htmltools::tags$iframe(getwd(), "index.html")
+
 
 ```
 
