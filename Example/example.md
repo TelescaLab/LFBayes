@@ -1,180 +1,219 @@
-Bayesian longitudinal functional data analysis example
-================
-John Shamshoian
-December 17, 2020
+---
+title: "Bayesian longitudinal functional data analysis example"
+author: John Shamshoian
+date: December 17, 2020
+output: 
+  html_document:
+    keep_md: true
+---
 
 This notebook runs a longitudinal-functional analysis on simulated data.
 
-    library(tidyverse)
-    library(MASS)
-    library(Rcpp)
-    library(splines)
-    library(LFBayes)
-    library(plotly)
 
-    ### Control parameters
+```r
+library(tidyverse)
+library(MASS)
+library(Rcpp)
+library(splines)
+library(LFBayes)
+library(plotly)
+```
 
-    set.seed(999)
-    source("/Users/johnshamshoian/Documents/R_projects/LFBayes/Example/Simulation_funcs.R")
-    errorvar <- .025
-    SS <- 20
-    TT <- 20
-    t <- seq(from = 0, to = 1, length.out = TT)
-    s <- seq(from = 0, to = 1, length.out = SS)
-    n <- 60
-    tt <- list()
-    tt[[1]] <- 1:(TT*SS)
-    tt <- rep(tt, n)
-    p1 <- 12
-    p2 <- 12
-    q1 <- 3
-    q2 <- 3
-    Bt <- bs(t, df = p1, intercept = TRUE)
-    Bs <- bs(s, df = p2, intercept = TRUE)
-    Bt1 <- bs(t, df = p1, intercept = TRUE)
-    Bs1 <- bs(s, df = p2, intercept = TRUE)
 
-    ### Generate key model quantities
+```r
+### Control parameters
 
-    H <- GenerateH(q1, q2)
-    mu1 <- GenerateMu1(s,t)
-    Lambda <- Loading.Matern(t, p1, q1, Bt)
-    Gamma <- Loading.Brown.Bridge(s, p2, q2)
-    Cov <- kronecker(Bs%*%Gamma, Bt%*%Lambda)%*%H%*%
-      t(kronecker(Bs%*%Gamma, Bt%*%Lambda)) + errorvar * diag(SS * TT)
+set.seed(999)
+source("/Users/johnshamshoian/Documents/R_projects/LFBayes/Example/Simulation_funcs.R")
+errorvar <- .025
+SS <- 20
+TT <- 20
+t <- seq(from = 0, to = 1, length.out = TT)
+s <- seq(from = 0, to = 1, length.out = SS)
+n <- 60
+tt <- list()
+tt[[1]] <- 1:(TT*SS)
+tt <- rep(tt, n)
+p1 <- 12
+p2 <- 12
+q1 <- 3
+q2 <- 3
+Bt <- bs(t, df = p1, intercept = TRUE)
+Bs <- bs(s, df = p2, intercept = TRUE)
+Bt1 <- bs(t, df = p1, intercept = TRUE)
+Bs1 <- bs(s, df = p2, intercept = TRUE)
+```
 
-    ### Generate data from model
 
-    x <- mvrnorm(n, mu  = as.vector(mu1), Sigma = Cov)
-    sx <- sd(x)
-    mx <- mean(x)
-    x <- (x-mx)/sx
-    Smooth_scaled_cov <- (Cov - errorvar * diag(SS * TT)) / sx^2
-    mu <- (mu1 - mx)/sx
-    y <- lapply(1:n, function(i) x[i,])
-    missing <- list()
-    for(ii in 1:n){
-      missing[[ii]] <- numeric(0)
-    }
-    X <- cbind(rep(1, n))
+```r
+### Generate key model quantities
 
-    ### Visualize a few trajectories
+H <- GenerateH(q1, q2)
+mu1 <- GenerateMu1(s,t)
+Lambda <- Loading.Matern(t, p1, q1, Bt)
+Gamma <- Loading.Brown.Bridge(s, p2, q2)
+Cov <- kronecker(Bs%*%Gamma, Bt%*%Lambda)%*%H%*%
+  t(kronecker(Bs%*%Gamma, Bt%*%Lambda)) + errorvar * diag(SS * TT)
+```
 
-    nsub <- 6
-    small_data <- tibble(id = numeric(),
-                         func_time = numeric(),
-                         long_time = numeric(),
-                         value = numeric())
-    small_data <- small_data %>% 
-      add_row(id = rep(1:nsub, each = SS * TT),
-              func_time = rep(rep(t, SS), nsub),
-              long_time = rep(rep(s, each = TT), nsub),
-              value = c(t(x[1:nsub,])))
 
-    id.labs <- paste("Subject", 1:nsub)
-    names(id.labs) <- "1":nsub
-    small_data %>%
-      filter(long_time %in% c(s[5], s[10], s[15])) %>%
-      ggplot(aes(func_time, value)) +
-      geom_line(aes(linetype = factor(long_time))) +
-      facet_wrap(. ~ id, labeller = labeller(id = id.labs)) + 
-      theme_bw() +
-      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
-      labs(x = "Functional time", y = "Response", linetype = "Longitudinal time") +
-      scale_linetype_discrete(labels = round(c(s[5], s[10], s[15]), 2))
+```r
+### Generate data from model
 
-![](example_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+x <- mvrnorm(n, mu  = as.vector(mu1), Sigma = Cov)
+sx <- sd(x)
+mx <- mean(x)
+x <- (x-mx)/sx
+Smooth_scaled_cov <- (Cov - errorvar * diag(SS * TT)) / sx^2
+mu <- (mu1 - mx)/sx
+y <- lapply(1:n, function(i) x[i,])
+missing <- list()
+for(ii in 1:n){
+  missing[[ii]] <- numeric(0)
+}
+X <- cbind(rep(1, n))
+```
 
-    ### MCMC control parameters
 
-    iter <- 500 # Number of iterations
-    burnin <- 100 # Burnin iterations
-    thin <- 1 # Thinning for each chain
-    nchain <- 1 # Number of chains
-    q1s <- 3 # Number of latent factors for functional dimension
-    q2s <- 3 # Number of latent factors for longitudinal dimension
-    alpha <- .05 # Type 1 error
-    neig <- 3 # Number of eigenfunctions for inference
+```r
+### Visualize a few trajectories
 
-    ### Processing
+nsub <- 6
+small_data <- tibble(id = numeric(),
+                     func_time = numeric(),
+                     long_time = numeric(),
+                     value = numeric())
+small_data <- small_data %>% 
+  add_row(id = rep(1:nsub, each = SS * TT),
+          func_time = rep(rep(t, SS), nsub),
+          long_time = rep(rep(s, each = TT), nsub),
+          value = c(t(x[1:nsub,])))
 
-    MCMC <- mcmcWeakChains(y, missing, X, Bs1, Bt1,
-                           q1s, q2s, iter, thin, burnin, nchain)
-    MCMC_eigen <- eigenLFChains(Bs1, Bt1, MCMC, neig,
-                                iter, burnin, nchain, s, t, alpha)
+id.labs <- paste("Subject", 1:nsub)
+names(id.labs) <- "1":nsub
+small_data %>%
+  filter(long_time %in% c(s[5], s[10], s[15])) %>%
+  ggplot(aes(func_time, value)) +
+  geom_line(aes(linetype = factor(long_time))) +
+  facet_wrap(. ~ id, labeller = labeller(id = id.labs)) + 
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  labs(x = "Functional time", y = "Response", linetype = "Longitudinal time") +
+  scale_linetype_discrete(labels = round(c(s[5], s[10], s[15]), 2))
+```
 
-    ### Prepare data for plotting
-    postmean <- matrix(MCMC_eigen$postmean, nrow = TT, ncol = SS)
-    fig <- plot_ly(z = ~postmean, x = s, y = t) %>% add_surface()
-    eigenfunction_tibble <- tibble(time = numeric(), type = character(),
-                                   value = numeric(), bound = character(),
-                                   number = numeric())
-    eigenfunction_tibble <- eigenfunction_tibble %>%
-      add_row(value = c(MCMC_eigen$eigvecFuncmean,
-                        MCMC_eigen$eigvecFunclower,
-                        MCMC_eigen$eigvecFuncupper),
-              number = rep(rep(1:neig, each = TT), 3),
-              bound = rep(c("mean", "lower", "upper"), each = neig * TT),
-              type = "Functional",
-              time = rep(t, 3 * neig)) %>%
-      add_row(value = c(MCMC_eigen$eigvecLongmean,
-                        MCMC_eigen$eigvecLonglower,
-                        MCMC_eigen$eigvecLongupper),
-              number = rep(rep(1:neig, each = SS), 3),
-              bound = rep(c("mean", "lower", "upper"), each = neig * SS),
-              type = "Longitudinal",
-              time = rep(s, 3 * neig))
+![](example_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
-    ### Plot mean surface
+```r
+### MCMC control parameters
 
-    axx <- list(
-      title = "Longitudinal time"
-    )
+iter <- 500 # Number of iterations
+burnin <- 100 # Burnin iterations
+thin <- 1 # Thinning for each chain
+nchain <- 1 # Number of chains
+q1s <- 3 # Number of latent factors for functional dimension
+q2s <- 3 # Number of latent factors for longitudinal dimension
+alpha <- .05 # Type 1 error
+neig <- 3 # Number of eigenfunctions for inference
+```
 
-    axy <- list(
-      title = "Functional time"
-    )
 
-    axz <- list(
-      title = "Posterior mean"
-    )
+```r
+### Processing
 
-    fig <- plot_ly() %>%
-      add_surface(z = ~postmean, x = s, y = t) %>%
-      layout(scene = list(xaxis=axx,yaxis=axy,zaxis=axz,
-                          aspectratio = list(x = .9, y = .8, z = 1))) %>%
-      hide_colorbar()
-    htmlwidgets::saveWidget(fig, "index.html")
-    htmltools::tags$iframe(getwd(), "index.html")
+MCMC <- mcmcWeakChains(y, missing, X, Bs1, Bt1,
+                       q1s, q2s, iter, thin, burnin, nchain)
+MCMC_eigen <- eigenLFChains(Bs1, Bt1, MCMC, neig,
+                            iter, burnin, nchain, s, t, alpha)
+```
 
-<!--html_preserve-->
-<iframe>
-/Users/johnshamshoian/Documents/R\_projects/LFBayes/Example index.html
-</iframe>
-<!--/html_preserve-->
 
-    ### Plot eigenfunctions
+```r
+### Prepare data for plotting
+postmean <- matrix(MCMC_eigen$postmean, nrow = TT, ncol = SS)
+fig <- plot_ly(z = ~postmean, x = s, y = t) %>% add_surface()
+eigenfunction_tibble <- tibble(time = numeric(), type = character(),
+                               value = numeric(), bound = character(),
+                               number = numeric())
+eigenfunction_tibble <- eigenfunction_tibble %>%
+  add_row(value = c(MCMC_eigen$eigvecFuncmean,
+                    MCMC_eigen$eigvecFunclower,
+                    MCMC_eigen$eigvecFuncupper),
+          number = rep(rep(1:neig, each = TT), 3),
+          bound = rep(c("mean", "lower", "upper"), each = neig * TT),
+          type = "Functional",
+          time = rep(t, 3 * neig)) %>%
+  add_row(value = c(MCMC_eigen$eigvecLongmean,
+                    MCMC_eigen$eigvecLonglower,
+                    MCMC_eigen$eigvecLongupper),
+          number = rep(rep(1:neig, each = SS), 3),
+          bound = rep(c("mean", "lower", "upper"), each = neig * SS),
+          type = "Longitudinal",
+          time = rep(s, 3 * neig))
+```
 
-    options(repr.plot.width=6, repr.plot.height=3)
-    number.labs <- paste("Eigenfunction", 1:neig)
-    names(number.labs) <- c("1":neig)
-    eigenfunction_tibble %>%
-      ggplot(aes(time, value)) +
-      geom_line(aes(linetype = bound)) +
-      facet_grid(type ~ number, labeller = labeller(number = number.labs)) +
-      scale_linetype_manual(values=c("dashed", "solid", "dashed"))+
-      theme_bw() +
-      theme(legend.position = "none",
-            axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
-![](example_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+```r
+### Plot mean surface
 
-    ### Percent variability explained by first few eigenfunctions in functional direction
-    100 * rowMeans(MCMC_eigen$eigvalFunc)[p1:(p1-neig+1)]
+axx <- list(
+  title = "Longitudinal time"
+)
 
-    ## [1] 63.379161 24.612260  7.079978
+axy <- list(
+  title = "Functional time"
+)
 
-    ### Percent variability explained by first few eigenfunctions in longitudinal direction
-    100 * rowMeans(MCMC_eigen$eigvalLong)[p2:(p2-neig+1)]
+axz <- list(
+  title = "Posterior mean"
+)
 
-    ## [1] 78.402375 14.563600  2.790165
+fig <- plot_ly() %>%
+  add_surface(z = ~postmean, x = s, y = t) %>%
+  layout(scene = list(xaxis=axx,yaxis=axy,zaxis=axz,
+                      aspectratio = list(x = .9, y = .8, z = 1))) %>%
+  hide_colorbar()
+fig
+```
+
+<!--html_preserve--><div id="htmlwidget-5e25a9a6b28ef9af7add" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5e25a9a6b28ef9af7add">{"x":{"visdat":{"976dad20c4b":["function () ","plotlyVisDat"]},"cur_data":"976dad20c4b","attrs":{"976dad20c4b":{"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"z":{},"type":"surface","x":[0,0.0526315789473684,0.105263157894737,0.157894736842105,0.210526315789474,0.263157894736842,0.315789473684211,0.368421052631579,0.421052631578947,0.473684210526316,0.526315789473684,0.578947368421053,0.631578947368421,0.684210526315789,0.736842105263158,0.789473684210526,0.842105263157895,0.894736842105263,0.947368421052632,1],"y":[0,0.0526315789473684,0.105263157894737,0.157894736842105,0.210526315789474,0.263157894736842,0.315789473684211,0.368421052631579,0.421052631578947,0.473684210526316,0.526315789473684,0.578947368421053,0.631578947368421,0.684210526315789,0.736842105263158,0.789473684210526,0.842105263157895,0.894736842105263,0.947368421052632,1],"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"scene":{"xaxis":{"title":"Longitudinal time"},"yaxis":{"title":"Functional time"},"zaxis":{"title":"Posterior mean"},"aspectratio":{"x":0.9,"y":0.8,"z":1}},"hovermode":"closest","showlegend":false,"legend":{"yanchor":"top","y":0.5}},"source":"A","config":{"showSendToCloud":false},"data":[{"colorbar":{"title":"postmean","ticklen":2,"len":0.5,"lenmode":"fraction","y":1,"yanchor":"top"},"colorscale":[["0","rgba(68,1,84,1)"],["0.0416666666666667","rgba(70,19,97,1)"],["0.0833333333333333","rgba(72,32,111,1)"],["0.125","rgba(71,45,122,1)"],["0.166666666666667","rgba(68,58,128,1)"],["0.208333333333333","rgba(64,70,135,1)"],["0.25","rgba(60,82,138,1)"],["0.291666666666667","rgba(56,93,140,1)"],["0.333333333333333","rgba(49,104,142,1)"],["0.375","rgba(46,114,142,1)"],["0.416666666666667","rgba(42,123,142,1)"],["0.458333333333333","rgba(38,133,141,1)"],["0.5","rgba(37,144,140,1)"],["0.541666666666667","rgba(33,154,138,1)"],["0.583333333333333","rgba(39,164,133,1)"],["0.625","rgba(47,174,127,1)"],["0.666666666666667","rgba(53,183,121,1)"],["0.708333333333333","rgba(79,191,110,1)"],["0.75","rgba(98,199,98,1)"],["0.791666666666667","rgba(119,207,85,1)"],["0.833333333333333","rgba(147,214,70,1)"],["0.875","rgba(172,220,52,1)"],["0.916666666666667","rgba(199,225,42,1)"],["0.958333333333333","rgba(226,228,40,1)"],["1","rgba(253,231,37,1)"]],"showscale":false,"z":[[-0.139134533850901,-0.134438773422694,-0.123196878307528,-0.115530939213214,-0.109013863713912,-0.0977707930725448,-0.0831881956928658,-0.0699314756202623,-0.0605265373727263,-0.0560145285975185,-0.055785691640321,-0.0578649985063035,-0.0615236175484445,-0.0675111810182845,-0.0757042413027261,-0.0845024364587394,-0.0930528049720716,-0.102335875029816,-0.112372746528671,-0.119760189322387],[0.0907647132501361,0.106364802474382,0.117445404613824,0.130436082226388,0.144870228506103,0.158081894337946,0.168975729918919,0.177199554915574,0.182324973048553,0.183886899256488,0.181696975447549,0.175814235112439,0.166526366656847,0.1543845580757,0.140452426997805,0.126560806968025,0.113792479552897,0.101522436015319,0.0890834062711245,0.0763051852013285],[0.313489897005933,0.339255534538644,0.349837911756657,0.367632241324717,0.389372172410429,0.404143564788766,0.411135465702508,0.41417032853904,0.414905564290629,0.413519854993792,0.409041481935847,0.399582284356612,0.384987395868474,0.367142643035941,0.348027674399131,0.329587093345479,0.313073665169927,0.298294024018834,0.2839721275096,0.266241073512344],[0.495404675598026,0.530170244861729,0.540861907028028,0.563040366149061,0.591187611997121,0.607645284786263,0.611739225917151,0.610573429026826,0.607489049592775,0.603241122287207,0.596276789189038,0.583182579716495,0.563518976946606,0.540351881127423,0.516490990289922,0.494041910658439,0.474454790732377,0.457929739764376,0.4426236603444,0.421268241152428],[0.635656484449186,0.677860892817148,0.689021640816512,0.714921432048263,0.748329680085016,0.766386988289667,0.768459663120462,0.764092436934099,0.757905699237951,0.751126349326197,0.741797744450595,0.72538840625965,0.701294103863981,0.673541136024861,0.645635540133627,0.619872695653166,0.597904112912762,0.580246175875032,0.564562369456083,0.540719958076446],[0.741775444585013,0.789467038686728,0.800900332969943,0.829522049994186,0.866802200970735,0.885964780468363,0.886418252918195,0.879562054603866,0.87099044012344,0.862291735928183,0.851203224586626,0.832342572913321,0.804972613044378,0.77383436377484,0.742954560521366,0.714775236538373,0.691098928569848,0.672669110743462,0.656769555918179,0.63111457149486],[0.797363709157101,0.848152740319434,0.859945615754567,0.890163954541985,0.929615670992006,0.949503211928196,0.94921772430495,0.941062887952649,0.931136535621866,0.92124855446406,0.908999347550018,0.888576526935323,0.859199604145872,0.826022912878319,0.793383394971174,0.763833939130795,0.739283586118212,0.720608788375673,0.704855898299361,0.678426623509301],[0.776806712240249,0.827870939144868,0.840734394975922,0.871395765300342,0.910997709563444,0.931560018010682,0.932271699308324,0.924784035875561,0.914960245349437,0.904653554163777,0.891628640842523,0.870334732448245,0.840154572333514,0.806288643813711,0.773143338387214,0.743387099729334,0.719022240103155,0.70096330479921,0.686183916768424,0.66071422129706],[0.679986693727425,0.728399948824903,0.742969957662736,0.772859062074622,0.810534759067277,0.831671034606419,0.83508093354264,0.830222438647854,0.821984639077033,0.812074042554779,0.798717963351044,0.777323752927196,0.747638555760897,0.714524366558792,0.682200100391759,0.65344139586055,0.63032470248159,0.613716331627974,0.600696021861572,0.577888406401398],[0.523216635729783,0.566174005428242,0.582568986635366,0.610393594962864,0.644188379559868,0.665506525549957,0.672708750447146,0.671933604252636,0.666527362323337,0.657866655810715,0.644850667766652,0.624374333128151,0.596667083199424,0.565883978194437,0.535794514453566,0.509226775527297,0.488282870308231,0.473708425925696,0.462875339124975,0.443941108021825],[0.321932472854045,0.356989214492929,0.3749825060219,0.399494012690776,0.427672915746298,0.448591826248787,0.460149448902715,0.464399537073901,0.46274440267875,0.456083255653086,0.444121817191865,0.425607518365851,0.401308552139375,0.374365398309124,0.347868531593507,0.324621410399025,0.306685548191974,0.294615030999045,0.286237288669258,0.272081580540719],[0.0904862582734998,0.115765970064311,0.134951466312104,0.155057151586063,0.176193992699564,0.196045706017051,0.212076695828828,0.22179502541068,0.224418086064144,0.220279563352716,0.209966539407534,0.194286160834624,0.174561402384143,0.152708792137341,0.130974687190584,0.112060973645933,0.097915905798228,0.0888226385610259,0.0831790749032357,0.0745626741553376],[-0.159455443856596,-0.145115498797554,-0.12501704839102,-0.110018080843751,-0.0968287622179664,-0.0784890233023129,-0.0579464364349774,-0.0425117009342807,-0.0352942070384289,-0.0365767093040042,-0.0448491722388657,-0.0571281795651254,-0.0715325987538892,-0.087499703385239,-0.103727183243211,-0.117656786869089,-0.127501451086257,-0.133319503791147,-0.136077248298911,-0.138684623822135],[-0.419119435233799,-0.416008377989278,-0.394809510776819,-0.384961375662223,-0.379864402870942,-0.362910274085953,-0.337488644332922,-0.315942031778653,-0.303817462401682,-0.302054033936802,-0.308181215489114,-0.316938452168692,-0.325865278248675,-0.335825529513892,-0.346496073048174,-0.355431078816099,-0.360992965964311,-0.363622669288567,-0.363635340384609,-0.36023132872135],[-0.669501843612374,-0.677044118801218,-0.654570442854319,-0.649474895087116,-0.651958823996428,-0.636091462018328,-0.605708125226259,-0.578040431139131,-0.561016365756286,-0.556232306486166,-0.560285830987074,-0.565689804213477,-0.569420323959086,-0.573742598728718,-0.579277272345407,-0.583643350507037,-0.585321305195741,-0.585139368114744,-0.582793499596519,-0.573871789096972],[-0.875589643089807,-0.892374383724035,-0.869234932559405,-0.868406464759997,-0.877487037826349,-0.862881393405082,-0.828721660342219,-0.796163078704591,-0.77507396588196,-0.767624473150149,-0.769673291124262,-0.771924544094483,-0.770931130686481,-0.770171532032632,-0.771095446517993,-0.771414050296945,-0.769739456797448,-0.767246426813648,-0.76308681418385,-0.749664516478653],[-1.0193599067632,-1.04341493697848,-1.02052111662817,-1.02334231640177,-1.03770752953769,-1.02469486071268,-0.988528965081808,-0.952933657873495,-0.929080335670186,-0.91956623280535,-0.919778829170066,-0.919218849613029,-0.914208153602915,-0.90914208091155,-0.90612636905608,-0.903024706324593,-0.89861067143101,-0.894329429493031,-0.888896469676707,-0.872206579492656],[-1.12130528843531,-1.1506665553185,-1.12808455601951,-1.13364852519578,-1.15192980676343,-1.14021541737541,-1.10278887302437,-1.06519050728402,-1.03949278804384,-1.02856297736705,-1.02745382907524,-1.02483958089929,-1.01688755079736,-1.00863145023055,-1.00264745439099,-0.996940762130779,-0.990420452623881,-0.984713440340488,-0.978218034066168,-0.959059731470158],[-1.18597965516615,-1.2186075930203,-1.19615962529285,-1.20342285389772,-1.22415264671584,-1.21321677142027,-1.17496793765339,-1.13614745261369,-1.10938731508263,-1.09767676980411,-1.09584256884405,-1.09205143795993,-1.08236146373214,-1.0721670232182,-1.06432315924512,-1.05694640880626,-1.04904024772173,-1.04232038957854,-1.03498586167961,-1.01413613755532],[-1.15813082976526,-1.19146347487697,-1.17087316013248,-1.17915240836486,-1.20054390434562,-1.19107837602556,-1.15478589104075,-1.11742814548884,-1.09125634218048,-1.07927927836806,-1.07655080065866,-1.07163231373071,-1.06079052607115,-1.0494084971169,-1.04042507883397,-1.03220669701923,-1.02393801575068,-1.01734172411201,-1.01050524998327,-0.990138451276444]],"type":"surface","x":[0,0.0526315789473684,0.105263157894737,0.157894736842105,0.210526315789474,0.263157894736842,0.315789473684211,0.368421052631579,0.421052631578947,0.473684210526316,0.526315789473684,0.578947368421053,0.631578947368421,0.684210526315789,0.736842105263158,0.789473684210526,0.842105263157895,0.894736842105263,0.947368421052632,1],"y":[0,0.0526315789473684,0.105263157894737,0.157894736842105,0.210526315789474,0.263157894736842,0.315789473684211,0.368421052631579,0.421052631578947,0.473684210526316,0.526315789473684,0.578947368421053,0.631578947368421,0.684210526315789,0.736842105263158,0.789473684210526,0.842105263157895,0.894736842105263,0.947368421052632,1],"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script><!--/html_preserve-->
+
+
+```r
+### Plot eigenfunctions
+
+options(repr.plot.width=6, repr.plot.height=3)
+number.labs <- paste("Eigenfunction", 1:neig)
+names(number.labs) <- c("1":neig)
+eigenfunction_tibble %>%
+  ggplot(aes(time, value)) +
+  geom_line(aes(linetype = bound)) +
+  facet_grid(type ~ number, labeller = labeller(number = number.labs)) +
+  scale_linetype_manual(values=c("dashed", "solid", "dashed"))+
+  theme_bw() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+![](example_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+
+
+```r
+### Percent variability explained by first few eigenfunctions in functional direction
+100 * rowMeans(MCMC_eigen$eigvalFunc)[p1:(p1-neig+1)]
+```
+
+```
+## [1] 63.379161 24.612260  7.079978
+```
+
+
+```r
+### Percent variability explained by first few eigenfunctions in longitudinal direction
+100 * rowMeans(MCMC_eigen$eigvalLong)[p2:(p2-neig+1)]
+```
+
+```
+## [1] 78.402375 14.563600  2.790165
+```

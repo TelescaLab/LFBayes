@@ -2,7 +2,9 @@
 title: "Bayesian longitudinal functional data analysis example"
 author: John Shamshoian
 date: December 17, 2020
-output: github_document
+output: 
+  html_document:
+    keep_md: true
 ---
 
 This notebook runs a longitudinal-functional analysis on simulated data.
@@ -162,10 +164,7 @@ fig <- plot_ly() %>%
   layout(scene = list(xaxis=axx,yaxis=axy,zaxis=axz,
                       aspectratio = list(x = .9, y = .8, z = 1))) %>%
   hide_colorbar()
-htmlwidgets::saveWidget(fig, "index.html")
-htmltools::tags$iframe(getwd(), "index.html")
-
-
+fig
 ```
 
 ```{r}
